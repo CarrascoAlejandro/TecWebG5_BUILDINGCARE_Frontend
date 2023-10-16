@@ -1,23 +1,14 @@
 <template>
   <div id="app">
-    <LoginSignUp/>
-    <NavigationBar/>
+    <router-view></router-view>
+    <!-- <LoginSignUp/> -->
   </div>
 </template>
 
 <script>
-import LoginSignUp from './components/LoginSignUp.vue'
-import NavigationBar from './components/NavigationBar.vue'
-
 export default {
-  name: 'App',
-  components: {
-    LoginSignUp,
-    NavigationBar
-  }
-}
+  name: "App",
+};
 </script>
 
-<style lang="scss">
-
-</style>
+<style lang="scss"></style>
