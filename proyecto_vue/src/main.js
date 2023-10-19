@@ -4,6 +4,7 @@ import { createRouter, createWebHistory } from "vue-router";
 /**Pages */
 import App from "./App.vue";
 import login from "./components/LoginSignUp.vue";
+import BlogView from "./components/BlogView.vue";
 
 /**end pages */
 
@@ -17,6 +18,11 @@ const routes = [
     path: "/login",
     component: login,
   },
+  {
+    name: "blog",
+    path: "/blog",
+    component: BlogView,
+  },
 ];
 
 const router = createRouter({
@@ -24,7 +30,6 @@ const router = createRouter({
   routes,
 });
 
-// Crea la aplicación y úsala con el router y Pinia
 const app = createApp(App);
 app.use(router);
 
