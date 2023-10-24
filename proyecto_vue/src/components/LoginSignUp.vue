@@ -140,7 +140,7 @@ export default {
           } else if (data.data) {
             localStorage.setItem("userID", JSON.stringify(data.data));
             alert("Ingreso exitoso");
-            this.$router.push("/blog");
+            this.$router.push("/propertyView");
           } else if (data.errorMessage) {
             alert(data.errorMessage);
           }

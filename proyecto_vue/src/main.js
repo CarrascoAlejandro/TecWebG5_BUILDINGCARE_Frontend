@@ -5,6 +5,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import App from "./App.vue";
 import login from "./components/LoginSignUp.vue";
 import BlogView from "./components/BlogView.vue";
+import PropertiesView from "./components/PropertiesView.vue";
 
 /**end pages */
 
@@ -20,8 +21,13 @@ const routes = [
   },
   {
     name: "blog",
-    path: "/blog",
+    path: "/blogView",
     component: BlogView,
+  },
+  {
+    name: "property",
+    path: "/propertyView",
+    component: PropertiesView,
   },
 ];
 
