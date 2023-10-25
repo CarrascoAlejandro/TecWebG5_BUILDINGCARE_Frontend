@@ -208,7 +208,7 @@
       },
       editPostId(id){
         this.idEdit = id;
-        openFormEdit();
+        this.openFormEdit();
       },
       deletePostId(id){
         this.idDelete = id;
