@@ -29,12 +29,12 @@
           :key="index"
           class="announcement-post"
         >
-          <div class="post-title">{{ post.title }}</div>
+          <div class="post-title">{{ post.postTitle }}</div>
           <div class="post-content">
             <div class="post-image">
-              <img :src="post.image" alt="post image" />
+              <img :src="'../assets/images/living1.jpg'" alt="post image" />
             </div>
-            <div class="post-description">{{ post.description }}</div>
+            <div class="post-description">{{ post.postContent }}</div>
           </div>
         </div>
       </div>
@@ -130,30 +130,41 @@
         title: "",
         description: "",
         type: 2,
-        posts: [
-          {
-            title: "Living 1",
-            image: require("@/assets/images/living1.jpg"),
-            description:
-              "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi tincidunt risus eu porttitor volutpat. Phasellus justo justo, tristique eget elit vel, sodales posuere purus. Fusce id massa ac lorem maximus auctor non eu ante. In sapien leo, scelerisque non venenatis at, ullamcorper eu mauris. Proin id velit vel ipsum commodo hendrerit. Donec eleifend augue ut mi hendrerit, in feugiat lectus tincidunt. Suspendisse quis odio in arcu finibus consectetur sed a dolor. Suspendisse mattis velit in condimentum dictum. Aenean non magna sem.",
-          },
-          {
-            title: "Living 2",
-            image: require("@/assets/images/living2.jpg"),
-            description:
-              "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi tincidunt risus eu porttitor volutpat. Phasellus justo justo, tristique eget elit vel, sodales posuere purus. Fusce id massa ac lorem maximus auctor non eu ante. In sapien leo, scelerisque non venenatis at, ullamcorper eu mauris. Proin id velit vel ipsum commodo hendrerit. Donec eleifend augue ut mi hendrerit, in feugiat lectus tincidunt. Suspendisse quis odio in arcu finibus consectetur sed a dolor. Suspendisse mattis velit in condimentum dictum. Aenean non magna sem.",
-          },
-          {
-            title: "Living 3",
-            image: require("@/assets/images/living3.jpg"),
-            description:
-              "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi tincidunt risus eu porttitor volutpat. Phasellus justo justo, tristique eget elit vel, sodales posuere purus. Fusce id massa ac lorem maximus auctor non eu ante. In sapien leo, scelerisque non venenatis at, ullamcorper eu mauris. Proin id velit vel ipsum commodo hendrerit. Donec eleifend augue ut mi hendrerit, in feugiat lectus tincidunt. Suspendisse quis odio in arcu finibus consectetur sed a dolor. Suspendisse mattis velit in condimentum dictum. Aenean non magna sem.",
-          },
-        ],
+        posts: [],
+        // posts: [
+        //   {
+        //     title: "Living 1",
+        //     image: require("@/assets/images/living1.jpg"),
+        //     description:
+        //       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi tincidunt risus eu porttitor volutpat. Phasellus justo justo, tristique eget elit vel, sodales posuere purus. Fusce id massa ac lorem maximus auctor non eu ante. In sapien leo, scelerisque non venenatis at, ullamcorper eu mauris. Proin id velit vel ipsum commodo hendrerit. Donec eleifend augue ut mi hendrerit, in feugiat lectus tincidunt. Suspendisse quis odio in arcu finibus consectetur sed a dolor. Suspendisse mattis velit in condimentum dictum. Aenean non magna sem.",
+        //   },
+        //   {
+        //     title: "Living 2",
+        //     image: require("@/assets/images/living2.jpg"),
+        //     description:
+        //       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi tincidunt risus eu porttitor volutpat. Phasellus justo justo, tristique eget elit vel, sodales posuere purus. Fusce id massa ac lorem maximus auctor non eu ante. In sapien leo, scelerisque non venenatis at, ullamcorper eu mauris. Proin id velit vel ipsum commodo hendrerit. Donec eleifend augue ut mi hendrerit, in feugiat lectus tincidunt. Suspendisse quis odio in arcu finibus consectetur sed a dolor. Suspendisse mattis velit in condimentum dictum. Aenean non magna sem.",
+        //   },
+        //   {
+        //     title: "Living 3",
+        //     image: require("@/assets/images/living3.jpg"),
+        //     description:
+        //       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi tincidunt risus eu porttitor volutpat. Phasellus justo justo, tristique eget elit vel, sodales posuere purus. Fusce id massa ac lorem maximus auctor non eu ante. In sapien leo, scelerisque non venenatis at, ullamcorper eu mauris. Proin id velit vel ipsum commodo hendrerit. Donec eleifend augue ut mi hendrerit, in feugiat lectus tincidunt. Suspendisse quis odio in arcu finibus consectetur sed a dolor. Suspendisse mattis velit in condimentum dictum. Aenean non magna sem.",
+        //   },
+        // ],
       };
     },
     created(){
         this.postService = new PostService();
+    },
+    mounted(){
+      try{
+        this.postService.getPosts().then((data) => {
+                    this.posts = data.data;
+                    console.log(this.posts);
+                });
+      }catch(e){
+        console.log("error " + e);
+      }
     },
     methods: {
       newPost(){
