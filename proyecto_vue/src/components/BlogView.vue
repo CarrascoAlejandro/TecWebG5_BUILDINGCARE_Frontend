@@ -36,12 +36,14 @@
             </div>
             <div class="post-description">{{ post.postContent }}</div>
           </div>
+          <button @click="editPostId(post.id)">Editar</button>
+          <button @click="deletePostId(post.id)">Borrar</button>
         </div>
       </div>
     </div>
     <div id="propertyForm" >
       <h1>Nuevo post</h1>
-      <form @submit.prevent="newPost()">
+      <form @submit.prevent="editPost()">
         <input
           v-model="title"
           placeholder="Título"
@@ -71,40 +73,21 @@
     </div>
     <div id="editProperty" style="display: none">
       <h1>Editar Propiedad</h1>
-      <form @submit.prevent="updateProperty">
-        <input type="hidden" id="propertyIdEdit" />
-        <input type="hidden" id="editingPropertyId" />
+      <form @submit.prevent="updatePost">
         <input
-          v-model="environments"
-          placeholder="Cantidad de ambientes:"
-          type="number"
-          required
-        />
-        <input
-          v-model="dimensions"
-          placeholder="Dimensiones"
-          type="number"
-          step="any"
-          required
-        />
-        <input
-          v-model="value"
-          placeholder="Valor"
-          type="number"
-          step="any"
-          required
-        />
-        <input
-          v-model="description"
-          placeholder="Descripcion"
+          v-model="titleEdit"
+          placeholder="Título"
           type="text"
           required
         />
-        <input type="file" @change="handleImageUpload" accept="image/*" />
-        <select v-model="type" required>
-          <option value="0" selected>Seleccione un tipo</option>
-          <option value="1">Garzonier</option>
-          <option value="2">Departamento</option>
+        <textarea v-model="descriptionEdit" rows="4" cols="50" required>
+          Escriba el contenido del post aqui...
+        </textarea>
+        
+        <select v-model="typeEdit" required>
+          <option value="2" selected>Anuncio</option>
+          <!-- <option value="1">Garzonier</option>
+          <option value="2">Departamento</option> -->
         </select>
         <div class="form-buttons">
           <input class="submitBtn" type="submit" value="Guardar" />
@@ -130,24 +113,29 @@
         title: "",
         description: "",
         type: 2,
+        titleEdit: "",
+        descriptionEdit: "",
+        typeEdit: 2,
+        idEdit: 1,
+        idDelete: 1,
         posts: [],
         // posts: [
         //   {
-        //     title: "Living 1",
+        //     postTitle: "Living 1",
         //     image: require("@/assets/images/living1.jpg"),
-        //     description:
+        //     postContent:
         //       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi tincidunt risus eu porttitor volutpat. Phasellus justo justo, tristique eget elit vel, sodales posuere purus. Fusce id massa ac lorem maximus auctor non eu ante. In sapien leo, scelerisque non venenatis at, ullamcorper eu mauris. Proin id velit vel ipsum commodo hendrerit. Donec eleifend augue ut mi hendrerit, in feugiat lectus tincidunt. Suspendisse quis odio in arcu finibus consectetur sed a dolor. Suspendisse mattis velit in condimentum dictum. Aenean non magna sem.",
         //   },
         //   {
-        //     title: "Living 2",
+        //     postTitle: "Living 2",
         //     image: require("@/assets/images/living2.jpg"),
-        //     description:
+        //     postContent:
         //       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi tincidunt risus eu porttitor volutpat. Phasellus justo justo, tristique eget elit vel, sodales posuere purus. Fusce id massa ac lorem maximus auctor non eu ante. In sapien leo, scelerisque non venenatis at, ullamcorper eu mauris. Proin id velit vel ipsum commodo hendrerit. Donec eleifend augue ut mi hendrerit, in feugiat lectus tincidunt. Suspendisse quis odio in arcu finibus consectetur sed a dolor. Suspendisse mattis velit in condimentum dictum. Aenean non magna sem.",
         //   },
         //   {
-        //     title: "Living 3",
+        //     postTitle: "Living 3",
         //     image: require("@/assets/images/living3.jpg"),
-        //     description:
+        //     postContent:
         //       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi tincidunt risus eu porttitor volutpat. Phasellus justo justo, tristique eget elit vel, sodales posuere purus. Fusce id massa ac lorem maximus auctor non eu ante. In sapien leo, scelerisque non venenatis at, ullamcorper eu mauris. Proin id velit vel ipsum commodo hendrerit. Donec eleifend augue ut mi hendrerit, in feugiat lectus tincidunt. Suspendisse quis odio in arcu finibus consectetur sed a dolor. Suspendisse mattis velit in condimentum dictum. Aenean non magna sem.",
         //   },
         // ],
@@ -168,20 +156,63 @@
     },
     methods: {
       newPost(){
-        this.postService.newPost(this.title, this.description, this.type).then((data) => {
+        
+        this.postService.updatePostById(this.titleEdit, this.descriptionEdit, this.type).then((data) => {
           console.log("codigo de respuesta http: "+ data.responseCode);
           if(data.responseCode == "POST-0001"){
                     //se insertó correctamente el post :D
                     console.log('se creó el post correctamente :D');
                     Swal.fire(
                         '¡Creado!',
-                        'La etiqueta ha sido creada.',
+                        'La publicación ha sido creada.',
                         'success'
                     )
                 }else{
                     console.log('no se pudo crear el post :(');
                 }
         });
+      },
+      updatePost(){
+        const stateEdit = "Activo";
+        const idPostRequest = null; 
+        this.postService.newPost(this.title, this.description, stateEdit, this.typeEdit, idPostRequest, this.idEdit).then((data) => {
+          console.log("codigo de respuesta http: "+ data.responseCode);
+          if(data.responseCode == "POST-0002"){
+                    //se insertó correctamente el post :D
+                    console.log('se actualizó el post correctamente :D');
+                    Swal.fire(
+                        '¡Actualizado!',
+                        'La publicación ha sido editada.',
+                        'success'
+                    )
+                }else{
+                    console.log('no se pudo actualizar el post :(');
+                }
+        });
+      },
+      deletePost(){
+        this.postService.deletePostById(this.idDelete).then((data) => {
+          console.log("codigo de respuesta http: "+ data.responseCode);
+          if(data.responseCode == "POST-0003"){
+                    //se insertó correctamente el post :D
+                    console.log('se eliminó el post correctamente :D');
+                    Swal.fire(
+                        '¡Eliminado!',
+                        'La publicación ha sido eliminada.',
+                        'success'
+                    )
+                }else{
+                    console.log('no se pudo actualizar el post :(');
+                }
+        });
+      },
+      editPostId(id){
+        this.idEdit = id;
+        openFormEdit();
+      },
+      deletePostId(id){
+        this.idDelete = id;
+        this.deletePost();
       },
       openForm() {
         document.getElementById("propertyForm").style.display = "block";
