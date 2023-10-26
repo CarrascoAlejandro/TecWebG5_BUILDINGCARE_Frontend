@@ -30,14 +30,12 @@
             <th>Descripcion</th>
             <th>Imagenes</th>
             <th>Tipo</th>
+            <th>Seccion</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="property in filteredProperties"
-            :key="property.propertyIdSection"
-          >
+          <tr v-for="property in filteredProperties" :key="property.propertyId">
             <td>{{ property.propertyEnvironments }}</td>
             <td>{{ property.propertyDimensions }}</td>
             <td>{{ property.propertyValue }}</td>
@@ -46,6 +44,7 @@
               <img :src="property.propertyImage" alt="Imagen de la propiedad" />
             </td>
             <td class="propertyType">{{ property.propertyType }}</td>
+            <td class="propertySection">{{ property.propertySection }}</td>
             <td>
               <button @click="editProperty(property)">Editar</button>
               <button @click="deleteProperty(property)">Borrar</button>
@@ -107,33 +106,33 @@
         <input type="hidden" id="propertyIdEdit" />
         <input type="hidden" id="editingPropertyId" />
         <input
-          v-model="environments"
+          v-model="environmentsEdit"
           placeholder="Cantidad de ambientes:"
           type="number"
           required
         />
         <input
-          v-model="dimensions"
+          v-model="dimensionsEdit"
           placeholder="Dimensiones"
           type="number"
           step="any"
           required
         />
         <input
-          v-model="value"
+          v-model="valueEdit"
           placeholder="Valor"
           type="number"
           step="any"
           required
         />
         <input
-          v-model="description"
+          v-model="descriptionEdit"
           placeholder="Descripcion"
           type="text"
           required
         />
-        <input type="file" @change="handleImageUpload" accept="image/*" />
-        <select v-model="type" required>
+        <input type="file" @change="handleImageUploadEdit" accept="image/*" />
+        <select v-model="typeEdit" required>
           <option value="0" selected>Seleccione un tipo</option>
           <option value="1">Garzonier</option>
           <option value="2">Departamento</option>
@@ -158,19 +157,23 @@ export default {
   data() {
     return {
       properties: [],
+      propertyId: null,
       environments: "",
       dimensions: "",
       value: "",
       description: "",
       image: "",
       type: "0",
-      editingPropertyId: null,
+      section: "0",
+      //Edicion
+      //editingPropertyId: null,
       environmentsEdit: "",
       dimensionsEdit: "",
       valueEdit: "",
       descriptionEdit: "",
       imageEdit: "",
       typeEdit: "0",
+      //Filtros
       filter: "all",
       searchText: "",
       activeNavItem: "Propiedades",
@@ -193,37 +196,50 @@ export default {
         console.error("Failed to fetch properties:", error);
       }
     },
-    addProperty() {
+    async addProperty() {
+      // Construir el objeto de propiedad basado en los datos del formulario.
       const newProperty = {
-        id: this.properties.length + 1,
-        environments: this.environments,
-        dimensions: this.dimensions,
-        value: this.value,
-        description: this.description,
-        image: this.image,
-        type: this.type,
+        propertyEnvironments: this.environments,
+        propertyDimensions: parseFloat(this.dimensions),
+        propertyValue: parseFloat(this.value),
+        propertyDescription: this.description,
+        propertyImage: "anURL.jpg",
+        propertyIdSection: 1,
+        propertyIdType: 1,
       };
-      this.properties.push(newProperty);
-      this.closeForm();
 
-      // Add new row to table
-      const table = document.getElementById("propertiesTable");
-      const newRow = table.insertRow(-1);
-      const idCell = newRow.insertCell(0);
-      const envCell = newRow.insertCell(1);
-      const dimCell = newRow.insertCell(2);
-      const valCell = newRow.insertCell(3);
-      const descCell = newRow.insertCell(4);
-      const imgCell = newRow.insertCell(5);
-      const typeCell = newRow.insertCell(6);
+      try {
+        // Realizar una solicitud POST a la API para agregar una nueva propiedad.
+        const response = await fetch("http://localhost:8080/api/v1/property", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            token: "1", // Tu token se establece aquí
+          },
+          body: JSON.stringify(newProperty),
+        });
 
-      idCell.innerHTML = newProperty.id;
-      envCell.innerHTML = newProperty.environments;
-      dimCell.innerHTML = newProperty.dimensions;
-      valCell.innerHTML = newProperty.value;
-      descCell.innerHTML = newProperty.description;
-      imgCell.innerHTML = newProperty.image;
-      typeCell.innerHTML = newProperty.type;
+        // Verificar si la solicitud se completó correctamente.
+        if (response.ok) {
+          const responseData = await response.json();
+
+          if (responseData.responseCode === "PROP-0001" && responseData.data) {
+            // Suponiendo que el servidor devuelve la propiedad creada, la agregamos a nuestra lista.
+            this.properties.push(responseData.data);
+          } else {
+            console.error("Error adding property:", responseData.errorMessage);
+          }
+        } else {
+          console.error(
+            "Failed to add property, server responded with:",
+            response.status
+          );
+        }
+      } catch (error) {
+        console.error("Failed to add property:", error);
+      } finally {
+        this.closeForm();
+      }
     },
     editProperty(property) {
       this.editingPropertyId = property.id;
@@ -237,10 +253,12 @@ export default {
     },
 
     async deleteProperty(property) {
+      console.log(property);
+      console.log(property.id); // Esta es la corrección
       try {
         // Realizar una solicitud DELETE a la API para eliminar la propiedad
         const response = await fetch(
-          `http://localhost:8080/api/v1/property/${property.propertyIdSection}`,
+          `http://localhost:8080/api/v1/property/${property.id}`,
           {
             method: "DELETE",
           }
@@ -250,7 +268,7 @@ export default {
         if (response.ok) {
           // Eliminar la propiedad de la lista local
           const propertyIndex = this.properties.findIndex(
-            (p) => p.propertyIdSection === property.propertyIdSection
+            (p) => p.id === property.id // Aquí también se cambió `propertyId` por `id`
           );
           this.properties.splice(propertyIndex, 1);
         } else {
@@ -286,17 +304,58 @@ export default {
       this.imageEdit = "";
       this.typeEdit = "0";
     },
-    updateProperty() {
-      const propertyIndex = this.properties.findIndex(
-        (p) => p.id === this.editingPropertyId
-      );
-      this.properties[propertyIndex].environments = this.environmentsEdit;
-      this.properties[propertyIndex].dimensions = this.dimensionsEdit;
-      this.properties[propertyIndex].value = this.valueEdit;
-      this.properties[propertyIndex].description = this.descriptionEdit;
-      this.properties[propertyIndex].image = this.imageEdit;
-      this.properties[propertyIndex].type = this.typeEdit;
-      this.closeFormEdit();
+    async updateProperty() {
+      const updatedProperty = {
+        propertyEnvironments: parseInt(this.environmentsEdit),
+        propertyDimensions: parseFloat(this.dimensionsEdit),
+        propertyValue: parseFloat(this.valueEdit),
+        propertyDescription: this.descriptionEdit,
+        propertyImage: "newURL.jpg", // Usamos una condición por si no se cambió la imagen
+        propertyIdSection: 1, // Estás usando valores estáticos aquí. Considera cambiarlo si necesitas valores dinámicos.
+        propertyIdType: 1,
+      };
+
+      console.log(updatedProperty);
+      try {
+        // Actualizar una propiedad en la API usando su ID
+        const response = await fetch(
+          `http://localhost:8080/api/v1/property/${this.editingPropertyId}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              token: "1",
+            },
+            body: JSON.stringify(updatedProperty),
+          }
+        );
+
+        if (response.ok) {
+          const responseData = await response.json();
+
+          if (responseData.responseCode === "PROP-0002" && responseData.data) {
+            // Actualizar la propiedad en la lista local
+            const propertyIndex = this.properties.findIndex(
+              (p) => p.id === this.editingPropertyId
+            );
+            this.properties[propertyIndex] = responseData.data;
+          } else {
+            console.error(
+              "Error updating property:",
+              responseData.errorMessage
+            );
+          }
+        } else {
+          console.error(
+            "Failed to update property, server responded with:",
+            response.status
+          );
+        }
+      } catch (error) {
+        console.error("Failed to update property:", error);
+      } finally {
+        this.closeFormEdit();
+      }
     },
     handleImageUpload(event) {
       const file = event.target.files[0];
