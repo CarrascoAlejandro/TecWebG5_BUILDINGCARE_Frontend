@@ -40,7 +40,7 @@
             <!-- Botones de acción -->
             <div class="form-buttons">
                 <button @click="createPost" v-if="!editing">Crear</button>
-                <button @click="updatePost">Actualizar</button>
+                <button @click="updatePost" v-if="editing">Actualizar</button>
                 <button @click="deletePost(index)">Eliminar</button>
                 <button @click="closeForm">Cerrar</button>
             </div>
@@ -89,6 +89,19 @@ export default {
         },
         closeForm() {
             this.showPopup = false;
+        },
+        handleImageUpload(event) {
+            // Obtiene el archivo de imagen seleccionado por el usuario
+            const file = event.target.files[0];
+
+            // Comprueba si se seleccionó un archivo
+            if (file) {
+                // Crea una URL de objeto (Blob URL) para la imagen
+                const imageUrl = URL.createObjectURL(file);
+
+                // Asigna la URL de la imagen al atributo 'image' en los datos del componente
+                this.image = imageUrl;
+            }
         },
         createPost() {
             // Verificar que los campos estén completos antes de agregar el post
@@ -346,21 +359,22 @@ button:hover {
         text-align: start;
     }
 
+    .actions {
+        flex: 1;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        align-items: flex-end;
+        margin-top: 10px;
+
+        button {
+            margin-right: 10px;
+        }
+    }
+
     &:hover {
         transform: scale(1.05);
     }
-}
-
-.crud-form {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: #fff;
-    padding: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-    z-index: 1000;
 }
 
 .form-buttons button {
