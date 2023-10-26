@@ -1,67 +1,195 @@
 <template>
-    <div class="container">
-      <div class="announcement-board">
-        <div
-          v-for="(post, index) in posts"
-          :key="index"
-          class="announcement-post"
-        >
-          <div class="post-title">{{ post.title }}</div>
-          <div class="post-content">
-            <div class="post-image">
-              <img :src="post.image" alt="post image" />
+<div class="container">
+    <div class="announcement-board">
+        <button @click="openForm"> Nuevo Post + </button>
+        <div v-for="(post, index) in posts" :key="index" class="announcement-post">
+            <div class="header-date">
+                <div class="header">
+                    <div class="post-title">{{ post.title }}</div>
+                    <div class="post-type">{{ post.type }}</div>
+                </div>
+                <div class="date-time">
+                    <div class="post-date">{{ post.date }}</div>
+                    <div class="post-time">{{ post.time }}</div>
+                </div>
             </div>
-            <div class="post-description">{{ post.description }}</div>
-          </div>
+            <div class="post-content">
+                <div class="post-image">
+                    <img :src="post.image" alt="post image" />
+                </div>
+                <div class="post-description">{{ post.description }}</div>
+                <div class="actions">
+                    <button @click="editPost(index)">Editar</button>
+                    <button @click="deletePost(index)">Eliminar</button>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </template>
-  
-  <script>
-  export default {
+</div>
+
+<div class="popup" v-if="showPopup">
+    <div class="popup-content">
+        <form>
+            <input v-model="title" placeholder="Titulo del Post" type="text" required />
+            <textarea v-model="description" placeholder="Descripción" required></textarea>
+            <input type="file" @change="handleImageUpload" accept="image/*" />
+            <select v-model="type" required>
+                <option value="">Selecciona una opción</option>
+                <option v-for="option in options" :key="option.value" :value="option.value">{{ option.text }}</option>
+            </select>
+            <!-- Botones de acción -->
+            <div class="form-buttons">
+                <button @click="createPost" v-if="!editing">Crear</button>
+                <button @click="updatePost">Actualizar</button>
+                <button @click="deletePost(index)">Eliminar</button>
+                <button @click="closeForm">Cerrar</button>
+            </div>
+        </form>
+    </div>
+</div>
+</template>
+
+<script>
+export default {
     data() {
-      return {
-        posts: [
-          {
-            title: "Living 1",
-            image: require("@/assets/images/living1.jpg"),
-            description:
-              "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi tincidunt risus eu porttitor volutpat. Phasellus justo justo, tristique eget elit vel, sodales posuere purus. Fusce id massa ac lorem maximus auctor non eu ante. In sapien leo, scelerisque non venenatis at, ullamcorper eu mauris. Proin id velit vel ipsum commodo hendrerit. Donec eleifend augue ut mi hendrerit, in feugiat lectus tincidunt. Suspendisse quis odio in arcu finibus consectetur sed a dolor. Suspendisse mattis velit in condimentum dictum. Aenean non magna sem.",
-          },
-          {
-            title: "Living 2",
-            image: require("@/assets/images/living2.jpg"),
-            description:
-              "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi tincidunt risus eu porttitor volutpat. Phasellus justo justo, tristique eget elit vel, sodales posuere purus. Fusce id massa ac lorem maximus auctor non eu ante. In sapien leo, scelerisque non venenatis at, ullamcorper eu mauris. Proin id velit vel ipsum commodo hendrerit. Donec eleifend augue ut mi hendrerit, in feugiat lectus tincidunt. Suspendisse quis odio in arcu finibus consectetur sed a dolor. Suspendisse mattis velit in condimentum dictum. Aenean non magna sem.",
-          },
-          {
-            title: "Living 3",
-            image: require("@/assets/images/living3.jpg"),
-            description:
-              "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi tincidunt risus eu porttitor volutpat. Phasellus justo justo, tristique eget elit vel, sodales posuere purus. Fusce id massa ac lorem maximus auctor non eu ante. In sapien leo, scelerisque non venenatis at, ullamcorper eu mauris. Proin id velit vel ipsum commodo hendrerit. Donec eleifend augue ut mi hendrerit, in feugiat lectus tincidunt. Suspendisse quis odio in arcu finibus consectetur sed a dolor. Suspendisse mattis velit in condimentum dictum. Aenean non magna sem.",
-          },
-        ],
-      };
+        return {
+            posts: [{
+                title: "Living 1",
+                type: "Living",
+                date: "2021-01-01",
+                time: "10:00",
+                image: require("@/assets/images/living1.jpg"),
+                description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi tincidunt risus eu porttitor volutpat. Phasellus justo justo, tristique eget elit vel, sodales posuere purus. Fusce id massa ac lorem maximus auctor non eu ante. In sapien leo, scelerisque non venenatis at, ullamcorper eu mauris. Proin id velit vel ipsum commodo hendrerit. Donec eleifend augue ut mi hendrerit, in feugiat lectus tincidunt. Suspendisse quis odio in arcu finibus consectetur sed a dolor. Suspendisse mattis velit in condimentum dictum. Aenean non magna sem.",
+            }],
+            showPopup: false,
+            editing: false,
+            formData: {
+                title: '',
+                type: '',
+                date: '',
+                time: '',
+                image: '',
+                description: '',
+            },
+            options: [{
+                    value: 'opcion1',
+                    text: 'Opción 1'
+                },
+                {
+                    value: 'opcion2',
+                    text: 'Opción 2'
+                },
+                // Agregar más opciones según sea necesario
+            ],
+        };
     },
-  };
-  </script>
-  
-  <style lang="scss" scoped>
-  @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&display=swap");
-  
-  * {
+    methods: {
+        openForm() {
+            this.showPopup = true;
+        },
+        closeForm() {
+            this.showPopup = false;
+        },
+        createPost() {
+            // Verificar que los campos estén completos antes de agregar el post
+            if (this.title && this.description && this.type) {
+                const newPost = {
+                    title: this.title,
+                    type: this.type,
+                    date: new Date().toISOString().split('T')[0], // Obtener la fecha actual
+                    time: new Date().toLocaleTimeString(),
+                    image: require("@/assets/images/living1.jpg"), // Puedes ajustar la imagen según sea necesario
+                    description: this.description,
+                };
+
+                // Agregar el nuevo post a la lista
+                this.posts.push(newPost);
+
+                // Limpiar los campos del formulario
+                this.title = '';
+                this.description = '';
+                this.type = '';
+
+                // Cerrar la ventana emergente u ocultar el formulario
+                this.showPopup = false;
+            } else {
+                // Puedes agregar lógica adicional para manejar campos incompletos
+                alert('Por favor, complete todos los campos.');
+            }
+        },
+        editPost(index) {
+            // Abre el formulario de edición con los detalles del post seleccionado
+            this.title = this.posts[index].title;
+            this.description = this.posts[index].description;
+            this.type = this.posts[index].type;
+
+            // Puedes guardar el índice del post que se está editando para actualizarlo después
+            this.editingIndex = index;
+            this.editing = true;
+
+            // Abre la ventana emergente o muestra el formulario de edición
+            this.showPopup = true;
+        },
+
+        updatePost() {
+            // Verifica que los campos estén completos antes de actualizar el post
+            if (this.title && this.description && this.type) {
+                const updatedPost = {
+                    title: this.title,
+                    type: this.type,
+                    date: this.posts[this.editingIndex].date, // Mantén la fecha original
+                    time: this.posts[this.editingIndex].time, // Mantén la hora original
+                    image: this.posts[this.editingIndex].image, // Mantén la imagen original
+                    description: this.description,
+                };
+
+                // Actualiza el post en la lista
+                this.posts.splice(this.editingIndex, 1, updatedPost);
+
+                // Restablece los campos del formulario
+                this.title = '';
+                this.description = '';
+                this.type = '';
+
+                // Cierra la ventana emergente o formulario de edición
+                this.showPopup = false;
+                this.editing = false;
+            } else {
+                // Puedes agregar lógica adicional para manejar campos incompletos
+                alert('Por favor, complete todos los campos.');
+            }
+        },
+        deletePost(index) {
+            // Pregunta al usuario si realmente desea eliminar el post
+            const confirmDelete = window.confirm('¿Está seguro de que desea eliminar este post?');
+
+            if (confirmDelete) {
+                // Elimina el post de la lista
+                this.posts.splice(index, 1);
+            }
+        },
+    },
+
+};
+</script>
+
+<style lang="scss" scoped>
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&display=swap");
+
+* {
     font-family: "Poppins", sans-serif;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-  }
-  
-  html, body, #app {
+}
+
+html,
+body,
+#app {
     height: 100%;
-  }
-  
-  .container {
+}
+
+.container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -71,8 +199,68 @@
     width: 100%;
     justify-content: center;
     text-align: center;
-  }
-  
+    height: 100vh;
+}
+
+.popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.popup-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+form {
+    max-width: 400px;
+    margin: 0 auto;
+
+}
+
+input,
+textarea,
+select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+select {
+    height: 40px;
+}
+
+.form-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
 .announcement-board {
     display: flex;
     flex-wrap: wrap;
@@ -82,8 +270,8 @@
     width: 100%;
     flex-direction: column;
 }
-  
-  .announcement-post {
+
+.announcement-post {
     width: 95%;
     display: flex;
     flex-direction: column;
@@ -94,58 +282,106 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease-in-out;
     margin: 10px;
-  
-    .post-title {
-        text-align: start;
-      font-size: 18px;
-      font-weight: bold;
+
+    .header-date {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        width: 100%;
+
+        .header {
+            font-weight: bold;
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+
+            .post-title {
+                margin-right: 10px;
+            }
+
+            .post-type {
+                font-size: 10px;
+                color: #fff;
+                background-color: #22abb3;
+                padding: 5px;
+                border-radius: 10px;
+            }
+        }
+
+        .date-time {
+            font-weight: 600;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+
+            .post-date {
+                margin-right: 10px;
+            }
+        }
     }
-  
+
     .post-content {
         margin-top: 10px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
     }
-  
+
     .post-image {
-      flex: 1;
-      max-width: 10%;
-      margin-right: 20px;
-  
-      img {
-        width: 100%;
-        border-radius: 5px;
-      }
+        flex: 1;
+        max-width: 10%;
+        margin-right: 20px;
+
+        img {
+            width: 100%;
+            border-radius: 5px;
+        }
     }
-  
+
     .post-description {
         flex: 1;
-      font-size: 14px;
-      text-align: start;
+        font-size: 14px;
+        text-align: start;
     }
-  
+
     &:hover {
-      transform: scale(1.05);
+        transform: scale(1.05);
     }
-  }
-  
-  @media screen and (max-width: 768px) {
+}
+
+.crud-form {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+}
+
+.form-buttons button {
+    margin-right: 10px;
+}
+
+@media screen and (max-width: 768px) {
     .announcement-post {
-      .post-content {
-        flex-direction: column;
-      }
-  
-      .post-image {
-        max-width: 100%;
-        margin-right: 0;
-        margin-bottom: 20px;
-  
-        img {
-          height: 100%;
+        .post-content {
+            flex-direction: column;
         }
-      }
+
+        .post-image {
+            max-width: 100%;
+            margin-right: 0;
+            margin-bottom: 20px;
+
+            img {
+                height: 100%;
+            }
+        }
     }
-  }
-  </style>
-  
+}
+</style>
