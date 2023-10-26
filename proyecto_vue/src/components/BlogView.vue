@@ -36,14 +36,14 @@
             </div>
             <div class="post-description">{{ post.postContent }}</div>
           </div>
-          <button @click="editPostId(post.id)">Editar</button>
+          <button @click="editPostId(post.id, post.postTitle, post.postContent)">Editar</button>
           <button @click="deletePostId(post.id)">Borrar</button>
         </div>
       </div>
     </div>
     <div id="propertyForm" >
       <h1>Nuevo post</h1>
-      <form @submit.prevent="editPost()">
+      <form @submit.prevent="newPost()">
         <input
           v-model="title"
           placeholder="Título"
@@ -73,7 +73,7 @@
     </div>
     <div id="editProperty" style="display: none">
       <h1>Editar Propiedad</h1>
-      <form @submit.prevent="updatePost">
+      <form @submit.prevent="updatePost()">
         <input
           v-model="titleEdit"
           placeholder="Título"
@@ -155,9 +155,19 @@
       }
     },
     methods: {
+      getPosts(){
+          try{
+            this.postService.getPosts().then((data) => {
+                        this.posts = data.data;
+                        console.log(this.posts);
+                    });
+          }catch(e){
+            console.log("error " + e);
+          }
+      },
       newPost(){
         
-        this.postService.updatePostById(this.titleEdit, this.descriptionEdit, this.type).then((data) => {
+        this.postService.newPost(this.title, this.description, this.type).then((data) => {
           console.log("codigo de respuesta http: "+ data.responseCode);
           if(data.responseCode == "POST-0001"){
                     //se insertó correctamente el post :D
@@ -167,6 +177,8 @@
                         'La publicación ha sido creada.',
                         'success'
                     )
+                    this.closeForm();
+                    this.getPosts();
                 }else{
                     console.log('no se pudo crear el post :(');
                 }
@@ -175,7 +187,7 @@
       updatePost(){
         const stateEdit = "Activo";
         const idPostRequest = null; 
-        this.postService.newPost(this.title, this.description, stateEdit, this.typeEdit, idPostRequest, this.idEdit).then((data) => {
+        this.postService.updatePostById(this.titleEdit, this.descriptionEdit, stateEdit, this.typeEdit, idPostRequest, this.idEdit).then((data) => {
           console.log("codigo de respuesta http: "+ data.responseCode);
           if(data.responseCode == "POST-0002"){
                     //se insertó correctamente el post :D
@@ -185,6 +197,8 @@
                         'La publicación ha sido editada.',
                         'success'
                     )
+                    this.closeFormEdit();
+                    this.getPosts();
                 }else{
                     console.log('no se pudo actualizar el post :(');
                 }
@@ -201,13 +215,16 @@
                         'La publicación ha sido eliminada.',
                         'success'
                     )
+                    this.getPosts();
                 }else{
                     console.log('no se pudo actualizar el post :(');
                 }
         });
       },
-      editPostId(id){
+      editPostId(id, title, content){
         this.idEdit = id;
+        this.titleEdit = title;
+        this.descriptionEdit = content;
         this.openFormEdit();
       },
       deletePostId(id){
@@ -226,6 +243,10 @@
       closeFormEdit() {
         document.getElementById("editProperty").style.display = "none";
         this.resetEditForm();
+      },
+      resetEditForm() {
+        this.titleEdit = "";
+        this.descriptionEdit = "";
       },
     }
   };
