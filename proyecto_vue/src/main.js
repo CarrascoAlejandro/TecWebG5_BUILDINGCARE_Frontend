@@ -6,8 +6,9 @@ import App from "./App.vue";
 import login from "./components/LoginSignUp.vue";
 import BlogView from "./components/BlogView.vue";
 import PropertiesView from "./components/PropertiesView.vue";
+import PaymentsView from "./components/PaymentsView.vue";
 
-/**end pages */
+/**end pages **/
 
 const routes = [
   {
@@ -29,6 +30,11 @@ const routes = [
     path: "/propertyView",
     component: PropertiesView,
   },
+  {
+    name: "payments",
+    path: "/paymentsView",
+    component: PaymentsView,
+  }
 ];
 
 const router = createRouter({
