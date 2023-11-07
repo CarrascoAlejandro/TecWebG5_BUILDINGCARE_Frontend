@@ -45,7 +45,7 @@
                     Escriba el detalle del pago aqui...
                 </textarea>
 
-                <input v-model="date" placeholder="Fecha" type="date" required />
+                <input v-model="date" type="date" required />
                 <input v-model="userpays" placeholder="Persona paga" type="text" required /> <!-- TODO: convert from username combobox -->
                 <input v-model="userreceives" placeholder="Persona recibe" type="text" required />
                 <div class="form-buttons">

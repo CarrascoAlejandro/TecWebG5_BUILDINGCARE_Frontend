@@ -17,7 +17,7 @@
                 <a @click="setActiveNavItem('blog')">Anuncios</a>
             </li>
             <li :class="{ 'nav-active': activeNavItem === 'Requests' }">
-                <a @click="setActiveNavItem('requests')">Solicitudes</a>
+                <a @click="setActiveNavItem('requests')">Pagos</a>
             </li>
             <li :class="{ 'nav-active': activeNavItem === 'Houses' }">
                 <a @click="setActiveNavItem('houses')">Propiedades</a>
@@ -42,6 +42,15 @@ export default {
     methods: {
         setActiveNavItem(item) {
             this.activeNavItem = item;
+            if (item === 'blog'){
+                this.$router.push("/blogView");
+            } else if (item === 'requests'){
+                this.$router.push("/paymentsView");
+            } else if (item === 'houses'){
+                this.$router.push("/propertyView");
+            } else if (item === 'logOut'){
+                this.$router.push("/login");
+            }
         },
         toggleMenu() {
             this.isMenuOpen = !this.isMenuOpen;
