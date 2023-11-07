@@ -118,5 +118,100 @@ export default class PostService{
             throw error;
         }
     }
+
+    async getPostTypes() {
+        try {
+            // Define los encabezados para especificar que se espera una respuesta en formato JSON
+            const headers = {
+                'Accept': 'application/json'
+            };
+    
+            // Realiza la solicitud GET utilizando Axios
+            const response = await axios.get(url+'/type', { headers });
+            
+            // Devuelve los datos de la respuesta
+            return response.data;
+        } catch (error) {
+            // Maneja cualquier error que ocurra durante la solicitud
+            console.error('Error al obtener los tipos de post:', error);
+            throw error;
+        } 
+    }
+
+    async getUrgentPosts() {
+        try {
+            // Define los encabezados para especificar que se espera una respuesta en formato JSON
+            const headers = {
+                'Accept': 'application/json'
+            };
+    
+            // Realiza la solicitud GET utilizando Axios
+            const response = await axios.get(url+'/urgent', { headers });
+            
+            // Devuelve los datos de la respuesta
+            return response.data;
+        } catch (error) {
+            // Maneja cualquier error que ocurra durante la solicitud
+            console.error('Error al obtener los posts urgentes:', error);
+            throw error;
+        }
+    }
+
+    async getDonePosts() {
+        try {
+            // Define los encabezados para especificar que se espera una respuesta en formato JSON
+            const headers = {
+                'Accept': 'application/json'
+            };
+    
+            // Realiza la solicitud GET utilizando Axios
+            const response = await axios.get(url+'/done', { headers });
+            
+            // Devuelve los datos de la respuesta
+            return response.data;
+        } catch (error) {
+            // Maneja cualquier error que ocurra durante la solicitud
+            console.error('Error al obtener los posts urgentes:', error);
+            throw error;
+        }
+    }
+
+    async markPostAsUrgent(postId) {
+        try {
+            // Define los encabezados, incluyendo el token
+            const headers = {
+                'token': this.token
+            };
+    
+            // Realiza la solicitud POST utilizando Axios
+            const response = await axios.post(url+'/'+postId+'/urgent', data, { headers });
+    
+            // Devuelve la respuesta
+            return response.data;
+        } catch (error) {
+            // Maneja cualquier error que ocurra durante la solicitud
+            console.error('Error al marcar el post como urgente:', error);
+            throw error;
+        }
+    }
+
+    async markPostAsDone(postId) {
+        try {
+            // Define los encabezados, incluyendo el token
+            const headers = {
+                'token': this.token
+            };
+    
+            // Realiza la solicitud POST utilizando Axios
+            const response = await axios.post(url+'/'+postId+'/done', data, { headers });
+    
+            // Devuelve la respuesta
+            return response.data;
+        } catch (error) {
+            // Maneja cualquier error que ocurra durante la solicitud
+            console.error('Error al marcar el post como hecho:', error);
+            throw error;
+        }
+    }
     
 }
