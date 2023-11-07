@@ -60,6 +60,7 @@
 </template>
 
 <script>
+import PaymentService from '@/service/PaymentService';
 export default {
     data() {
         return {
