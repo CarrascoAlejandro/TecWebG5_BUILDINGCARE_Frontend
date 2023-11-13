@@ -1,8 +1,10 @@
 import axios from 'axios';
 
 export default class PostService{
-    url = "http://localhost:8080/api/v1/blog";
-    token = '1';
+    constructor() {
+        this.url = "http://localhost:8080/api/v1/blog";
+        this.token = '1';
+    }
     async newPost(title, content, idTypePost) {
         try {
             // Define los datos que se enviarán en el cuerpo de la solicitud
@@ -127,7 +129,7 @@ export default class PostService{
             };
     
             // Realiza la solicitud GET utilizando Axios
-            const response = await axios.get(url+'/type', { headers });
+            const response = await axios.get(this.url+'/type', { headers });
             
             // Devuelve los datos de la respuesta
             return response.data;
@@ -146,7 +148,7 @@ export default class PostService{
             };
     
             // Realiza la solicitud GET utilizando Axios
-            const response = await axios.get(url+'/urgent', { headers });
+            const response = await axios.get(this.url+'/urgent', { headers });
             
             // Devuelve los datos de la respuesta
             return response.data;
@@ -165,7 +167,7 @@ export default class PostService{
             };
     
             // Realiza la solicitud GET utilizando Axios
-            const response = await axios.get(url+'/done', { headers });
+            const response = await axios.get(this.url+'/done', { headers });
             
             // Devuelve los datos de la respuesta
             return response.data;
@@ -184,7 +186,7 @@ export default class PostService{
             };
     
             // Realiza la solicitud POST utilizando Axios
-            const response = await axios.post(url+'/'+postId+'/urgent', data, { headers });
+            const response = await axios.post(this.url+'/'+postId+'/urgent', { headers });
     
             // Devuelve la respuesta
             return response.data;
@@ -203,7 +205,7 @@ export default class PostService{
             };
     
             // Realiza la solicitud POST utilizando Axios
-            const response = await axios.post(url+'/'+postId+'/done', data, { headers });
+            const response = await axios.post(this.url+'/'+postId+'/done', { headers });
     
             // Devuelve la respuesta
             return response.data;
