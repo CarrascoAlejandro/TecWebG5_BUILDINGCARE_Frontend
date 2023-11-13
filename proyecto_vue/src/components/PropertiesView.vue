@@ -1,5 +1,7 @@
 <template>
-  <body>
+  
+    <body>
+      <NavigationBar></NavigationBar>
     <div class="container">
       <div class="utilities-container">
         <div class="filter-and-add">
@@ -153,250 +155,229 @@
 </template>
 
 <script>
+import NavigationBar from "./NavigationBar.vue";
 export default {
-  data() {
-    return {
-      properties: [],
-      propertyId: null,
-      environments: "",
-      dimensions: "",
-      value: "",
-      description: "",
-      image: "",
-      type: "0",
-      section: "0",
-      //Edicion
-      //editingPropertyId: null,
-      environmentsEdit: "",
-      dimensionsEdit: "",
-      valueEdit: "",
-      descriptionEdit: "",
-      imageEdit: "",
-      typeEdit: "0",
-      //Filtros
-      filter: "all",
-      searchText: "",
-      activeNavItem: "Propiedades",
-    };
-  },
-  methods: {
-    async fetchProperties() {
-      try {
-        const response = await fetch(
-          "http://localhost:8080/api/v1/property/all"
-        );
-        const data = await response.json();
-
-        if (data.responseCode === "PROP-0000" && data.data) {
-          this.properties = data.data;
-        } else {
-          console.error("Error fetching properties:", data.errorMessage);
-        }
-      } catch (error) {
-        console.error("Failed to fetch properties:", error);
-      }
+    data() {
+        return {
+            properties: [],
+            propertyId: null,
+            environments: "",
+            dimensions: "",
+            value: "",
+            description: "",
+            image: "",
+            type: "0",
+            section: "0",
+            //Edicion
+            //editingPropertyId: null,
+            environmentsEdit: "",
+            dimensionsEdit: "",
+            valueEdit: "",
+            descriptionEdit: "",
+            imageEdit: "",
+            typeEdit: "0",
+            //Filtros
+            filter: "all",
+            searchText: "",
+            activeNavItem: "Propiedades",
+        };
     },
-    async addProperty() {
-      // Construir el objeto de propiedad basado en los datos del formulario.
-      const newProperty = {
-        propertyEnvironments: this.environments,
-        propertyDimensions: parseFloat(this.dimensions),
-        propertyValue: parseFloat(this.value),
-        propertyDescription: this.description,
-        propertyImage: "anURL.jpg",
-        propertyIdSection: 1,
-        propertyIdType: 1,
-      };
-
-      try {
-        // Realizar una solicitud POST a la API para agregar una nueva propiedad.
-        const response = await fetch("http://localhost:8080/api/v1/property", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            token: "1", // Tu token se establece aquí
-          },
-          body: JSON.stringify(newProperty),
-        });
-
-        // Verificar si la solicitud se completó correctamente.
-        if (response.ok) {
-          const responseData = await response.json();
-
-          if (responseData.responseCode === "PROP-0001" && responseData.data) {
-            // Suponiendo que el servidor devuelve la propiedad creada, la agregamos a nuestra lista.
-            this.properties.push(responseData.data);
-          } else {
-            console.error("Error adding property:", responseData.errorMessage);
-          }
-        } else {
-          console.error(
-            "Failed to add property, server responded with:",
-            response.status
-          );
-        }
-      } catch (error) {
-        console.error("Failed to add property:", error);
-      } finally {
-        this.closeForm();
-      }
+    methods: {
+        async fetchProperties() {
+            try {
+                const response = await fetch("http://localhost:8080/api/v1/property/all");
+                const data = await response.json();
+                if (data.responseCode === "PROP-0000" && data.data) {
+                    this.properties = data.data;
+                }
+                else {
+                    console.error("Error fetching properties:", data.errorMessage);
+                }
+            }
+            catch (error) {
+                console.error("Failed to fetch properties:", error);
+            }
+        },
+        async addProperty() {
+            // Construir el objeto de propiedad basado en los datos del formulario.
+            const newProperty = {
+                propertyEnvironments: this.environments,
+                propertyDimensions: parseFloat(this.dimensions),
+                propertyValue: parseFloat(this.value),
+                propertyDescription: this.description,
+                propertyImage: "anURL.jpg",
+                propertyIdSection: 1,
+                propertyIdType: 1,
+            };
+            try {
+                // Realizar una solicitud POST a la API para agregar una nueva propiedad.
+                const response = await fetch("http://localhost:8080/api/v1/property", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        token: "1", // Tu token se establece aquí
+                    },
+                    body: JSON.stringify(newProperty),
+                });
+                // Verificar si la solicitud se completó correctamente.
+                if (response.ok) {
+                    const responseData = await response.json();
+                    if (responseData.responseCode === "PROP-0001" && responseData.data) {
+                        // Suponiendo que el servidor devuelve la propiedad creada, la agregamos a nuestra lista.
+                        this.properties.push(responseData.data);
+                    }
+                    else {
+                        console.error("Error adding property:", responseData.errorMessage);
+                    }
+                }
+                else {
+                    console.error("Failed to add property, server responded with:", response.status);
+                }
+            }
+            catch (error) {
+                console.error("Failed to add property:", error);
+            }
+            finally {
+                this.closeForm();
+            }
+        },
+        editProperty(property) {
+            this.editingPropertyId = property.id;
+            this.environmentsEdit = property.environments;
+            this.dimensionsEdit = property.dimensions;
+            this.valueEdit = property.value;
+            this.descriptionEdit = property.description;
+            this.imageEdit = property.image;
+            this.typeEdit = property.type;
+            this.openFormEdit();
+        },
+        async deleteProperty(property) {
+            console.log(property);
+            console.log(property.id); // Esta es la corrección
+            try {
+                // Realizar una solicitud DELETE a la API para eliminar la propiedad
+                const response = await fetch(`http://localhost:8080/api/v1/property/${property.id}`, {
+                    method: "DELETE",
+                });
+                // Verificar si la solicitud se completó correctamente
+                if (response.ok) {
+                    // Eliminar la propiedad de la lista local
+                    const propertyIndex = this.properties.findIndex((p) => p.id === property.id // Aquí también se cambió `propertyId` por `id`
+                    );
+                    this.properties.splice(propertyIndex, 1);
+                }
+                else {
+                    const data = await response.json();
+                    console.error("Error deleting property:", data.errorMessage || "Unknown error");
+                }
+            }
+            catch (error) {
+                console.error("Failed to delete property:", error);
+            }
+        },
+        filterProperties(filter) {
+            if (filter === "all") {
+                this.filteredProperties = this.properties;
+            }
+            else {
+                this.filteredProperties = this.properties.filter((p) => p.type === filter);
+            }
+        },
+        searchProperties() {
+            this.filteredProperties = this.properties.filter((p) => p.description.toLowerCase().includes(this.searchText.toLowerCase()));
+        },
+        resetEditForm() {
+            this.environmentsEdit = "";
+            this.dimensionsEdit = "";
+            this.valueEdit = "";
+            this.descriptionEdit = "";
+            this.imageEdit = "";
+            this.typeEdit = "0";
+        },
+        async updateProperty() {
+            const updatedProperty = {
+                propertyEnvironments: parseInt(this.environmentsEdit),
+                propertyDimensions: parseFloat(this.dimensionsEdit),
+                propertyValue: parseFloat(this.valueEdit),
+                propertyDescription: this.descriptionEdit,
+                propertyImage: "newURL.jpg",
+                propertyIdSection: 1,
+                propertyIdType: 1,
+            };
+            console.log(updatedProperty);
+            try {
+                // Actualizar una propiedad en la API usando su ID
+                const response = await fetch(`http://localhost:8080/api/v1/property/${this.editingPropertyId}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        token: "1",
+                    },
+                    body: JSON.stringify(updatedProperty),
+                });
+                if (response.ok) {
+                    const responseData = await response.json();
+                    if (responseData.responseCode === "PROP-0002" && responseData.data) {
+                        // Actualizar la propiedad en la lista local
+                        const propertyIndex = this.properties.findIndex((p) => p.id === this.editingPropertyId);
+                        this.properties[propertyIndex] = responseData.data;
+                    }
+                    else {
+                        console.error("Error updating property:", responseData.errorMessage);
+                    }
+                }
+                else {
+                    console.error("Failed to update property, server responded with:", response.status);
+                }
+            }
+            catch (error) {
+                console.error("Failed to update property:", error);
+            }
+            finally {
+                this.closeFormEdit();
+            }
+        },
+        handleImageUpload(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                this.image = event.target.result;
+            };
+        },
+        handleTableClick(event) {
+            const propertyId = event.target.parentElement.parentElement.children[0].innerText;
+            const property = this.properties.find((p) => p.id === Number(propertyId));
+            this.editProperty(property);
+        },
+        openForm() {
+            document.getElementById("propertyForm").style.display = "block";
+        },
+        closeForm() {
+            document.getElementById("propertyForm").style.display = "none";
+        },
+        openFormEdit() {
+            document.getElementById("editProperty").style.display = "block";
+        },
+        closeFormEdit() {
+            document.getElementById("editProperty").style.display = "none";
+            this.resetEditForm();
+        },
     },
-    editProperty(property) {
-      this.editingPropertyId = property.id;
-      this.environmentsEdit = property.environments;
-      this.dimensionsEdit = property.dimensions;
-      this.valueEdit = property.value;
-      this.descriptionEdit = property.description;
-      this.imageEdit = property.image;
-      this.typeEdit = property.type;
-      this.openFormEdit();
+    computed: {
+        filteredProperties() {
+            if (this.filter === "all") {
+                return this.properties;
+            }
+            else {
+                return this.properties.filter((p) => p.type === this.filter);
+            }
+        },
     },
-
-    async deleteProperty(property) {
-      console.log(property);
-      console.log(property.id); // Esta es la corrección
-      try {
-        // Realizar una solicitud DELETE a la API para eliminar la propiedad
-        const response = await fetch(
-          `http://localhost:8080/api/v1/property/${property.id}`,
-          {
-            method: "DELETE",
-          }
-        );
-
-        // Verificar si la solicitud se completó correctamente
-        if (response.ok) {
-          // Eliminar la propiedad de la lista local
-          const propertyIndex = this.properties.findIndex(
-            (p) => p.id === property.id // Aquí también se cambió `propertyId` por `id`
-          );
-          this.properties.splice(propertyIndex, 1);
-        } else {
-          const data = await response.json();
-          console.error(
-            "Error deleting property:",
-            data.errorMessage || "Unknown error"
-          );
-        }
-      } catch (error) {
-        console.error("Failed to delete property:", error);
-      }
+    mounted() {
+        this.fetchProperties();
     },
-    filterProperties(filter) {
-      if (filter === "all") {
-        this.filteredProperties = this.properties;
-      } else {
-        this.filteredProperties = this.properties.filter(
-          (p) => p.type === filter
-        );
-      }
-    },
-    searchProperties() {
-      this.filteredProperties = this.properties.filter((p) =>
-        p.description.toLowerCase().includes(this.searchText.toLowerCase())
-      );
-    },
-    resetEditForm() {
-      this.environmentsEdit = "";
-      this.dimensionsEdit = "";
-      this.valueEdit = "";
-      this.descriptionEdit = "";
-      this.imageEdit = "";
-      this.typeEdit = "0";
-    },
-    async updateProperty() {
-      const updatedProperty = {
-        propertyEnvironments: parseInt(this.environmentsEdit),
-        propertyDimensions: parseFloat(this.dimensionsEdit),
-        propertyValue: parseFloat(this.valueEdit),
-        propertyDescription: this.descriptionEdit,
-        propertyImage: "newURL.jpg", // Usamos una condición por si no se cambió la imagen
-        propertyIdSection: 1, // Estás usando valores estáticos aquí. Considera cambiarlo si necesitas valores dinámicos.
-        propertyIdType: 1,
-      };
-
-      console.log(updatedProperty);
-      try {
-        // Actualizar una propiedad en la API usando su ID
-        const response = await fetch(
-          `http://localhost:8080/api/v1/property/${this.editingPropertyId}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              token: "1",
-            },
-            body: JSON.stringify(updatedProperty),
-          }
-        );
-
-        if (response.ok) {
-          const responseData = await response.json();
-
-          if (responseData.responseCode === "PROP-0002" && responseData.data) {
-            // Actualizar la propiedad en la lista local
-            const propertyIndex = this.properties.findIndex(
-              (p) => p.id === this.editingPropertyId
-            );
-            this.properties[propertyIndex] = responseData.data;
-          } else {
-            console.error(
-              "Error updating property:",
-              responseData.errorMessage
-            );
-          }
-        } else {
-          console.error(
-            "Failed to update property, server responded with:",
-            response.status
-          );
-        }
-      } catch (error) {
-        console.error("Failed to update property:", error);
-      } finally {
-        this.closeFormEdit();
-      }
-    },
-    handleImageUpload(event) {
-      const file = event.target.files[0];
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = (event) => {
-        this.image = event.target.result;
-      };
-    },
-    handleTableClick(event) {
-      const propertyId =
-        event.target.parentElement.parentElement.children[0].innerText;
-      const property = this.properties.find((p) => p.id === Number(propertyId));
-      this.editProperty(property);
-    },
-    openForm() {
-      document.getElementById("propertyForm").style.display = "block";
-    },
-    closeForm() {
-      document.getElementById("propertyForm").style.display = "none";
-    },
-    openFormEdit() {
-      document.getElementById("editProperty").style.display = "block";
-    },
-    closeFormEdit() {
-      document.getElementById("editProperty").style.display = "none";
-      this.resetEditForm();
-    },
-  },
-  computed: {
-    filteredProperties() {
-      if (this.filter === "all") {
-        return this.properties;
-      } else {
-        return this.properties.filter((p) => p.type === this.filter);
-      }
-    },
-  },
-  mounted() {
-    this.fetchProperties();
-  },
+    components: { NavigationBar }
 };
 </script>
 

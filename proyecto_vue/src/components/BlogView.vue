@@ -1,4 +1,5 @@
 <template>
+  <NavigationBar></NavigationBar>
   <div class="container">
     <button @click="openForm"> Nuevo Post + </button>
       <div class="announcement-board">
@@ -51,231 +52,217 @@
   </template>
   
   <script>
-  import PostService from "../service/PostService.js";
+    import PostService from "../service/PostService.js";
+    import NavigationBar from "./NavigationBar.vue";
+//   import NavigationBar from "./components/NavigationBar.vue";
   import Swal from 'sweetalert2';
   
   export default {
-      data() {
-          return {
-              editPostForm:[{
-                  id:'',
-                  title: '',
-                  type: '',
-                  date: '',
-                  time: '',
-                  image: '',
-                  description: '',
-              }],
-              image: require("@/assets/images/living1.jpg"),
-              posts: [],
-              // posts: [{
-              //     title: "Living 1",
-              //     type: "Living",
-              //     date: "2021-01-01",
-              //     time: "10:00",
-              //     image: require("@/assets/images/living1.jpg"),
-              //     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi tincidunt risus eu porttitor volutpat. Phasellus justo justo, tristique eget elit vel, sodales posuere purus. Fusce id massa ac lorem maximus auctor non eu ante. In sapien leo, scelerisque non venenatis at, ullamcorper eu mauris. Proin id velit vel ipsum commodo hendrerit. Donec eleifend augue ut mi hendrerit, in feugiat lectus tincidunt. Suspendisse quis odio in arcu finibus consectetur sed a dolor. Suspendisse mattis velit in condimentum dictum. Aenean non magna sem.",
-              // }],
-              showPopup: false,
-              editing: false,
-              formData: {
-                  id:'',
-                  title: '',
-                  type: '',
-                  date: '',
-                  time: '',
-                  image: '',
-                  description: '',
-              },
-              options: [{
-                      value: '1',
-                      text: 'Mantenimiento'
-                  },
-                  {
-                      value: '2',
-                      text: 'Anuncio'
-                  },
-                  {
-                      value: '3',
-                      text: 'Pedido'
-                  },
-                  // Agregar más opciones según sea necesario
-              ],
-          };
-      },
-      created(){
-          this.postService = new PostService();
-      },
-      mounted(){
-        this.getPosts();
-      },
-      methods: {
-          getTypePosts(){
-                try{
-                  this.postService.getPosts().then((data) => {
-                              this.posts = data.data;
-                              console.log(this.posts);
-                          });
-                }catch(e){
-                  console.log("error " + e);
-                }
+    data() {
+        return {
+            editPostForm: [{
+                    id: '',
+                    title: '',
+                    type: '',
+                    date: '',
+                    time: '',
+                    image: '',
+                    description: '',
+                }],
+            image: require("@/assets/images/living1.jpg"),
+            posts: [],
+            // posts: [{
+            //     title: "Living 1",
+            //     type: "Living",
+            //     date: "2021-01-01",
+            //     time: "10:00",
+            //     image: require("@/assets/images/living1.jpg"),
+            //     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi tincidunt risus eu porttitor volutpat. Phasellus justo justo, tristique eget elit vel, sodales posuere purus. Fusce id massa ac lorem maximus auctor non eu ante. In sapien leo, scelerisque non venenatis at, ullamcorper eu mauris. Proin id velit vel ipsum commodo hendrerit. Donec eleifend augue ut mi hendrerit, in feugiat lectus tincidunt. Suspendisse quis odio in arcu finibus consectetur sed a dolor. Suspendisse mattis velit in condimentum dictum. Aenean non magna sem.",
+            // }],
+            showPopup: false,
+            editing: false,
+            formData: {
+                id: '',
+                title: '',
+                type: '',
+                date: '',
+                time: '',
+                image: '',
+                description: '',
             },
-          getPosts(){
-              try{
+            options: [{
+                    value: '1',
+                    text: 'Mantenimiento'
+                },
+                {
+                    value: '2',
+                    text: 'Anuncio'
+                },
+                {
+                    value: '3',
+                    text: 'Pedido'
+                },
+                // Agregar más opciones según sea necesario
+            ],
+        };
+    },
+    created() {
+        this.postService = new PostService();
+    },
+    mounted() {
+        this.getPosts();
+    },
+    methods: {
+        getTypePosts() {
+            try {
                 this.postService.getPosts().then((data) => {
-                            this.posts = data.data;
-                            console.log(this.posts);
-                        });
-              }catch(e){
+                    this.posts = data.data;
+                    console.log(this.posts);
+                });
+            }
+            catch (e) {
                 console.log("error " + e);
-              }
-          },
-          openForm() {
-              this.showPopup = true;
-          },
-          closeForm() {
-              this.showPopup = false;
-          },
-          handleImageUpload(event) {
-              // Obtiene el archivo de imagen seleccionado por el usuario
-              const file = event.target.files[0];
-  
-              // Comprueba si se seleccionó un archivo
-              if (file) {
-                  // Crea una URL de objeto (Blob URL) para la imagen
-                  const imageUrl = URL.createObjectURL(file);
-  
-                  // Asigna la URL de la imagen al atributo 'image' en los datos del componente
-                  this.image = imageUrl;
-              }
-          },
-          newPost(){
-            console.log("title: "+ this.title);
-            console.log("description: "+ this.description);
-            console.log("type: "+ this.type);
-            try{
-              this.postService.newPost(this.title, this.description, this.type).then((data) => {
-                console.log("codigo de respuesta http: "+ data.responseCode);
-                if(data.responseCode == "POST-0001"){
-                          //se insertó correctamente el post :D
-                          console.log('se creó el post correctamente :D');
-                          Swal.fire(
-                              '¡Creado!',
-                              'La publicación ha sido creada.',
-                              'success'
-                          )
-                          this.closeForm();
-                          this.getPosts();
-                      }else{
-                          console.log('no se pudo crear el post :(');
-                      }
-              });
-            }catch(e){
-              console.log("error " + e);
             }
-            
-          },
-          createPost() {
-              // Verificar que los campos estén completos antes de agregar el post
-              if (this.title && this.description && this.type) {
-                  // const newPost = {
-                  //     title: this.title,
-                  //     type: this.type,
-                  //     description: this.description,
-                  // };
-                  this.newPost();
-                  // Limpiar los campos del formulario
-                  this.title = '';
-                  this.description = '';
-                  this.type = '';
-  
-                  // Cerrar la ventana emergente u ocultar el formulario
-                  this.showPopup = false;
-              } else {
-                  // Puedes agregar lógica adicional para manejar campos incompletos
-                  Swal.fire(
-                            '¡Ups!',
-                            'Por favor, complete todos los campos.',
-                            'question'
-                        )
-              }
-          },
-          editPost(index) {
-              // Abre el formulario de edición con los detalles del post seleccionado
-              this.title = this.posts[index].title;
-              this.description = this.posts[index].description;
-              this.type = this.posts[index].type;
-  
-              // Puedes guardar el índice del post que se está editando para actualizarlo después
-              this.editingIndex = index;
-              this.editing = true;
-  
-              // Abre la ventana emergente o muestra el formulario de edición
-              this.showPopup = true;
-          },
-  
-          updatePost() {
-              // Verifica que los campos estén completos antes de actualizar el post
-              if (this.title && this.description && this.type) {
-                  const updatedPost = {
-                      title: this.title,
-                      type: this.type,
-                      date: this.posts[this.editingIndex].date, // Mantén la fecha original
-                      time: this.posts[this.editingIndex].time, // Mantén la hora original
-                      image: this.posts[this.editingIndex].image, // Mantén la imagen original
-                      description: this.description,
-                  };
-  
-                  // Actualiza el post en la lista
-                  this.posts.splice(this.editingIndex, 1, updatedPost);
-  
-                  // Restablece los campos del formulario
-                  this.title = '';
-                  this.description = '';
-                  this.type = '';
-  
-                  // Cierra la ventana emergente o formulario de edición
-                  this.showPopup = false;
-                  this.editing = false;
-              } else {
-                  // Puedes agregar lógica adicional para manejar campos incompletos
-                  alert('Por favor, complete todos los campos.');
-              }
-          },
-          deletePostDB(deleteId){
-            try{
-              this.postService.deletePostById(deleteId).then((data) => {
-                console.log("codigo de respuesta http: "+ data.responseCode);
-                if(data.responseCode == "POST-0003"){
-                          //se insertó correctamente el post :D
-                          console.log('se eliminó el post correctamente :D');
-                          Swal.fire(
-                              '¡Eliminado!',
-                              'La publicación ha sido eliminada.',
-                              'success'
-                          )
-                          this.getPosts();
-                      }else{
-                          console.log('no se pudo actualizar el post :(');
-                      }
-              });
-            }catch(e){
-              console.log("error " + e);
-            }
-          
         },
-          deletePost(index) {
-              // Pregunta al usuario si realmente desea eliminar el post
-              const confirmDelete = window.confirm('¿Está seguro de que desea eliminar este post?');
-  
-              if (confirmDelete) {
-                  // Elimina el post de la lista
-                  this.deletePostDB(index);
-              }
-          },
-      },
-  
-  };
+        getPosts() {
+            try {
+                this.postService.getPosts().then((data) => {
+                    this.posts = data.data;
+                    console.log(this.posts);
+                });
+            }
+            catch (e) {
+                console.log("error " + e);
+            }
+        },
+        openForm() {
+            this.showPopup = true;
+        },
+        closeForm() {
+            this.showPopup = false;
+        },
+        handleImageUpload(event) {
+            // Obtiene el archivo de imagen seleccionado por el usuario
+            const file = event.target.files[0];
+            // Comprueba si se seleccionó un archivo
+            if (file) {
+                // Crea una URL de objeto (Blob URL) para la imagen
+                const imageUrl = URL.createObjectURL(file);
+                // Asigna la URL de la imagen al atributo 'image' en los datos del componente
+                this.image = imageUrl;
+            }
+        },
+        newPost() {
+            console.log("title: " + this.title);
+            console.log("description: " + this.description);
+            console.log("type: " + this.type);
+            try {
+                this.postService.newPost(this.title, this.description, this.type).then((data) => {
+                    console.log("codigo de respuesta http: " + data.responseCode);
+                    if (data.responseCode == "POST-0001") {
+                        //se insertó correctamente el post :D
+                        console.log('se creó el post correctamente :D');
+                        Swal.fire('¡Creado!', 'La publicación ha sido creada.', 'success');
+                        this.closeForm();
+                        this.getPosts();
+                    }
+                    else {
+                        console.log('no se pudo crear el post :(');
+                    }
+                });
+            }
+            catch (e) {
+                console.log("error " + e);
+            }
+        },
+        createPost() {
+            // Verificar que los campos estén completos antes de agregar el post
+            if (this.title && this.description && this.type) {
+                // const newPost = {
+                //     title: this.title,
+                //     type: this.type,
+                //     description: this.description,
+                // };
+                this.newPost();
+                // Limpiar los campos del formulario
+                this.title = '';
+                this.description = '';
+                this.type = '';
+                // Cerrar la ventana emergente u ocultar el formulario
+                this.showPopup = false;
+            }
+            else {
+                // Puedes agregar lógica adicional para manejar campos incompletos
+                Swal.fire('¡Ups!', 'Por favor, complete todos los campos.', 'question');
+            }
+        },
+        editPost(index) {
+            // Abre el formulario de edición con los detalles del post seleccionado
+            this.title = this.posts[index].title;
+            this.description = this.posts[index].description;
+            this.type = this.posts[index].type;
+            // Puedes guardar el índice del post que se está editando para actualizarlo después
+            this.editingIndex = index;
+            this.editing = true;
+            // Abre la ventana emergente o muestra el formulario de edición
+            this.showPopup = true;
+        },
+        updatePost() {
+            // Verifica que los campos estén completos antes de actualizar el post
+            if (this.title && this.description && this.type) {
+                const updatedPost = {
+                    title: this.title,
+                    type: this.type,
+                    date: this.posts[this.editingIndex].date,
+                    time: this.posts[this.editingIndex].time,
+                    image: this.posts[this.editingIndex].image,
+                    description: this.description,
+                };
+                // Actualiza el post en la lista
+                this.posts.splice(this.editingIndex, 1, updatedPost);
+                // Restablece los campos del formulario
+                this.title = '';
+                this.description = '';
+                this.type = '';
+                // Cierra la ventana emergente o formulario de edición
+                this.showPopup = false;
+                this.editing = false;
+            }
+            else {
+                // Puedes agregar lógica adicional para manejar campos incompletos
+                alert('Por favor, complete todos los campos.');
+            }
+        },
+        deletePostDB(deleteId) {
+            try {
+                this.postService.deletePostById(deleteId).then((data) => {
+                    console.log("codigo de respuesta http: " + data.responseCode);
+                    if (data.responseCode == "POST-0003") {
+                        //se insertó correctamente el post :D
+                        console.log('se eliminó el post correctamente :D');
+                        Swal.fire('¡Eliminado!', 'La publicación ha sido eliminada.', 'success');
+                        this.getPosts();
+                    }
+                    else {
+                        console.log('no se pudo actualizar el post :(');
+                    }
+                });
+            }
+            catch (e) {
+                console.log("error " + e);
+            }
+        },
+        deletePost(index) {
+            // Pregunta al usuario si realmente desea eliminar el post
+            const confirmDelete = window.confirm('¿Está seguro de que desea eliminar este post?');
+            if (confirmDelete) {
+                // Elimina el post de la lista
+                this.deletePostDB(index);
+            }
+        },
+    },
+    components: { NavigationBar }
+};
   </script>
   
   <style lang="scss" scoped>
@@ -298,8 +285,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      min-height: 100vh;
-      min-width: 98.9vw;
+      min-height: 100%;
+      min-width: 100%;
       padding: 20px;
       background-color: #fea162;
       width: 100%;

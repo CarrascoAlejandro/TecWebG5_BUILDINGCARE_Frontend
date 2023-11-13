@@ -1,19 +1,19 @@
 <template>
   <div id="app">
-    <NavigationBar></NavigationBar>
+    <!-- <NavigationBar></NavigationBar> -->
     <router-view></router-view>
     <!-- <LoginSignUp/> -->
   </div>
 </template>
 
 <script>
-import NavigationBar from "./components/NavigationBar.vue";
+// import NavigationBar from "./components/NavigationBar.vue";
 
 export default {
   name: "App",
-  components: {
-    NavigationBar,
-  },
+  // components: {
+  //   NavigationBar,
+  // },
 };
 </script>
 
