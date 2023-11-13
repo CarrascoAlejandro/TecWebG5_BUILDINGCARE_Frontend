@@ -206,6 +206,7 @@ export default {
 .container {
   position: relative;
   min-height: 100vh;
+  min-width: 98.9vw;
   overflow: hidden;
   background: linear-gradient(
     90deg,

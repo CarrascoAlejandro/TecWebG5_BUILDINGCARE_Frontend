@@ -299,7 +299,7 @@
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
-      min-width: 100vw;
+      min-width: 98.9vw;
       padding: 20px;
       background-color: #fea162;
       width: 100%;
