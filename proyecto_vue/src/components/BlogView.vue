@@ -1,7 +1,6 @@
 <template>
-  <button @click="openForm"> Nuevo Post + </button>
   <div class="container">
-    
+    <button @click="openForm"> Nuevo Post + </button>
       <div class="announcement-board">
           
           <div v-for="(post, index) in posts" :key="index" class="announcement-post">
@@ -299,13 +298,14 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      min-height: 100%;
+      min-height: 100vh;
+      min-width: 100vw;
       padding: 20px;
       background-color: #fea162;
       width: 100%;
       justify-content: center;
       text-align: center;
-      height: 100vh;
+      height: 100%;
   }
   
   .popup {
