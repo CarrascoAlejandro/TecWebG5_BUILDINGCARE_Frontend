@@ -152,7 +152,8 @@
   </body>
 </template>
 
-<script>
+<!-- <script>
+import PropertiesService from "../service/PropertiesService.js";
 export default {
   data() {
     return {
@@ -192,6 +193,19 @@ export default {
         } else {
           console.error("Error fetching properties:", data.errorMessage);
         }
+      } catch (error) {
+        console.error("Failed to fetch properties:", error);
+      }
+    },
+    created() {
+      this.propertiesService = new PropertiesService();
+    },
+    async fetchProperties() {
+      try {
+        this.propertiesService.fetchProperties().then((response) => {
+          this.properties = response.data;
+          console.log(response.data);
+        });
       } catch (error) {
         console.error("Failed to fetch properties:", error);
       }
@@ -392,6 +406,193 @@ export default {
       } else {
         return this.properties.filter((p) => p.type === this.filter);
       }
+    },
+  },
+  mounted() {
+    this.fetchProperties();
+  },
+};
+</script> -->
+
+<script>
+import PropertiesService from "../service/PropertiesService.js";
+
+export default {
+  data() {
+    return {
+      properties: [],
+      propertyId: null,
+      environments: "",
+      dimensions: "",
+      value: "",
+      description: "",
+      image: "",
+      type: "0",
+      section: "0",
+      environmentsEdit: "",
+      dimensionsEdit: "",
+      valueEdit: "",
+      descriptionEdit: "",
+      imageEdit: "",
+      typeEdit: "0",
+      filter: "all",
+      searchText: "",
+      activeNavItem: "Propiedades",
+    };
+  },
+  computed: {
+    filteredProperties() {
+      if (this.filter === "all") {
+        return this.properties;
+      } else {
+        return this.properties.filter((p) => p.type === this.filter);
+      }
+    },
+  },
+  methods: {
+    async fetchProperties() {
+      try {
+        const data = await PropertiesService.fetchProperties();
+
+        if (data.responseCode === "PROP-0000" && data.data) {
+          this.properties = data.data;
+        } else {
+          console.error("Error fetching properties:", data.errorMessage);
+        }
+      } catch (error) {
+        console.error("Failed to fetch properties:", error);
+      }
+    },
+    async addProperty() {
+      const newProperty = {
+        propertyEnvironments: this.environments,
+        propertyDimensions: parseFloat(this.dimensions),
+        propertyValue: parseFloat(this.value),
+        propertyDescription: this.description,
+        propertyImage: "anURL.jpg",
+        propertyIdSection: 1,
+        propertyIdType: 1,
+      };
+
+      try {
+        const responseData = await PropertiesService.addProperty(newProperty);
+
+        if (responseData.responseCode === "PROP-0001" && responseData.data) {
+          this.properties.push(responseData.data);
+        } else {
+          console.error("Error adding property:", responseData.errorMessage);
+        }
+      } catch (error) {
+        console.error("Failed to add property:", error);
+      } finally {
+        this.closeForm();
+      }
+    },
+    editProperty(property) {
+      this.editingPropertyId = property.id;
+      this.environmentsEdit = property.environments;
+      this.dimensionsEdit = property.dimensions;
+      this.valueEdit = property.value;
+      this.descriptionEdit = property.description;
+      this.imageEdit = property.image;
+      this.typeEdit = property.type;
+      this.openFormEdit();
+    },
+    async deleteProperty(property) {
+      try {
+        const success = await PropertiesService.deleteProperty(property.id);
+
+        if (success) {
+          const propertyIndex = this.properties.findIndex(
+            (p) => p.id === property.id
+          );
+          this.properties.splice(propertyIndex, 1);
+        } else {
+          console.error("Error deleting property");
+        }
+      } catch (error) {
+        console.error("Failed to delete property:", error);
+      }
+    },
+    filterProperties(filter) {
+      if (filter === "all") {
+        this.filteredProperties = this.properties;
+      } else {
+        this.filteredProperties = this.properties.filter(
+          (p) => p.type === filter
+        );
+      }
+    },
+    searchProperties() {
+      this.filteredProperties = this.properties.filter((p) =>
+        p.description.toLowerCase().includes(this.searchText.toLowerCase())
+      );
+    },
+    resetEditForm() {
+      this.environmentsEdit = "";
+      this.dimensionsEdit = "";
+      this.valueEdit = "";
+      this.descriptionEdit = "";
+      this.imageEdit = "";
+      this.typeEdit = "0";
+    },
+    async updateProperty() {
+      const updatedProperty = {
+        propertyEnvironments: parseInt(this.environmentsEdit),
+        propertyDimensions: parseFloat(this.dimensionsEdit),
+        propertyValue: parseFloat(this.valueEdit),
+        propertyDescription: this.descriptionEdit,
+        propertyImage: "newURL.jpg",
+        propertyIdSection: 1,
+        propertyIdType: 1,
+      };
+
+      try {
+        const responseData = await PropertiesService.updateProperty(
+          this.editingPropertyId,
+          updatedProperty
+        );
+
+        if (responseData.responseCode === "PROP-0002" && responseData.data) {
+          const propertyIndex = this.properties.findIndex(
+            (p) => p.id === this.editingPropertyId
+          );
+          this.properties[propertyIndex] = responseData.data;
+        } else {
+          console.error("Error updating property:", responseData.errorMessage);
+        }
+      } catch (error) {
+        console.error("Failed to update property:", error);
+      } finally {
+        this.closeFormEdit();
+      }
+    },
+    handleImageUpload(event) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        this.image = event.target.result;
+      };
+    },
+    handleTableClick(event) {
+      const propertyId =
+        event.target.parentElement.parentElement.children[0].innerText;
+      const property = this.properties.find((p) => p.id === Number(propertyId));
+      this.editProperty(property);
+    },
+    openForm() {
+      document.getElementById("propertyForm").style.display = "block";
+    },
+    closeForm() {
+      document.getElementById("propertyForm").style.display = "none";
+    },
+    openFormEdit() {
+      document.getElementById("editProperty").style.display = "block";
+    },
+    closeFormEdit() {
+      document.getElementById("editProperty").style.display = "none";
+      this.resetEditForm();
     },
   },
   mounted() {
