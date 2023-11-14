@@ -1,4 +1,5 @@
 <template>
+    <NavigationBar></NavigationBar>
     <body>
         <div class="container">
             <div class="utilities-container">
@@ -61,6 +62,7 @@
 
 <script>
 //import PaymentService from '@/service/PaymentService';
+import NavigationBar from "./NavigationBar.vue";
 export default {
     data() {
         return {
@@ -72,23 +74,22 @@ export default {
             detail: "",
             userpays: "",
             userreceives: "",
-
         };
     },
     methods: {
         async fetchPayments() {
             try {
-                const response = await fetch(
-                    "http://localhost:8080/api/v1/payment/all"
-                );
+                const response = await fetch("http://localhost:8080/api/v1/payment/all");
                 const data = await response.json();
                 console.log(data);
                 if (data.responseCode === "PAYM-0000" && data.data) {
                     this.payments = data.data;
-                } else {
+                }
+                else {
                     console.error("Error fetching payments:", data.errorMessage);
                 }
-            } catch (error) {
+            }
+            catch (error) {
                 console.error("Failed to fetch payments:", error);
             }
         },
@@ -101,38 +102,34 @@ export default {
                 idUserPays: this.userpays,
                 idUserReceives: this.userreceives,
             };
-
             try {
                 // Realizar una solicitud POST a la API para agregar una nueva propiedad.
-                const response = await fetch(
-                    "http://localhost:8080/api/v1/payment",
-                    {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            token: "1", // Tu token se establece aquí
-                        },
-                        body: JSON.stringify(newPayment),
-                    });
-
+                const response = await fetch("http://localhost:8080/api/v1/payment", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        token: "1", // Tu token se establece aquí
+                    },
+                    body: JSON.stringify(newPayment),
+                });
                 if (response.ok) {
                     const responseData = await response.json();
-
                     if (responseData.responseCode === "PAYM-0001" && responseData.data) {
                         // Suponiendo que el servidor devuelve la propiedad creada, la agregamos a nuestra lista.
                         this.payments.push(responseData.data);
-                    } else {
+                    }
+                    else {
                         console.error("Error adding payment:", responseData.errorMessage);
                     }
-                } else {
-                    console.error(
-                        "Failed to add payment, server responded with:",
-                        response.status
-                    );
                 }
-            } catch (error) {
+                else {
+                    console.error("Failed to add payment, server responded with:", response.status);
+                }
+            }
+            catch (error) {
                 console.error("Failed to add payment:", error);
-            } finally {
+            }
+            finally {
                 this.closeForm();
             }
         },
@@ -176,6 +173,7 @@ export default {
     mounted() {
         this.fetchPayments();
     },
+    components: { NavigationBar }
 }
 </script>
 
@@ -194,7 +192,9 @@ html,
 body,
 #app {
     height: 100%;
-    height: 100vh;
+    min-height: 100%;
+    width: 100%;
+    min-width: 100%;
     overflow: hidden;
     background-color: #fea162;
 }
