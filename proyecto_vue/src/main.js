@@ -7,7 +7,7 @@ import login from "./components/LoginSignUp.vue";
 import BlogView from "./components/BlogView.vue";
 import PropertiesView from "./components/PropertiesView.vue";
 import PaymentsView from "./components/PaymentsView.vue";
-import ContractsView from "./components/ContractsView.vue";
+import ContractsView from "./components/ContractsView2.vue";
 
 /**end pages **/
 

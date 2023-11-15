@@ -1,19 +1,19 @@
 <template>
+<NavigationBar></NavigationBar>
     <div class="payment-app">
         <button @click="openForm" id="newPaymentbtn">Registrar Nuevo Contrato</button>
     
         <div class="payment-list">
-            <div v-for="(receipt, index) in paymentReceipts" :key="index" class="payment-card">
+            <div v-for="(contract, index) in paymentReceipts" :key="index" class="payment-card">
                 <div class="receipt-content">
                     <div class="header">
-                        <div class="receipt-concept">{{ receipt.concept }}</div>
-                        <div class="receipt-date">Amount: {{ receipt.date }}</div>
+                        <div class="receipt-detail">Tipo: {{ contract.contractType }}</div>
+                        <div class="receipt-detail">Monto pagado: {{ contract.contractAmount }}</div>
                     </div>
                     <div class="receipt-info">
-                        <div class="receipt-detail">Start Date: {{ receipt.detail }}</div>
-                        <div class="receipt-buyer">End Date: {{ receipt.buyer }}</div>
-                        <div class="receipt-seller">Property: {{ receipt.seller }}</div>
-                        <div class="receipt-seller">User: {{ receipt.seller }}</div>
+                        <div class="receipt-detail">Fecha de inicio: {{ contract.contractSignatureDate }}</div>
+                        <div class="receipt-detail">Fecha de fin: {{ contract.contractEndDate }}</div>
+                        <div class="receipt-detail">Propiedad: {{ contract.contractProperty }}</div>
                     </div>
                 </div>
                 <div class="receipt-actions">
@@ -26,16 +26,26 @@
         <!-- Payment Receipt Form -->
         <div class="receipt-popup" v-if="showReceiptForm">
             <div class="popup-content">
-                <form>
-                    <input v-model="concept" placeholder="Concepto" type="text" required />
-                    <input v-model="date" placeholder="Fecha del Pago" type="date" required />
-                    <input v-model="ammount" placeholder="Monto del Pago" type="number" step="0.01" required />
-                    <input v-model="detail" placeholder="Detalle del Pago" type="text" required />
-                    <input v-model="buyer" placeholder="Paga" type="text" required />
-                    <input v-model="seller" placeholder="Recibe" type="text" required />
+                <form @submit.prevent="editing ? updateReceipt() : createReceipt()">
+                    <label for="propiedad">Propiedad:</label>
+                    <select id="propiedad" v-model="propiedad" required>
+                        <option value="">Selecciona una propiedad</option>
+                        <option v-for="propiedad in propiedades" :key="propiedad.id" :value="propiedad.id">
+                            {{ propiedad.propertyDescription }}
+                        </option>
+                    </select>
+                    <label for="propiedad">Fecha de inicio:</label>
+                    <input v-model="signatureDate" placeholder="Fecha de inicio" type="date" required />
+                    <label for="propiedad">Fecha de conclusión:</label>
+                    <input v-model="endDate" placeholder="Fecha de conclusión" type="date" required />
+                    <label for="propiedad">Monto pagado:</label>
+                    <input v-model="amount" placeholder="Monto pagado" type="text" required />
+                    <label for="propiedad">Tipo de contrato:</label>
                     <select v-model="type" required>
-                        <option value="">Selecciona una opción</option>
-                        <option v-for="option in options" :key="option.value" :value="option.value">{{ option.text }}</option>
+                        <option value="">Seleccione un tipo de contrato:</option>
+                        <option v-for="option in options" :key="option.value" :value="option.value">
+                            {{ option.text }}
+                        </option>
                     </select>
                     <!-- Action buttons -->
                     <div class="form-buttons">
@@ -51,90 +61,140 @@
     </template>
     
     <script>
+    import NavigationBar from "./NavigationBar.vue";
+    import ContractService from "../service/ContractService.js";
     export default {
-        data() {
-            return {
-                paymentReceipts: [],
-                showReceiptForm: false,
-                concept: '',
-                date: '',
-                ammount: '',
-                detail: '',
-                buyer: '',
-                seller: '',
-                editing: false,
-                index: null,
-            };
-        },
-        methods: {
-            openForm() {
-                this.concept = '';
-                this.date = '';
-                this.ammount = '';
-                this.detail = '';
-                this.buyer = '';
-                this.seller = '';
-    
-                this.editing = false;
-                this.showReceiptForm = true;
-            },
-            closeForm() {
-                this.showReceiptForm = false;
-                this.clearForm();
-            },
-            clearForm() {
-                this.concept = '';
-                this.date = '';
-                this.ammount = '';
-                this.detail = '';
-                this.buyer = '';
-                this.seller = '';
-            },
-            createReceipt() {
-                this.paymentReceipts.push({
-                    concept: this.concept,
-                    date: this.date,
-                    ammount: this.ammount,
-                    detail: this.detail,
-                    buyer: this.buyer,
-                    seller: this.seller,
-    
-                });
-                this.closeForm();
-            },
-            editReceipt(index) {
-                const receipt = this.paymentReceipts[index];
-                this.concept = receipt.concept;
-                this.date = receipt.date;
-                this.ammount = receipt.ammount;
-                this.detail = receipt.detail;
-                this.buyer = receipt.buyer;
-                this.seller = receipt.seller;
-    
-                this.editing = true;
-                this.showReceiptForm = true;
-                this.index = index;
-            },
-            updateReceipt() {
-                this.paymentReceipts[this.index] = {
-                    concept: this.concept,
-                    date: this.date,
-                    ammount: this.ammount,
-                    detail: this.detail,
-                    buyer: this.buyer,
-                    seller: this.seller,
-    
-                };
-                this.closeForm();
-            },
-            deleteReceipt(index) {
-                this.paymentReceipts.splice(index, 1);
+    data() {
+        return {
+            paymentReceipts: [],
+            showReceiptForm: false,
+
+            propiedad: '',
+            signatureDate: '',
+            endDate: '',
+            amount: '',
+            type: '',
+            
+            editing: false,
+            index: null,
+
+            contractService: new ContractService(),
+            token: 1,//localStorage.getItem("token"),
+        };
+    },
+    async created() {
+        await this.loadContracts();
+    },
+    methods: {
+        async loadContracts() {
+            try {
+                const contracts = await this.contractService.getAllContracts(this.token);
+                this.paymentReceipts = contracts; // Actualiza tu lista de contratos
+            } catch (error) {
+                console.error('Error al cargar contratos:', error);
             }
-        }
-    };
+        },
+        async createReceipt() {
+            const newContract = {
+                propiedad: this.propiedad,
+                signatureDate: this.signatureDate,
+                endDate: this.endDate,
+                amount: this.amount,
+                type: this.type,
+            };
+            try {
+                await this.contractService.createContract(newContract, this.token);
+                await this.loadContracts(); // Recargar lista después de añadir
+                this.closeForm();
+            } catch (error) {
+                console.error('Error al crear contrato:', error);
+            }
+        },
+        async updateReceipt() {
+            const updatedContract = {
+                propiedad: this.propiedad,
+                signatureDate: this.signatureDate,
+                endDate: this.endDate,
+                amount: this.amount,
+                type: this.type,
+            };
+            try {
+                await this.contractService.updateContract(this.paymentReceipts[this.index].id, updatedContract, this.token);
+                await this.loadContracts(); // Recargar lista después de actualizar
+                this.closeForm();
+            } catch (error) {
+                console.error('Error al actualizar contrato:', error);
+            }
+        },
+        async deleteReceipt(index) {
+            const contractId = this.paymentReceipts[index].id;
+            try {
+                await this.contractService.deleteContract(contractId, this.token);
+                await this.loadContracts(); // Recargar lista después de eliminar
+            } catch (error) {
+                console.error('Error al eliminar contrato:', error);
+            }
+        },
+        openForm() {
+            this.propiedad = '';
+            this.signatureDate = '';
+            this.endDate = '',
+            this.amount = '',
+            this.type = '',
+            this.editing = false;
+            this.showReceiptForm = true;
+        },
+        closeForm() {
+            this.showReceiptForm = false;
+            this.clearForm();
+        },
+        clearForm() {
+            this.propiedad = '';
+            this.signatureDate = '';
+            this.endDate = '',
+            this.amount = '',
+            this.type = ''
+        },
+        // createReceipt() {
+        //     this.paymentReceipts.push({
+        //         propiedad: this.propiedad,
+        //         signatureDate: this.signatureDate,
+        //         endDate: this.endDate,
+        //         amount: this.amount,
+        //         type: this.type,
+        //     });
+        //     this.closeForm();
+        // },
+        editReceipt(index) {
+            const contract = this.paymentReceipts[index];
+            this.propiedad = contract.propiedad;
+            this.signatureDate = contract.signatureDate;
+            this.endDate = contract.endDate;
+            this.amount = contract.amount;
+            this.type = contract.type;
+            this.editing = true;
+            this.showReceiptForm = true;
+            this.index = index;
+        },
+        // updateReceipt() {
+        //     this.paymentReceipts[this.index] = {
+        //         propiedad: this.propiedad,
+        //         signatureDate: this.signatureDate,
+        //         endDate: this.endDate,
+        //         amount: this.amount,
+        //         type: this.type,
+        //     };
+        //     this.closeForm();
+        // },
+        // deleteReceipt(index) {
+        //     this.paymentReceipts.splice(index, 1);
+        // }
+    },
+    components: { NavigationBar }
+};
     </script>
     
-      
+    
     <style lang="scss" scoped>
     /* Import Google Font Poppins */
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
@@ -172,7 +232,6 @@
         padding: 20px;
         margin-bottom: 20px;
     }
-    
     .payment-card:hover {
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
         scale: 1.01;
@@ -187,6 +246,7 @@
         justify-content: space-between;
         align-items: center;
         flex-direction: row;
+        font-style: bold;
         /* Your styles for the header and card details */
     }
     
@@ -302,4 +362,14 @@
             width: calc(100% - 20px);
         }
     }
+    label, .receipt-detail {
+        display: block;
+        text-align: left;
+        margin-bottom: 8px; /* Espacio entre el label y el input */
+        color: #5f5f5f; /* Color del texto */
+        font-size: 16px; /* Tamaño del texto */
+        font-weight:500; /* Negrita, si es necesario */
+    }
+
+
     </style>

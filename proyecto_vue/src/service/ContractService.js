@@ -3,7 +3,7 @@
 export default class ContractService {
 
     async getAllContracts(token) {
-        const url = 'http://localhost:8080/api/v1/contract/all';
+        const url = 'http://localhost:8080/api/v1/contract';
         const options = {
             method: 'GET',
             headers: {
@@ -17,7 +17,10 @@ export default class ContractService {
                 throw new Error(`HTTP error: Status: ${response.status}`);
             }
             const contracts = await response.json();
-            return contracts;
+            console.log("contratos en service "+contracts.data);
+            console.log("obtuvo contratos"+JSON.stringify(contracts.data));
+
+            return contracts.data;
         } catch (error) {
             console.error('Error al obtener los contratos:', error);
         }

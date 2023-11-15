@@ -123,8 +123,8 @@ export default {
         alert("Uno o más campos están vacíos");
         return;
       }
-      axios
-        .post("http://localhost:8080/api/v1/login", {
+      axios//TODO consumir service de login -> UserServie
+        .post("http://localhost:8080/api/v1/user/login", {
           username: this.username,
           password: this.password,
         })
