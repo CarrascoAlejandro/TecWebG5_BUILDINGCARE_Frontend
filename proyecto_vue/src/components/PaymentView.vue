@@ -27,7 +27,7 @@
                 <input v-model="concept" placeholder="Concepto" type="text" required />
                 <input v-model="date" placeholder="Fecha del Pago" type="date" required />
                 <input v-model="ammount" placeholder="Monto del Pago" type="number" step="0.01" required />
-                <input v-model="detail" placeholder="Detalle del Pago" type="text" required />
+                <textarea v-model="detail" placeholder="Detalle del Pago" required></textarea>
                 <input v-model="buyer" placeholder="Paga" type="text" required />
                 <input v-model="seller" placeholder="Recibe" type="text" required />
                 <!-- Action buttons -->
@@ -188,7 +188,7 @@ export default {
             display: flex;
             flex-direction: column;
 
-            input {
+            input, textarea {
                 margin-bottom: 15px;
                 padding: 10px;
                 border: 1px solid #ccc;
