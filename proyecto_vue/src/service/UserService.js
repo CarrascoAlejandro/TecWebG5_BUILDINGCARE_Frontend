@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export default class UserService{
-    url = "http://localhost:8080/api/v1/login";
+    url = "http://localhost:8080/api/v1/user/login";
     token = '1';
     async loginUser(username, password){
         try{
@@ -22,7 +22,7 @@ export default class UserService{
         
     }
     async signUpUser(name, usename, password, email, CI, phone, itTypeUser){
-        url = "http://localhost:8080/api/v1/signUp";
+        url = "http://localhost:8080/api/v1/user/signUp";
         try{
             const headers = {
                 'Content-Type': 'application/json',
