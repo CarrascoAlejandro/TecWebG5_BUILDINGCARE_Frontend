@@ -16,10 +16,7 @@
                     <div class="receipt-seller">Recibe: {{ receipt.seller }}</div>
                 </div>
             </div>
-            <div class="receipt-actions">
-                <button @click="editReceipt(index)">Editar</button>
-                <button @click="deleteReceipt(index)">Borrar</button>
-            </div>
+
         </div>
     </div>
 
@@ -35,9 +32,7 @@
                 <input v-model="seller" placeholder="Recibe" type="text" required />
                 <!-- Action buttons -->
                 <div class="form-buttons">
-                    <button @click="createReceipt" v-if="!editing">Añadir</button>
-                    <button @click="updateReceipt" v-if="editing">Actualizar</button>
-                    <button @click="deleteReceipt(index)" v-if="editing">Borrar</button>
+                    <button @click="createReceipt">Añadir</button>
                     <button @click="closeForm">Cerrar</button>
                 </div>
             </form>
@@ -59,7 +54,6 @@ export default {
             detail: '',
             buyer: '',
             seller: '',
-            editing: false,
             index: null,
         };
     },
@@ -99,34 +93,6 @@ export default {
             });
             this.closeForm();
         },
-        editReceipt(index) {
-            const receipt = this.paymentReceipts[index];
-            this.concept = receipt.concept;
-            this.date = receipt.date;
-            this.ammount = receipt.ammount;
-            this.detail = receipt.detail;
-            this.buyer = receipt.buyer;
-            this.seller = receipt.seller;
-
-            this.editing = true;
-            this.showReceiptForm = true;
-            this.index = index;
-        },
-        updateReceipt() {
-            this.paymentReceipts[this.index] = {
-                concept: this.concept,
-                date: this.date,
-                ammount: this.ammount,
-                detail: this.detail,
-                buyer: this.buyer,
-                seller: this.seller,
-
-            };
-            this.closeForm();
-        },
-        deleteReceipt(index) {
-            this.paymentReceipts.splice(index, 1);
-        }
     }
 };
 </script>
@@ -188,15 +154,7 @@ export default {
 }
 
 /* Style the actions section (buttons) on the payment card */
-.receipt-actions button {
-    margin: 5px;
-    padding: 8px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    background-color: blue;
-    color: #fff;
-}
+
 
 /* Make the form responsive */
 /* Estilos para el formulario con aspecto de carta y espaciado entre elementos */

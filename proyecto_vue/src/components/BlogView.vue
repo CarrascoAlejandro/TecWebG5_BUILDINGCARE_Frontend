@@ -72,11 +72,11 @@ export default {
                 description: '',
             },
             options: [{
-                    value: 'opcion1',
+                    value: 'opcion 1',
                     text: 'Opción 1'
                 },
                 {
-                    value: 'opcion2',
+                    value: 'opcion 2',
                     text: 'Opción 2'
                 },
                 // Agregar más opciones según sea necesario
@@ -111,7 +111,7 @@ export default {
                     type: this.type,
                     date: new Date().toISOString().split('T')[0], // Obtener la fecha actual
                     time: new Date().toLocaleTimeString(),
-                    image: require("@/assets/images/living1.jpg"), // Puedes ajustar la imagen según sea necesario
+                    image: this.image,
                     description: this.description,
                 };
 
