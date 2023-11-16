@@ -267,7 +267,9 @@ export default {
                 { name: "blog", label: "Anuncios" },
                 { name: "requests", label: "Solicitudes" },
                 { name: "houses", label: "Propiedades" },
+                { name: "contracts", label: "Contratos" },
                 { name: "logOut", label: "Cerrar Sesión" },
+                
             ],
         };
     },
@@ -282,6 +284,8 @@ export default {
                 this.$router.push("/propertyView");
             } else if (item === 'logOut'){
                 this.$router.push("/login");
+            }else if (item === 'contracts'){
+                this.$router.push("/contractsView");
             }
         },
         toggleMenu() {
