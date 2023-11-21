@@ -7,13 +7,15 @@
             <div v-for="(contract, index) in paymentReceipts" :key="index" class="payment-card">
                 <div class="receipt-content">
                     <div class="header">
+                        <div class="receipt-detail">Propiedad: {{ propertyNames[contract.contractProperty] }}</div>
+                        <div class="receipt-detail">Propietario: {{ contract.contractOwner }}</div>
                         <div class="receipt-detail">Tipo: {{ typeContractNames[contract.contractType] }}</div>
-                        <div class="receipt-detail">Monto pagado: {{ contract.contractAmount }}</div>
                     </div>
                     <div class="receipt-info">
+                        <div class="receipt-detail">Monto pagado: {{ contract.contractAmount }}</div>
                         <div class="receipt-detail">Fecha de inicio: {{ contract.contractSignatureDate }}</div>
                         <div class="receipt-detail">Fecha de conclusión: {{ contract.contractEndDate }}</div>
-                        <div class="receipt-detail">Propiedad: {{ propertyNames[contract.contractProperty] }}</div>
+                        
                     </div>
                 </div>
                 <div class="receipt-actions">
