@@ -37,19 +37,22 @@
                     <label for="propiedad">Fecha de inicio:</label>
                     <input v-model="signatureDate" placeholder="Fecha de inicio" type="date" required />
                     <label for="propiedad">Fecha de conclusión:</label>
+                    
                     <input v-model="endDate" placeholder="Fecha de conclusión" type="date" required />
                     <label for="propiedad">Monto pagado:</label>
+                    
                     <input v-model="amount" placeholder="Monto pagado" type="text" required />
                     <label for="propiedad">Tipo de contrato:</label>
+                    
                     <select v-model="type" required>
                         <option value="">Seleccione un tipo de contrato:</option>
-                        <option v-for="option in options" :key="option.value" :value="option.value">
-                            {{ option.text }}
+                        <option v-for="option in typeContract" :key="option.id" :value="option.id">
+                            {{ option.type }}
                         </option>
                     </select>
                     <!-- Action buttons -->
                     <div class="form-buttons">
-                        <button @click="createReceipt" v-if="!editing">Añadir</button>
+                        <button @click="createContract" v-if="!editing">Añadir</button>
                         <button @click="updateReceipt" v-if="editing">Actualizar</button>
                         <button @click="deleteReceipt(index)" v-if="editing">Borrar</button>
                         <button @click="closeForm">Cerrar</button>
@@ -63,9 +66,12 @@
     <script>
     import NavigationBar from "./NavigationBar.vue";
     import ContractService from "../service/ContractService.js";
+    import PropertiesService from "../service/PropertiesService.js";
     export default {
     data() {
         return {
+            propiedades: [],
+            typeContract: [],
             paymentReceipts: [],
             showReceiptForm: false,
 
@@ -78,37 +84,62 @@
             editing: false,
             index: null,
 
-            contractService: new ContractService(),
+            // contractService: new ContractService(),
+            // propertiesService: new PropertiesService(),
             token: 1,//localStorage.getItem("token"),
+            contracts: [],
+            
         };
     },
-    async created() {
+    created() {
+        // await this.loadContracts();
+        this.contractService= new ContractService();
+    },
+    async mounted() {
         await this.loadContracts();
     },
     methods: {
         async loadContracts() {
             try {
                 const contracts = await this.contractService.getAllContracts(this.token);
-                this.paymentReceipts = contracts; // Actualiza tu lista de contratos
+                this.paymentReceipts = contracts;
+                // const prop = await this.contractService.getProperties(this.token);
+                const prop = await PropertiesService.fetchProperties();
+                this.propiedades = prop.data;
+                console.log("propiedades: "+JSON.stringify(this.propiedades));
+                const typeC = await this.contractService.getTypeContract(this.token);
+                this.typeContract = typeC;
+                console.log("tipos: "+JSON.stringify(this.typeContract));
             } catch (error) {
                 console.error('Error al cargar contratos:', error);
             }
         },
-        async createReceipt() {
-            const newContract = {
-                propiedad: this.propiedad,
-                signatureDate: this.signatureDate,
-                endDate: this.endDate,
-                amount: this.amount,
-                type: this.type,
-            };
+        async createContract() {
             try {
-                await this.contractService.createContract(newContract, this.token);
-                await this.loadContracts(); // Recargar lista después de añadir
-                this.closeForm();
+                const newContract = {
+                    signatureDate: this.signatureDate,
+                    endDate: this.endDate,
+                    amount: parseInt(this.amount),
+                    idProperty: parseInt(this.propiedad),
+                    idType: parseInt(this.type),
+                    };
+                // console.log("datos: "+newContract.signatureDate+" "+newContract.endDate+" "+newContract.amount+" "+newContract.idProperty+" "+newContract.idType);
+                const data = await this.contractService.createContract(newContract, this.token);
+                // const data = await this.contractService.createContract(this.signatureDate,this.endDate,parseInt(this.amount),(this.propiedad),(this.type), this.token);
+                // console.log("data: "+JSON.stringify(data)+" result "+JSON.stringify(data.responseCode));
+                console.log("code: "+JSON.stringify(data.responseCode));
+                    await this.loadContracts(); // Recargar lista después de añadir
+                    this.closeForm();
+                
             } catch (error) {
                 console.error('Error al crear contrato:', error);
             }
+            
+            
+        },
+        async createReceipt(){
+            await this.loadContracts(); // Recargar lista después de añadir
+            this.closeForm();
         },
         async updateReceipt() {
             const updatedContract = {
@@ -155,16 +186,6 @@
             this.amount = '',
             this.type = ''
         },
-        // createReceipt() {
-        //     this.paymentReceipts.push({
-        //         propiedad: this.propiedad,
-        //         signatureDate: this.signatureDate,
-        //         endDate: this.endDate,
-        //         amount: this.amount,
-        //         type: this.type,
-        //     });
-        //     this.closeForm();
-        // },
         editReceipt(index) {
             const contract = this.paymentReceipts[index];
             this.propiedad = contract.propiedad;
