@@ -73,13 +73,13 @@ export default class ContractService {
         }
     }
 
-    async getContractById(id, token) {
-        const url = `http://localhost:8080/api/v1/contract/${id}`;
+    async getPropertyById(id, token) {
+        const url = `http://localhost:8080/api/v1/property/${id}`;
         const options = {
             method: 'GET',
             headers: {
                 Accept: 'application/json',
-                Authorization: token,
+                Token: token,
             }
         };
         try {
@@ -89,6 +89,48 @@ export default class ContractService {
             }
             const contract = await response.json();
             return contract;
+        } catch (error) {
+            console.error('Error al obtener el contrato:', error);
+        }
+    }
+
+    async getContractById(id, token) {
+        const url = `http://localhost:8080/api/v1/contract/${id}`;
+        const options = {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Token: token,
+            }
+        };
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) {
+                throw new Error(`HTTP error: Status: ${response.status}`);
+            }
+            const contract = await response.json();
+            return contract;
+        } catch (error) {
+            console.error('Error al obtener el contrato:', error);
+        }
+    }
+
+    async getTypeContractById(id, token) {
+        const url = `http://localhost:8080/api/v1/contract/type/${id}`;
+        const options = {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Token: token,
+            }
+        };
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) {
+                throw new Error(`HTTP error: Status: ${response.status}`);
+            }
+            const contract = await response.json();
+            return contract.data;
         } catch (error) {
             console.error('Error al obtener el contrato:', error);
         }
@@ -118,7 +160,7 @@ export default class ContractService {
             }
             const data = await response.json();
             console.log('data', JSON.stringify(data));
-            return data.responseCode;
+            return data;
         } catch (error) {
             console.error("Error al crear un nuevo contrato:", error);
             throw error;
@@ -132,7 +174,7 @@ export default class ContractService {
             headers: {
                 "Content-Type": "application/json",
                 Accept: "application/json",
-                Authorization: token,
+                Token: token,
             },
             body: JSON.stringify(contract)
         };

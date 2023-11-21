@@ -7,18 +7,18 @@
             <div v-for="(contract, index) in paymentReceipts" :key="index" class="payment-card">
                 <div class="receipt-content">
                     <div class="header">
-                        <div class="receipt-detail">Tipo: {{ contract.contractType }}</div>
+                        <div class="receipt-detail">Tipo: {{ typeContractNames[contract.contractType] }}</div>
                         <div class="receipt-detail">Monto pagado: {{ contract.contractAmount }}</div>
                     </div>
                     <div class="receipt-info">
                         <div class="receipt-detail">Fecha de inicio: {{ contract.contractSignatureDate }}</div>
-                        <div class="receipt-detail">Fecha de fin: {{ contract.contractEndDate }}</div>
-                        <div class="receipt-detail">Propiedad: {{ contract.contractProperty }}</div>
+                        <div class="receipt-detail">Fecha de conclusión: {{ contract.contractEndDate }}</div>
+                        <div class="receipt-detail">Propiedad: {{ propertyNames[contract.contractProperty] }}</div>
                     </div>
                 </div>
                 <div class="receipt-actions">
                     <button @click="editReceipt(index)">Editar</button>
-                    <button @click="deleteReceipt(index)">Borrar</button>
+                    <button @click="deleteReceipt(index)">Eliminar</button>
                 </div>
             </div>
         </div>
@@ -53,8 +53,8 @@
                     <!-- Action buttons -->
                     <div class="form-buttons">
                         <button @click="createContract" v-if="!editing">Añadir</button>
-                        <button @click="updateReceipt" v-if="editing">Actualizar</button>
-                        <button @click="deleteReceipt(index)" v-if="editing">Borrar</button>
+                        <button @click="updateReceipt(index)" v-if="editing">Actualizar</button>
+                        <button @click="deleteReceipt(index)" v-if="editing">Eliminar</button>
                         <button @click="closeForm">Cerrar</button>
                     </div>
                 </form>
@@ -74,6 +74,9 @@
             typeContract: [],
             paymentReceipts: [],
             showReceiptForm: false,
+
+            propertyNames: {},
+            typeContractNames: {},
 
             propiedad: '',
             signatureDate: '',
@@ -107,9 +110,19 @@
                 const prop = await PropertiesService.fetchProperties();
                 this.propiedades = prop.data;
                 console.log("propiedades: "+JSON.stringify(this.propiedades));
+                
                 const typeC = await this.contractService.getTypeContract(this.token);
                 this.typeContract = typeC;
                 console.log("tipos: "+JSON.stringify(this.typeContract));
+
+                // Cargar los nombres de todas las propiedades únicas en los contratos
+                const propertyIds = [...new Set(contracts.map(c => c.contractProperty))];
+                await Promise.all(propertyIds.map(id => this.fetchPropertyName(id)));
+
+                // Cargar los nombres de todos los tipos de contrato únicos en los contratos
+                const typeContractIds = [...new Set(contracts.map(c => c.contractType))];
+                await Promise.all(typeContractIds.map(id => this.fetchTypeContractName(id)));
+
             } catch (error) {
                 console.error('Error al cargar contratos:', error);
             }
@@ -119,7 +132,7 @@
                 const newContract = {
                     signatureDate: this.signatureDate,
                     endDate: this.endDate,
-                    amount: parseInt(this.amount),
+                    amount: parseFloat(this.amount),
                     idProperty: parseInt(this.propiedad),
                     idType: parseInt(this.type),
                     };
@@ -141,23 +154,29 @@
             await this.loadContracts(); // Recargar lista después de añadir
             this.closeForm();
         },
-        async updateReceipt() {
-            const updatedContract = {
-                propiedad: this.propiedad,
-                signatureDate: this.signatureDate,
-                endDate: this.endDate,
-                amount: this.amount,
-                type: this.type,
-            };
+        async updateReceipt(index) {
             try {
-                await this.contractService.updateContract(this.paymentReceipts[this.index].id, updatedContract, this.token);
+                const updateContract = {
+                    signatureDate: this.signatureDate,
+                    endDate: this.endDate,
+                    amount: parseFloat(this.amount),
+                    idProperty: parseInt(this.propiedad),
+                    idType: parseInt(this.type),
+                    };
+                // console.log("datos: "+newContract.signatureDate+" "+newContract.endDate+" "+newContract.amount+" "+newContract.idProperty+" "+newContract.idType);
+                const data = await this.contractService.updateContract(this.paymentReceipts[index].id,updateContract, this.token);
+                // const data = await this.contractService.createContract(this.signatureDate,this.endDate,parseInt(this.amount),(this.propiedad),(this.type), this.token);
+                // console.log("data: "+JSON.stringify(data)+" result "+JSON.stringify(data.responseCode));
+                console.log("code: "+JSON.stringify(data.responseCode));
                 await this.loadContracts(); // Recargar lista después de actualizar
                 this.closeForm();
             } catch (error) {
                 console.error('Error al actualizar contrato:', error);
             }
         },
+        
         async deleteReceipt(index) {
+            this.closeForm();
             const contractId = this.paymentReceipts[index].id;
             try {
                 await this.contractService.deleteContract(contractId, this.token);
@@ -186,30 +205,52 @@
             this.amount = '',
             this.type = ''
         },
-        editReceipt(index) {
-            const contract = this.paymentReceipts[index];
-            this.propiedad = contract.propiedad;
-            this.signatureDate = contract.signatureDate;
-            this.endDate = contract.endDate;
-            this.amount = contract.amount;
-            this.type = contract.type;
-            this.editing = true;
-            this.showReceiptForm = true;
-            this.index = index;
+        async editReceipt(index) {
+            try {
+                const contracts = await this.contractService.getContractById(this.paymentReceipts[index].id, this.token);
+                const contract = contracts.data;
+                console.log("contract: "+JSON.stringify(contract));
+                this.propiedad = contract.contractProperty;
+                this.signatureDate = contract.contractSignatureDate;
+                this.endDate = contract.contractEndDate;
+                this.amount = contract.contractAmount;
+                this.type = contract.contractType;
+                this.editing = true;
+                this.showReceiptForm = true;
+                this.index = index;
+            } catch (error) {
+                console.error('Error al obtener contrato:', error);
+            }
+            
         },
-        // updateReceipt() {
-        //     this.paymentReceipts[this.index] = {
-        //         propiedad: this.propiedad,
-        //         signatureDate: this.signatureDate,
-        //         endDate: this.endDate,
-        //         amount: this.amount,
-        //         type: this.type,
-        //     };
-        //     this.closeForm();
-        // },
-        // deleteReceipt(index) {
-        //     this.paymentReceipts.splice(index, 1);
-        // }
+        async fetchPropertyName(propertyId) {
+            try {
+                const response = await this.contractService.getPropertyById(propertyId, this.token);
+                console.log("response: "+JSON.stringify(response));
+                const propertyName = response.data.propertyDescription; // Ajusta esto según tu respuesta real
+                console.log("propertyName: "+propertyName);
+                // Aquí actualizamos el objeto de propiedades
+                // Vue debería ser capaz de detectar este cambio sin necesidad de usar $set
+                this.propertyNames[propertyId] = propertyName;
+            } catch (error) {
+                console.error('Error al obtener el nombre de la propiedad:', error);
+            }
+        },
+        //getTypeContractById
+        async fetchTypeContractName(typeContractId) {
+            try {
+                const response = await this.contractService.getTypeContractById(typeContractId, this.token);
+                console.log("response: "+JSON.stringify(response));
+                console.log("response data: "+JSON.stringify(response.data.type));
+                const typeContractName = response.data.type; // Ajusta esto según tu respuesta real
+                console.log("typeContractName!: "+typeContractName);
+                // Aquí actualizamos el objeto de propiedades
+                // Vue debería ser capaz de detectar este cambio sin necesidad de usar $set
+                this.typeContractNames[typeContractId] = typeContractName;
+            } catch (error) {
+                console.error('Error al obtener el nombre del tipo de contrato:', error);
+            }
+        },
     },
     components: { NavigationBar }
 };
