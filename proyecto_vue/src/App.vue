@@ -1,13 +1,17 @@
 <template>
   <div id="app">
-    <router-view></router-view>
     <!-- <LoginSignUp/> -->
+    <UserView/>
   </div>
 </template>
 
 <script>
+import UserView from './components/UserView.vue';
 export default {
   name: "App",
+  components: {
+    UserView
+}
 };
 </script>
 
