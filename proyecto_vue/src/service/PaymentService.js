@@ -1,8 +1,10 @@
 import axios from 'axios';
 
 export default class PaymentService {
-    url = "http://localhost:8080/api/v1/payment";
-    token = '1';
+    constructor() {
+        this.url = "http://localhost:8080/api/v1/payment";
+        this.token = '1';
+    }
     async newPayment(amount, date, concept, detail, idUserPays, idUserReceives) {
         try {
             // Define los datos que se enviarán en el cuerpo de la solicitud

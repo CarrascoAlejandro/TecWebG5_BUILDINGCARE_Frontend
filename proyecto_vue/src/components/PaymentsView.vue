@@ -1,558 +1,320 @@
 <template>
-    <NavigationBar></NavigationBar>
-    <body>
-        <div class="container">
-            <div class="utilities-container">
-                <div class="filter-and-add">
-                    <!-- <select v-model="filter" @change="filterProperties">
-              <option value="all">Todas los posts</option>
-              <option value="typeA">Garzonier</option>
-              <option value="typeB">Departamento</option>
-            </select> -->
-                    <button class="add-btn" @click="openForm()">
-                        <span>Registrar pago</span>
-                    </button>
-                </div>
-                <!-- <div class="search-container">
-            <input
-              v-model="searchText"
-              type="text"
-              placeholder="Buscar Propiedad..."
-              @input="searchProperties"
-            />
-          </div> -->
-            </div>
-        </div>
-        <div class="container">
-            <div class="announcement-board">
-                <div v-for="(payment, index) in payments" :key="index" class="announcement-post">
-                    <div class="post-title">{{ payment.concept }}</div>
-                    <div class="post-content">
-                        <div><b>Amount: </b>{{ payment.amount }} Bs.</div>
-                        <div><b>Date: </b>{{ payment.date }} </div>
-                        <div class="post-description">{{ payment.detail }}</div>
-                        <div><b>From: </b>{{ payment.idUserPays }}</div> <!-- TODO: fetch user name from id -->
-                        <div><b>To: </b>{{ payment.idUserReceives }}</div>
+    <NavigationBar />
+    <div class="payment-app">
+        <button @click="openForm" id="newPaymentbtn">Nuevo Pago</button>
+
+        <div class="payment-list">
+            <div v-for="(receipt, index) in paymentReceipts" :key="index" class="payment-card">
+                <div class="receipt-content">
+                    <div class="header">
+                        <div class="receipt-concept">Concepto: {{ receipt.concept }}</div>
+                        <div class="receipt-date">Fecha del Pago: {{ receipt.date }}</div>
+                        <div class="receipt-amount">Monto: {{ receipt.amount }}</div>
+                    </div>
+                    <div class="receipt-info">
+                        <div class="receipt-detail">Detalle: {{ receipt.detail }}</div>
+                        <div class="receipt-buyer">Paga: {{ receipt.nameUserPays }}</div>
+                        <div class="receipt-seller">Recibe: {{ receipt.nameUserReceives }}</div>
                     </div>
                 </div>
+
             </div>
         </div>
-        <div id="propertyForm">
-            <h1>Registrar pago</h1>
-            <form @submit.prevent="newPayment()">
-                <input v-model="concept" placeholder="Concepto" type="text" required />
-                <input v-model="amount" placeholder="Monto" type="number" required />
-                <textarea v-model="detail" rows="4" cols="50" required>
-                    Escriba el detalle del pago aqui...
-                </textarea>
 
-                <input v-model="date" type="date" required />
-                <input v-model="userpays" placeholder="Persona paga" type="text" required /> <!-- TODO: convert from username combobox -->
-                <input v-model="userreceives" placeholder="Persona recibe" type="text" required />
-                <div class="form-buttons">
-                    <input class="submitBtn" type="submit" value="Añadir" />
-                    <input class="resetBtn" type="reset" value="Limpiar Campos" />
-                    <input class="cancelBtn" type="button" value="Cancelar" @click="closeForm" />
-                </div>
-            </form>
+        <!-- Payment Receipt Form -->
+        <div class="receipt-popup" v-if="showReceiptForm">
+            <div class="popup-content">
+                <form @submit.prevent="createReceipt">
+                    <input v-model="concept" placeholder="Concepto" type="text" required />
+                    <input v-model="date" placeholder="Fecha del Pago" type="date" required />
+                    <input v-model="ammount" placeholder="Monto del Pago" type="number" step="0.01" required />
+                    <textarea v-model="detail" placeholder="Detalle del Pago" required></textarea>
+                    <select v-model="buyer" required>
+                        <option value="" disabled selected>Paga</option>
+                        <option v-for="user in users" :key="user.idUser" :value="user.idUser">{{ user.name }}</option>
+                    </select>
+                    <select v-model="seller" required>
+                        <option value="" disabled selected>Recibe</option>
+                        <option v-for="user in users" :key="user.idUser" :value="user.idUser">{{ user.name }}</option>
+                    </select>
+                    
+                    <!-- Action buttons -->
+                    <div class="form-buttons">
+                        <button type="submit">Añadir</button>
+                        <button @click="closeForm">Cerrar</button>
+                    </div>
+                </form>
+            </div>
         </div>
-
-    </body>
+    </div>
 </template>
-
+    
+      
 <script>
-//import PaymentService from '@/service/PaymentService';
-import NavigationBar from "./NavigationBar.vue";
+import PaymentService from '../service/PaymentService';
+import UserService from '../service/UserService';
+import NavigationBar from './NavigationBar.vue';
+
 export default {
     data() {
         return {
-            payments: [],
-            showForm: false,
-            concept: "",
-            amount: "",
-            date: "",
-            detail: "",
-            userpays: "",
-            userreceives: "",
+            paymentReceipts: [],
+            showReceiptForm: false,
+            concept: '',
+            date: '',
+            ammount: '',
+            detail: '',
+            buyer: '',
+            seller: '',
+            index: null,
+            users: [],
         };
     },
-    methods: {
-        async fetchPayments() {
-            try {
-                const response = await fetch("http://localhost:8080/api/v1/payment/all");
-                const data = await response.json();
-                console.log(data);
-                if (data.responseCode === "PAYM-0000" && data.data) {
-                    this.payments = data.data;
-                }
-                else {
-                    console.error("Error fetching payments:", data.errorMessage);
-                }
-            }
-            catch (error) {
-                console.error("Failed to fetch payments:", error);
-            }
-        },
-        async newPayment() {
-            const newPayment = {
-                concept: this.concept,
-                amount: this.amount,
-                date: this.date,
-                detail: this.detail,
-                idUserPays: this.userpays,
-                idUserReceives: this.userreceives,
-            };
-            try {
-                // Realizar una solicitud POST a la API para agregar una nueva propiedad.
-                const response = await fetch("http://localhost:8080/api/v1/payment", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        token: "1", // Tu token se establece aquí
-                    },
-                    body: JSON.stringify(newPayment),
-                });
-                if (response.ok) {
-                    const responseData = await response.json();
-                    if (responseData.responseCode === "PAYM-0001" && responseData.data) {
-                        // Suponiendo que el servidor devuelve la propiedad creada, la agregamos a nuestra lista.
-                        this.payments.push(responseData.data);
-                    }
-                    else {
-                        console.error("Error adding payment:", responseData.errorMessage);
-                    }
-                }
-                else {
-                    console.error("Failed to add payment, server responded with:", response.status);
-                }
-            }
-            catch (error) {
-                console.error("Failed to add payment:", error);
-            }
-            finally {
-                this.closeForm();
-            }
-        },
-        /* filterProperties() {
-            if (this.filter === "all") {
-                this.getPayments();
-            } else {
-                this.$axios
-                    .get(`http://localhost:3000/payments?status=${this.filter}`)
-                    .then((response) => {
-                        this.payments = response.data;
-                    })
-                    .catch((error) => {
-                        console.log(error);
-                    });
-            }
-        },
-        searchProperties() {
-            if (this.searchText === "") {
-                this.getPayments();
-            } else {
-                this.$axios
-                    .get(
-                        `http://localhost:3000/payments?q=${this.searchText}&_limit=10`
-                    )
-                    .then((response) => {
-                        this.payments = response.data;
-                    })
-                    .catch((error) => {
-                        console.log(error);
-                    });
-            }
-        }, */
-        openForm() {
-            document.getElementById("propertyForm").style.display = "block";
-        },
-        closeForm() {
-            document.getElementById("propertyForm").style.display = "none";
-        },
+    created() {
+        this.paymentService = new PaymentService();
+        this.userService = new UserService();
     },
     mounted() {
-        this.fetchPayments();
+        this.getReceipts();
+        this.listAllUsers();
+    },
+    methods: {
+        listAllUsers() {
+            this.userService.listAllUsers()
+                .then((response) => {
+                    console.log(response.data.data);
+                    this.users = response.data.data;
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+        },
+        getReceipts() {
+            this.paymentService.getPayments()
+                .then((response) => {
+                    console.log(response.data);
+                    this.paymentReceipts = response.data;
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+        },
+        newPayment() {
+            const amount = this.ammount;
+            const date = this.date;
+            const concept = this.concept;
+            const detail = this.detail;
+            const buyer = this.buyer;
+            const seller = this.seller;
+            this.paymentService.newPayment(amount, date, concept, detail, buyer, seller)
+                .then((response) => {
+                    console.log(response.data);
+                    this.paymentReceipts = response.data;
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+        },
+        openForm() {
+            this.concept = '';
+            this.date = '';
+            this.ammount = '';
+            this.detail = '';
+            this.buyer = '';
+            this.seller = '';
+            this.editing = false;
+            this.showReceiptForm = true;
+        },
+        closeForm() {
+            this.showReceiptForm = false;
+            this.clearForm();
+        },
+        clearForm() {
+            this.concept = '';
+            this.date = '';
+            this.ammount = '';
+            this.detail = '';
+            this.buyer = '';
+            this.seller = '';
+        },
+        createReceipt() {
+            this.newPayment();
+            /* this.paymentReceipts.push({
+                concept: this.concept,
+                date: this.date,
+                ammount: this.ammount,
+                detail: this.detail,
+                buyer: this.buyer,
+                seller: this.seller,
+            }); */
+            this.closeForm();
+            //Reload the page
+            location.reload();
+        },
     },
     components: { NavigationBar }
-}
+};
 </script>
-
+    
+      
 <style lang="scss" scoped>
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&display=swap");
+/* Import Google Font Poppins */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
 
-
-* {
-    font-family: "Poppins", sans-serif;
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-html,
-body,
-#app {
-    height: 100%;
-    min-height: 100%;
-    width: 100%;
-    min-width: 100%;
-    overflow: hidden;
-    background-color: #fea162;
-}
-
-div {
-    box-sizing: border-box;
-}
-
-.container {
-    padding: 20px;
-    width: 100%;
-    margin: 0 auto;
-    text-align: center;
-}
-
-.utilities-container {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    background-color: #63f6ff;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    border: 3px solid #22abb3;
-}
-
-.utilities-container button {
-    margin-left: 10px;
-    padding: 10px;
-    border-radius: 5px;
-    background-color: #b36634;
-    color: #fff;
-    font-weight: bold;
-    cursor: pointer;
-    border: none;
-}
-
-.utilities-container button:hover {
-    transform: scale(1.1);
-}
-
-.utilities-container select {
-    padding: 10px;
-    border-radius: 5px;
-    background-color: #b36634;
-    color: #fff;
-    font-weight: bold;
-    cursor: pointer;
-    border: none;
-}
-
-#propertiesTable {
-    width: 100%;
-    border-collapse: collapse;
-    border: 3px solid #22abb3;
-    border-radius: 10px;
-    overflow: hidden;
-    background-color: #63f6ff;
-}
-
-#propertiesTable thead {
-    background-color: #22abb3;
-    color: #fff;
-}
-
-#propertyForm .form-buttons {
-    display: flex;
-    justify-content: space-between;
-}
-
-#propertyForm .form-buttons input {
-    padding: 10px;
-    border-radius: 5px;
-    background-color: #b36634;
-    color: #fff;
-    font-weight: bold;
-    cursor: pointer;
-    border: none;
-}
-
-#propertyForm .form-buttons input:hover {
-    transform: scale(1.1);
-}
-
-#propertyForm .form-buttons .cancelBtn {
-    background-color: #fea162;
-}
-
-#propertyForm .form-buttons .cancelBtn:hover {
-    background-color: #b36634;
-}
-
-#editProperty .form-buttons {
-    display: flex;
-    justify-content: space-between;
-}
-
-#editProperty .form-buttons input {
-    padding: 10px;
-    border-radius: 5px;
-    background-color: #b36634;
-    color: #fff;
-    font-weight: bold;
-    cursor: pointer;
-    border: none;
-}
-
-#editProperty .form-buttons input:hover {
-    transform: scale(1.1);
-}
-
-#editProperty .form-buttons .cancelBtn {
-    background-color: #fea162;
-}
-
-#editProperty .form-buttons .cancelBtn:hover {
-    background-color: #b36634;
-}
-
-.search-container {
-    width: 100%;
-    text-align: center;
-}
-
-.search-container input {
-    padding: 10px;
-    border-radius: 5px;
-    background-color: #fff;
-    color: #000;
-    font-weight: bold;
-    cursor: pointer;
-    border: none;
-}
-
-.search-container input:hover {
-    transform: scale(1.1);
-}
-
-.add-btn {
-    border-radius: 50px;
-    background-color: #fea162;
-    border: none;
-    color: #fff;
-    text-align: center;
-    font-size: 20px;
-    padding: 10px;
-    width: fit-content;
-    transition: all 0.5s;
-    cursor: pointer;
-    margin: 5px;
-}
-
-.add-btn span {
-    cursor: pointer;
-    display: inline-block;
-    position: relative;
-    transition: 0.5s;
-}
-
-.add-btn span:after {
-    position: absolute;
-    opacity: 0;
-    top: 0;
-    right: -20px;
-    transition: 0.5s;
-}
-
-.add-btn:hover {
-    background-color: #b36634;
-}
-
-.add-btn:hover span:after {
-    opacity: 1;
-    right: 0;
-}
-
-#propertyForm,
-#editProperty {
-    display: none;
-    border: 3px solid #22abb3;
-    border-radius: 10px;
-    padding: 2em;
-    width: 400px;
-    text-align: center;
-    position: fixed;
-    background: #63f6ff;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    -webkit-transform: translate(-50%, -50%);
-    animation: slide-in 0.5s forwards;
-}
-
-@keyframes slide-in {
-    from {
-        transform: translateY(-100%);
-        left: 40%;
-        opacity: 0;
-    }
-
-    to {
-        left: 40%;
-        transform: translateY(-50%);
-        opacity: 1;
-    }
-}
-
-#propertyForm h1,
-#editProperty h1 {
-    margin-bottom: 1em;
-    color: #fff;
-}
-
-#propertyForm input,
-#propertyForm select,
-#editProperty input,
-#editProperty select {
-    margin: 0.8em auto;
-    font-family: inherit;
-    text-transform: inherit;
-    font-size: inherit;
-
-    display: block;
-    width: 280px;
-    padding: 0.4em;
-    border-radius: 5px;
-    border: none;
-    background-color: #fff;
-    color: #000;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-#propertyForm input:hover,
-#propertyForm select:hover,
-#editProperty input:hover,
-#editProperty select:hover {
-    transform: scale(1.1);
-}
-
-#propertyForm input:focus,
-#propertyForm select:focus,
-#editProperty input:focus,
-#editProperty select:focus {
-    outline: none;
-    box-shadow: 0 0 5px #22abb3;
-}
-
-#propertyForm .form-buttons input:focus,
-#editProperty .form-buttons input:focus {
-    outline: none;
-    box-shadow: 0 0 5px #22abb3;
-}
-
-img {
-    max-width: 100%;
-    height: auto;
-}
-
-* {
-    font-family: "Poppins", sans-serif;
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-html,
-body,
-#app {
-    height: 100%;
-}
-
-.container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100%;
-    padding: 20px;
-    background-color: #fea162;
-    width: 100%;
-    justify-content: center;
-    text-align: center;
-}
-
-.announcement-board {
+/* Apply Poppins font family to the entire app */
+.payment-app {
+    background-color: #ccc;
+    font-family: 'Poppins', sans-serif;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
     gap: 20px;
     width: 100%;
+    height: 100vh;
     flex-direction: column;
 }
 
-.announcement-post {
-    width: 95%;
+/* Style the container for the list of payment cards */
+.payment-list {
     display: flex;
-    flex-direction: column;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #fff;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease-in-out;
-    margin: 10px;
-
-    .post-title {
-        text-align: start;
-        font-size: 18px;
-        font-weight: bold;
-    }
-
-    .post-content {
-        margin-top: 10px;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-    }
-
-    .post-image {
-        flex: 1;
-        max-width: 10%;
-        margin-right: 20px;
-
-        img {
-            width: 100%;
-            border-radius: 5px;
-        }
-    }
-
-    .post-description {
-        flex: 1;
-        font-size: 14px;
-        text-align: start;
-    }
-
-    &:hover {
-        transform: scale(1.05);
-    }
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
 }
 
-@media screen and (max-width: 768px) {
-    .announcement-post {
-        .post-content {
+/* Style individual payment card */
+.payment-card {
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    width: 300px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.payment-card:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    scale: 1.01;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Style the details section of the payment card */
+.receipt-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+    /* Your styles for the header and card details */
+}
+
+/* Style the actions section (buttons) on the payment card */
+
+
+/* Make the form responsive */
+/* Estilos para el formulario con aspecto de carta y espaciado entre elementos */
+.receipt-popup {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    transition: all 0.3s ease-in-out;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    /* Posición por encima de todo */
+    background: rgba(0, 0, 0, 0.5);
+
+    /* Fondo semi-transparente para resaltar el formulario */
+
+    .popup-content {
+        background: rgb(247, 247, 247);
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        max-width: 400px;
+        /* Ancho máximo del formulario */
+        width: 100%;
+        text-align: center;
+
+        form {
+            display: flex;
             flex-direction: column;
-        }
 
-        .post-image {
-            max-width: 100%;
-            margin-right: 0;
-            margin-bottom: 20px;
+            input,
+            textarea {
+                margin-bottom: 15px;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                width: calc(100% - 22px);
+                /* Ancho del input descontando el padding */
+                font-size: 16px;
 
-            img {
-                height: 100%;
+                &:last-child {
+                    margin-bottom: 0;
+                    /* Eliminar margen inferior del último input */
+                }
+            }
+
+            .form-buttons {
+                display: flex;
+                justify-content: space-between;
+
+                button {
+                    padding: 10px 20px;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    font-size: 16px;
+
+                    &:first-child {
+                        background-color: #4c53af;
+                        color: white;
+                    }
+
+                    &:nth-child(2) {
+                        background-color: #0a8bf5;
+                        color: white;
+                    }
+
+                    &:last-child {
+                        background-color: #f44336;
+                        color: white;
+                    }
+                }
             }
         }
+    }
+}
+
+#newPaymentbtn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    background-color: #4CAF50;
+    color: white;
+}
+
+/* Media query for responsiveness */
+@media (max-width: 768px) {
+    .payment-card {
+        width: calc(50% - 20px);
+    }
+
+}
+
+@media (max-width: 480px) {
+    .payment-card {
+        width: calc(100% - 20px);
     }
 }
 </style>
