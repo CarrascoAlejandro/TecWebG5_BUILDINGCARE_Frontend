@@ -26,13 +26,60 @@ export default class ContractService {
         }
     }
 
-    async getContractById(id, token) {
-        const url = `http://localhost:8080/api/v1/contract/${id}`;
+    async getTypeContract(token) {
+        const url = 'http://localhost:8080/api/v1/contract/type';
         const options = {
             method: 'GET',
             headers: {
                 Accept: 'application/json',
                 Authorization: token,
+            }
+        };
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) {
+                throw new Error(`HTTP error: Status: ${response.status}`);
+            }
+            const type = await response.json();
+            console.log("contratos en service "+type.data);
+            console.log("obtuvo contratos"+JSON.stringify(type.data));
+
+            return type.data;
+        } catch (error) {
+            console.error('Error al obtener los contratos:', error);
+        }
+    }
+
+    async getProperties(token) {
+        const url = 'http://localhost:8080/api/v1/property/all';
+        const options = {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: token,
+            }
+        };
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) {
+                throw new Error(`HTTP error: Status: ${response.status}`);
+            }
+            const properties = await response.json();
+            console.log("properties en service "+properties.data);
+            console.log("obtuvo properties en service"+JSON.stringify(properties.data));
+            return properties.data;
+        } catch (error) {
+            console.error('Error al obtener los contratos:', error);
+        }
+    }
+
+    async getPropertyById(id, token) {
+        const url = `http://localhost:8080/api/v1/property/${id}`;
+        const options = {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Token: token,
             }
         };
         try {
@@ -47,23 +94,72 @@ export default class ContractService {
         }
     }
 
-    async createContract(contract, token) {
-        const url = "http://localhost:8080/api/v1/contract";
+    async getContractById(id, token) {
+        const url = `http://localhost:8080/api/v1/contract/${id}`;
+        const options = {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Token: token,
+            }
+        };
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) {
+                throw new Error(`HTTP error: Status: ${response.status}`);
+            }
+            const contract = await response.json();
+            return contract;
+        } catch (error) {
+            console.error('Error al obtener el contrato:', error);
+        }
+    }
+
+    async getTypeContractById(id, token) {
+        const url = `http://localhost:8080/api/v1/contract/type/${id}`;
+        const options = {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Token: token,
+            }
+        };
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) {
+                throw new Error(`HTTP error: Status: ${response.status}`);
+            }
+            const contract = await response.json();
+            return contract.data;
+        } catch (error) {
+            console.error('Error al obtener el contrato:', error);
+        }
+    }
+
+    async createContract(contract,token) {//signatureDate,endDate,amount,idProperty,idType,
+        console.log("entro a crear contrato");
+        const url = 'http://localhost:8080/api/v1/contract';
+        console.log("data"+JSON.stringify(contract));
         const options = {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 Accept: "application/json",
-                Authorization: token,
+                Token: token
             },
             body: JSON.stringify(contract)
         };
+        
+        console.log('options', options);
+        // console.log('contract!!!', JSON.stringify(contract));
         try {
             const response = await fetch(url, options);
+            console.log('response', response);
             if (!response.ok) {
                 throw new Error(`HTTP error: Status ${response.status}`);
             }
             const data = await response.json();
+            console.log('data', JSON.stringify(data));
             return data;
         } catch (error) {
             console.error("Error al crear un nuevo contrato:", error);
@@ -78,7 +174,7 @@ export default class ContractService {
             headers: {
                 "Content-Type": "application/json",
                 Accept: "application/json",
-                Authorization: token,
+                Token: token,
             },
             body: JSON.stringify(contract)
         };
