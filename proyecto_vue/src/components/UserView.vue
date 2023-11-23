@@ -23,13 +23,6 @@
           <p>CI: {{ user?.ci }}</p>
         </div>
         <div class="actionButtons">
-          <button
-            class="btn btn-primary"
-            v-if="!adminCredential"
-            @click="changeRole"
-          >
-            Convertir en Administrador
-          </button>
           <button class="btn btn-primary" @click="editUser(index)">
             Editar
           </button>
