@@ -4,6 +4,7 @@ import { createRouter, createWebHistory } from "vue-router";
 /**Pages */
 import App from "./App.vue";
 import login from "./components/LoginSignUp.vue";
+import UserView from "./components/UserView.vue";
 import BlogView from "./components/BlogView.vue";
 import PropertiesView from "./components/PropertiesView.vue";
 import PaymentsView from "./components/PaymentsView.vue";
@@ -20,6 +21,11 @@ const routes = [
     name: "login",
     path: "/login",
     component: login,
+  },
+  {
+    name: "user",
+    path: "/userView",
+    component: UserView,
   },
   {
     name: "blog",

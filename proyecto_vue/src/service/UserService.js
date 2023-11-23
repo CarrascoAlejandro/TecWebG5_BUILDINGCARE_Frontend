@@ -57,4 +57,41 @@ export default class UserService{
         }
         
     }
+
+    async listAllUserTypes(){
+        try{
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': this.token,
+            };
+            const response = await axios.get(this.url+'/type/all', { headers });
+            return response;
+        }catch(err){
+            console.error('Error al listar tipos de usuarios:', err);
+            throw err;
+        }
+    }
+
+    async updateUser(id, name, usename, email, CI, phone, idTypeUser){
+        try{
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': this.token,
+            };
+            const data = {
+                idUser: id,
+                name: name,
+                usename: usename,
+                email: email,
+                ci: CI,
+                phone: phone,
+                typeUser: idTypeUser,
+            }
+            const response = await axios.put(this.url+'/update', data, { headers });
+            return response;
+        }catch(err){
+            console.error('Error al actualizar usuario:', err);
+            throw err;
+        }
+    }
 }

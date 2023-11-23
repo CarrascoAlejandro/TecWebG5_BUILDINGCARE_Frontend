@@ -276,7 +276,9 @@ export default {
     methods: {
         setActiveNavItem(item) {
             this.activeNavItem = item;
-            if (item === 'blog'){
+            if (item === 'about'){
+                this.$router.push("/userView");
+            } else if (item === 'blog'){
                 this.$router.push("/blogView");
             } else if (item === 'requests'){
                 this.$router.push("/paymentsView");
