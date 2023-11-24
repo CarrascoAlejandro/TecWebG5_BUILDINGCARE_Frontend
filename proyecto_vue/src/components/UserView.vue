@@ -4,7 +4,7 @@
     <button class="btn btn-primary" @click="addUsers">Añadir Usuarios</button>
     <div
       class="row align-items-center profile-header"
-      v-for="user in users"
+      v-for="(user, index) in users"
       :key="user.userId"
     >
       <div class="col-md-2 mb-3">
@@ -27,6 +27,9 @@
           @click="changeRole"
         >
           Convertir en Administrador
+        </button>
+        <button class="btn btn-primary" @click="deleteUser(index)">
+          Eliminar
         </button>
         <button class="btn btn-primary" @click="editUser(index)">
           Editar
@@ -65,7 +68,6 @@
           <div class="form-buttons">
             <button @click="createUser" v-if="!userEditing">Crear</button>
             <button @click="updateUser" v-if="userEditing">Actualizar</button>
-            <button @click="deleteUser(index)">Eliminar</button>
             <button @click="closeForm">Cerrar</button>
           </div>
         </form>
