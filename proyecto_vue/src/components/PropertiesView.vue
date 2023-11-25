@@ -42,7 +42,7 @@
             <td>{{ property.propertyValue }}</td>
             <td>{{ property.propertyDescription }}</td>
             <td>
-              <img :src="property.propertyImage" alt="Imagen de la propiedad" />
+              <img :src="require('../../../image_server/img/' + property.propertyImage)" alt="Imagen de la propiedad" />
             </td>
             <td class="propertyType">{{ property.propertyType }}</td>
             <td class="propertySection">{{ property.propertySection }}</td>
@@ -156,6 +156,7 @@
 <script>
 import PropertiesService from "../service/PropertiesService.js";
 import NavigationBar from "./NavigationBar.vue";
+import { uploadImage } from "../service/ImageService.js";
 
 export default {
     data() {
@@ -206,12 +207,14 @@ export default {
             }
         },
         async addProperty() {
+            let uplodedImagePath = await uploadImage(this.image);
+            //console.log(uplodedImagePath);
             const newProperty = {
                 propertyEnvironments: this.environments,
                 propertyDimensions: parseFloat(this.dimensions),
                 propertyValue: parseFloat(this.value),
                 propertyDescription: this.description,
-                propertyImage: "anURL.jpg",
+                propertyImage: uplodedImagePath,
                 propertyIdSection: 1,
                 propertyIdType: 1,
             };
@@ -303,13 +306,14 @@ export default {
             }
         },
         handleImageUpload(event) {
-            const file = event.target.files[0];
+            /* const file = event.target.files[0];
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = (event) => {
                 this.image = event.target.result;
-            };
-        },
+            }; */
+            this.image = event.target.files[0];
+        },  
         handleTableClick(event) {
             const propertyId = event.target.parentElement.parentElement.children[0].innerText;
             const property = this.properties.find((p) => p.id === Number(propertyId));
