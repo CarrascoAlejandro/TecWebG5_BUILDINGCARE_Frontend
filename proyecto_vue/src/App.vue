@@ -1,16 +1,19 @@
 <template>
   <div id="app">
     <!-- <LoginSignUp/> -->
-    <UserView/>
+    <!-- <UserView/> -->
+    <CommonAreaView />
   </div>
 </template>
 
 <script>
-import UserView from './components/UserView.vue';
+import CommonAreaView from './components/CommonAreaView.vue';
+
+//import UserView from './components/UserView.vue';
 export default {
   name: "App",
   components: {
-    UserView
+    CommonAreaView
 }
 };
 </script>
