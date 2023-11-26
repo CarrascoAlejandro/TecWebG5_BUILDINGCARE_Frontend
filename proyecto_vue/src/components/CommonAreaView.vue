@@ -80,7 +80,11 @@
 export default {
   data() {
     return {
-      commonAreas: [],
+      commonAreas: [{
+        name: "Gimnasio Esparta 1",
+        type: "Gimnasio",
+        description: "Gimnasio multifuncional con vista a los jardines principales, capacidad para 50 personas."
+      }],
       showPopup: false,
       type: "",
       name: "",
