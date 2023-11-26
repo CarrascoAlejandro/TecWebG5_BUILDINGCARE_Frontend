@@ -87,6 +87,14 @@ export default {
       description: "",
       index: null,
       editing: false,
+      options: [
+        { text: "Piscina", value: "Piscina" },
+        { text: "Gimnasio", value: "Gimnasio" },
+        { text: "Salón de Eventos", value: "Salón de Eventos" },
+        { text: "Parque", value: "Parque" },
+        { text: "Cancha", value: "Cancha" },
+        { text: "Otro", value: "Otro" },
+      ],
     };
   },
   methods: {
