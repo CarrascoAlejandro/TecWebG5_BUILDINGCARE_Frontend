@@ -68,6 +68,7 @@ export default {
             seller: '',
             index: null,
             users: [],
+            typeUser: '',
         };
     },
     created() {
@@ -75,8 +76,14 @@ export default {
         this.userService = new UserService();
     },
     mounted() {
+        this.typeUser = localStorage.getItem('typeUser');
+        //si el typeUser es null, redirige a la vista raiz
+        if (this.typeUser == null) {
+            this.$router.push('/');
+        }   
         this.getReceipts();
         this.listAllUsers();
+        
     },
     methods: {
         listAllUsers() {
