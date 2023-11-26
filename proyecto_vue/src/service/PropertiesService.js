@@ -58,6 +58,18 @@ class PropertiesService {
       throw error;
     }
   }
+
+  async fetchTypes() {
+    try {
+      const response = await fetch(
+        "http://localhost:8080/api/v1/property/type"
+      );
+      return await response.json();
+    } catch (error) {
+      console.error("Failed to fetch types:", error);
+      throw error;
+    }
+  }
 }
 
 export default new PropertiesService();
