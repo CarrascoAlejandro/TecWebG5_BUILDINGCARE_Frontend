@@ -57,7 +57,7 @@
         <form>
           <select v-model="selectedType" required>
             <option value="">Selecciona un tipo de propiedad</option>
-            <option v-for="type in types" :key="type.id" :value="type">
+            <option v-for="(type) in types" :key="type.id" :value="type">
               {{ type.type }}
             </option>
           </select>
@@ -67,7 +67,7 @@
           <input v-model="environments" placeholder="Ambientes de la Propiedad" type="number" required />
           <input v-model="dimensions" placeholder="Dimensiones de la Propiedad" type="number" step="0.01" required />
           <textarea v-model="description" placeholder="Descripción" required></textarea>
-          <input type="file" @change="handleImageUpload" accept="image/*" />
+          <input type="file" @change="handleImageUpload" accept="image/*" required/>
           <!-- Botones de acción -->
           <div class="form-buttons">
             <button @click="createPost" v-if="!editing">Crear</button>
@@ -211,13 +211,10 @@ export default {
         return;
       }
 
-      let imageUrl = null;
-      try {
-        if (this.image) {
-          imageUrl = await uploadImage(this.image);
-        }
-      } catch (error) {
-        console.error("Failed to upload image:", error);
+      let imageUrl = await uploadImage(this.image);
+      if (!imageUrl) {
+        console.error("Failed to upload image");
+        return;
       }
 
       const newProperty = {
@@ -239,7 +236,8 @@ export default {
         }
       } catch (error) {
         console.error("Failed to add property:", error);
-      } finally {
+      } 
+      finally {
         this.closeForm();
       }
     },
