@@ -5,16 +5,16 @@
 
         <div class="payment-list">
             <div v-for="(receipt, index) in paymentReceipts" :key="index" class="payment-card">
-                <div class="receipt-content">
-                    <div class="header">
-                        <div class="receipt-concept">Concepto: {{ receipt.concept }}</div>
-                        <div class="receipt-date">Fecha del Pago: {{ receipt.date }}</div>
-                        <div class="receipt-amount">Monto: {{ receipt.amount }}</div>
+                <div class="payment-content">
+                    <div class="payment-header">
+                        <div class="payment-concept">Concepto: {{ receipt.concept }}</div>
+                        <div class="payment-date">Fecha del Pago: {{ receipt.date }}</div>
+                        <div class="payment-amount">Monto: {{ receipt.amount }}</div>
                     </div>
-                    <div class="receipt-info">
-                        <div class="receipt-detail">Detalle: {{ receipt.detail }}</div>
-                        <div class="receipt-buyer">Paga: {{ receipt.nameUserPays }}</div>
-                        <div class="receipt-seller">Recibe: {{ receipt.nameUserReceives }}</div>
+                    <div class="payment-info">
+                        <div class="payment-detail">Detalle: {{ receipt.detail }}</div>
+                        <div class="payment-buyer">Paga: {{ receipt.buyer }}</div>
+                        <div class="payment-seller">Recibe: {{ receipt.seller }}</div>
                     </div>
                 </div>
 
@@ -163,7 +163,8 @@ export default {
 
 /* Apply Poppins font family to the entire app */
 .payment-app {
-    background-color: #ccc;
+    margin-top: 1.5rem;
+    background-color: #F2F1E4;
     font-family: 'Poppins', sans-serif;
     display: flex;
     flex-wrap: wrap;
@@ -171,47 +172,59 @@ export default {
     align-items: center;
     gap: 20px;
     width: 100%;
-    height: 100vh;
+    height: 100%;
     flex-direction: column;
 }
 
 /* Style the container for the list of payment cards */
 .payment-list {
     display: flex;
-    flex-wrap: wrap;
     gap: 20px;
     justify-content: center;
     align-items: center;
     flex-direction: row;
+    flex-wrap: wrap;
+    padding: 15px;
 }
 
 /* Style individual payment card */
 .payment-card {
-    border-radius: 12px;
+    border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    background-color: #fff;
-    width: 300px;
+    background-color: #fffaf1;
+    border: 3px solid #A69B8D;
+    min-width: 300px;
     padding: 20px;
     margin-bottom: 20px;
+    margin: 10px;
+    color: #101E26;
 }
 
 .payment-card:hover {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-    scale: 1.01;
-    transition: all 0.3s ease-in-out;
+    scale: 1.05;
+    transition: all 0.5s ease-in-out;
 }
 
-/* Style the details section of the payment card */
-.receipt-details {
+.payment-header {
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
     justify-content: space-between;
     align-items: center;
-    flex-direction: row;
-    /* Your styles for the header and card details */
+    flex-direction: column;
+    font-weight: 600;
+    font-size: 20px;
+    border-bottom: 2px solid #A69B8D;
+    padding: 10px;
 }
 
+.payment-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    flex-direction: column;
+    font-weight: 450;
+    padding: 10px;
+}
 /* Style the actions section (buttons) on the payment card */
 
 
@@ -221,9 +234,9 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    width: 100vw;
-    transition: all 0.3s ease-in-out;
+    height: 100%;
+    width: 100%;
+    transition: all 0.5s ease-in-out;
     position: fixed;
     top: 0;
     left: 0;
@@ -234,8 +247,9 @@ export default {
     /* Fondo semi-transparente para resaltar el formulario */
 
     .popup-content {
-        background: rgb(247, 247, 247);
+        background: #F2F1E4;
         border-radius: 10px;
+        border: 5px solid #A69B8D;
         padding: 20px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         max-width: 400px;
@@ -248,12 +262,13 @@ export default {
             flex-direction: column;
 
             input,
-            textarea {
+            textarea,
+            select {
                 margin-bottom: 15px;
                 padding: 10px;
-                border: 1px solid #ccc;
+                border: 2px solid #A69B8D;
                 border-radius: 5px;
-                width: calc(100% - 22px);
+                width: 100%;
                 /* Ancho del input descontando el padding */
                 font-size: 16px;
 
@@ -273,20 +288,14 @@ export default {
                     border-radius: 5px;
                     cursor: pointer;
                     font-size: 16px;
+                    background-color: #498c79;
+                    color: #101E26;
 
-                    &:first-child {
-                        background-color: #4c53af;
-                        color: white;
-                    }
-
-                    &:nth-child(2) {
-                        background-color: #0a8bf5;
-                        color: white;
-                    }
-
-                    &:last-child {
-                        background-color: #f44336;
-                        color: white;
+                    &:hover {
+                        background-color: #498c79;
+                        color: #f2d1b3;
+                        transition: all 0.5s ease-in-out;
+                        transform: scale(1.05);
                     }
                 }
             }
@@ -294,14 +303,21 @@ export default {
     }
 }
 
-#newPaymentbtn {
+button {
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
-    background-color: #4CAF50;
-    color: white;
+    background-color: #498c79;
+    color: #101E26;
+
+    &:hover {
+        background-color: #498c79;
+        color: #f2d1b3;
+        transition: all 0.5s ease-in-out;
+        transform: scale(1.05);
+    }
 }
 
 /* Media query for responsiveness */

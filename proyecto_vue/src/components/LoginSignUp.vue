@@ -10,7 +10,6 @@
               <h2>Registrarse</h2>
             </div>
             <div class="input-group">
-              <i class="bx bxs-user"></i>
               <input
                 type="text"
                 v-model="newUsername"
@@ -19,7 +18,6 @@
               />
             </div>
             <div class="input-group">
-              <i class="bx bxs-lock-alt"></i>
               <input
                 type="password"
                 v-model="newPassword"
@@ -28,7 +26,6 @@
               />
             </div>
             <div class="input-group">
-              <i class="bx bxs-lock-alt"></i>
               <input
                 type="password"
                 v-model="confirmPassword"
@@ -56,7 +53,6 @@
               <h2>Iniciar Sesión</h2>
             </div>
             <div class="input-group">
-              <i class="bx bxs-user"></i>
               <input
                 type="text"
                 v-model="username"
@@ -65,7 +61,6 @@
               />
             </div>
             <div class="input-group">
-              <i class="bx bxs-lock-alt"></i>
               <input
                 type="password"
                 v-model="password"
@@ -123,7 +118,7 @@ export default {
         alert("Uno o más campos están vacíos");
         return;
       }
-      axios//TODO consumir service de login -> UserServie
+      axios //TODO consumir service de login -> UserServie
         .post("http://localhost:8080/api/v1/user/login", {
           username: this.username,
           password: this.password,
@@ -189,15 +184,14 @@ export default {
 
 .head-signUp,
 .head-signUp {
-  color: black;
+  color: #101e26;
 }
 
-.head-signIn img,
 .head-signUp img {
   width: 100%;
   max-width: 10rem;
 }
-.head-signIn h2,
+
 .head-signUp h2 {
   font-size: 2rem;
   font-weight: 600;
@@ -208,11 +202,10 @@ export default {
   min-height: 100%;
   min-width: 100%;
   overflow: hidden;
-  background: linear-gradient(
-    90deg,
-    rgba(179, 102, 52, 1) 0%,
-    rgba(255, 177, 125, 1) 50%,
-    rgba(254, 161, 98, 1) 100%
+  background: radial-gradient(
+    circle,
+    rgba(73, 140, 121, 1) 0%,
+    rgba(16, 30, 38, 1) 70%
   );
 }
 
@@ -240,8 +233,9 @@ export default {
 
 .form {
   padding: 1rem;
-  background-color: #ffff;
+  background-color: #F2F1E4;
   border-radius: 1.5rem;
+  border: 5px solid #A69B8D;
   width: 100%;
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
   transform: scale(0);
@@ -254,29 +248,19 @@ export default {
   width: 100%;
   margin: 1rem 0;
 }
-
-.input-group i {
-  position: absolute;
-  top: 50%;
-  left: 1rem;
-  transform: translateY(-50%);
-  font-size: 1.4rem;
-  color: #757575;
-}
-
 .input-group input {
   width: 100%;
   padding: 1rem 3rem;
   font-size: 1rem;
-  background-color: #efefef;
-  border-radius: 0.5rem;
-  border: 0.125rem solid #ffff;
+  background-color: #fffaf1;
+  border-radius: 10px;
+  border: 3px solid #A69B8D;
   outline: none;
   text-align: center;
 }
 
 .input-group input:focus {
-  border: 0.125rem solid #1d6ba0;
+  border: 4px solid #F2D1B3;
 }
 
 .form button {
@@ -285,10 +269,17 @@ export default {
   padding: 0.6rem 0;
   border-radius: 0.5rem;
   border: none;
-  background-color: #22abb3;
-  color: #ffff;
+  background-color: #498C79;
+  color: #101E26;
   font-size: 1.2rem;
   outline: none;
+
+  &:hover {
+    background-color: #498C79;
+    color: #F2D1B3;
+    transition: all 0.5s ease-in-out;
+    transform: scale(1.05);
+  }
 }
 
 .footer-sign-in p,
@@ -323,38 +314,21 @@ export default {
   width: 100%;
 }
 
-.text {
-  margin: 4rem;
-  color: #ffff;
-}
-
-.text h2 {
-  font-size: 3.5rem;
-  font-weight: 800;
-  margin: 2rem 0;
-  transition: 1s ease-in-out;
-}
-.text p {
-  font-weight: 600;
-  transition: 1s ease-in-out;
-  transition-delay: 0.2s;
-}
-
 .img img {
   width: 30vh;
   transition: 1s ease-in-out;
   transition-delay: 0.4s;
 }
 
-.text.sign-in h2,
-.text.sign-in p,
-.img.sign-in img {
+.text .sign-in h2,
+.text .sign-in p,
+.img .sign-in img {
   transform: translateX(-250%);
 }
 
-.text.sign-up h2,
-.text.sign-up p,
-.img.sign-up img {
+.text .sign-up h2,
+.text .sign-up p,
+.img .sign-up img {
   transform: translateX(250%);
 }
 
@@ -436,7 +410,7 @@ export default {
     width: 100%;
     position: absolute;
     padding: 2rem;
-    background-color: #ffff;
+    background-color: #fffaf1;
     border-top-left-radius: 2rem;
     border-top-right-radius: 2rem;
     transform: translateY(100%);
@@ -446,26 +420,6 @@ export default {
   .row {
     align-items: flex-end;
     justify-content: flex-end;
-  }
-
-  .form,
-  .social-list {
-    box-shadow: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  .text {
-    margin: 0;
-  }
-
-  .text p {
-    display: none;
-  }
-
-  .text h2 {
-    margin: 0.5rem;
-    font-size: 2rem;
   }
 }
 </style>

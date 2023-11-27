@@ -1,4 +1,5 @@
 <template>
+  <NavigationBar/>
   <div class="property-app">
     <div class="utilities">
       <div class="filter-add">
@@ -26,11 +27,7 @@
 
     <!-- Lista de Propiedades -->
     <div class="property-list">
-      <div
-        v-for="(property, index) in properties"
-        :key="index"
-        class="property-post"
-      >
+      <div v-for="(property, index) in properties" :key="index" class="property-post">
         <!-- Contenido de Propiedad -->
 
         <div class="property-details">
@@ -42,9 +39,7 @@
             <div class="property-environments">
               Ambientes: {{ property.environments }}
             </div>
-            <div class="property-dimensions">
-              Dimensiones: {{ property.dimensions }}
-            </div>
+            <div class="property-dimensions">Dimensiones: {{ property.dimensions }}</div>
           </div>
         </div>
         <div class="property-content">
@@ -92,11 +87,7 @@
             step="0.01"
             required
           />
-          <textarea
-            v-model="description"
-            placeholder="Descripción"
-            required
-          ></textarea>
+          <textarea v-model="description" placeholder="Descripción" required></textarea>
           <input type="file" @change="handleImageUpload" accept="image/*" />
           <!-- Botones de acción -->
           <div class="form-buttons">
@@ -113,8 +104,12 @@
 
 <script>
 import PropertiesService from "../service/PropertiesService.js";
-
+import NavigationBar from "./NavigationBar.vue";
 export default {
+  name: "PropertiesView",
+  components: {
+    NavigationBar,
+  },
   data() {
     return {
       filter: "all",
@@ -346,6 +341,11 @@ html,
 body,
 #app {
   height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  overflow-y: auto;
 }
 
 .utilities {
@@ -374,8 +374,13 @@ body,
     input {
       width: 100%;
       padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      border: 3px solid #a69b8d;
+      border-radius: 10px;
+      background-color: #fffaf1;
+    }
+
+    input:focus {
+      outline: #a69b8d solid 1px;
     }
   }
 }
@@ -385,12 +390,13 @@ body,
   flex-direction: column;
   align-items: center;
   min-height: 100%;
+  min-width: 100%;
   padding: 20px;
-  background-color: #fea162;
+  background-color: #f2f1e4;
   width: 100%;
   justify-content: center;
   text-align: center;
-  height: 100vh;
+  height: 100%;
 }
 
 .popup {
@@ -405,13 +411,15 @@ body,
   display: flex;
   justify-content: center;
   align-items: center;
+  transition: all 0.5s ease-in-out;
 }
 
 .popup-content {
-  background: #fff;
+  background: #f2f1e4;
   padding: 20px;
-  border-radius: 4px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  border-color: #a69b8d;
+  border: #a69b8d solid 5px;
 }
 
 form {
@@ -425,12 +433,13 @@ select {
   width: 100%;
   padding: 10px;
   margin-bottom: 15px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 2px solid #a69b8d;
+  border-radius: 10px;
+  background-color: #fffaf1;
 }
 
 select {
-  height: 40px;
+  height: 50px;
 }
 
 .form-buttons {
@@ -440,15 +449,18 @@ select {
 
 button {
   padding: 10px 20px;
-  background-color: #007bff;
-  color: #fff;
+  background-color: #498c79;
+  color: #101e26;
   border: none;
-  border-radius: 4px;
+  border-radius: 10px;
   cursor: pointer;
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: #498c79;
+  color: #f2d1b3;
+  transition: all 0.5s ease-in-out;
+  transform: scale(1.05);
 }
 
 .property-list {
@@ -466,11 +478,11 @@ button:hover {
   display: flex;
   flex-direction: column;
   padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background-color: #fff;
+  border: 3px solid #a69b8d;
+  border-radius: 10px;
+  background-color: #fffaf1;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease-in-out;
+  transition: transform 0.5s ease-in-out;
   margin: 10px;
 
   .property-details {
@@ -485,6 +497,7 @@ button:hover {
       display: flex;
       flex-direction: row;
       align-items: flex-start;
+      color: #101e26;
 
       .property-type {
         font-size: 25px;
@@ -494,8 +507,8 @@ button:hover {
 
       .property-value {
         font-size: 20px;
-        color: #fff;
-        background-color: #22abb3;
+        color: #101e26;
+        background-color: #498c79;
         padding: 10px;
         border-radius: 10px;
       }
@@ -507,6 +520,7 @@ button:hover {
       flex-direction: row;
       justify-content: space-between;
       align-items: center;
+      color: #101e26;
 
       .property-environments {
         margin-right: 10px;
@@ -519,16 +533,17 @@ button:hover {
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
+    color: #101e26;
   }
 
   .property-image {
     flex: 1;
-    max-width: 10%;
+    max-width: 15%;
     margin-right: 20px;
 
     img {
       width: 100%;
-      border-radius: 5px;
+      border-radius: 10px;
     }
   }
 
@@ -560,20 +575,142 @@ button:hover {
 }
 
 @media screen and (max-width: 768px) {
-  .announcement-post {
-    .post-content {
-      flex-direction: column;
+  .property-list {
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+  .property-post {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .property-image {
+    max-width: 100%;
+    min-width: 100%;
+    margin-right: 0;
+    margin-bottom: 10px;
+    img {
+      width: 100%;
+      border-radius: 10px;
     }
+  }
 
-    .post-image {
-      max-width: 100%;
-      margin-right: 0;
-      margin-bottom: 20px;
+  .property-content {
+    flex-direction: column;
+  }
 
-      img {
-        height: 100%;
+  .property-description {
+    flex: 1;
+  }
+
+  .actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .actions button {
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+
+  .popup-content {
+    width: 100%;
+  }
+
+  .popup {
+    align-items: flex-start;
+  }
+
+  .utilities {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+
+    .filter-add {
+      flex-direction: row;
+      width: 100%;
+      justify-content: space-between;
+      align-items: center;
+
+      .filter {
+        margin-bottom: 0;
       }
     }
+
+    .search-container {
+      width: 100%;
+    }
+  }
+
+  .search-container {
+    margin-bottom: 10px;
+  }
+
+  .property-details {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 10px;
+
+    .header {
+      flex-direction: column;
+      align-items: flex-start;
+      margin-bottom: 10px;
+
+      .property-type {
+        margin-bottom: 10px;
+      }
+
+      .property-value {
+        margin-bottom: 10px;
+      }
+    }
+
+    .specs {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  .property-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .property-image {
+    max-width: 100%;
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+
+  .property-description {
+    flex: 1;
+    margin-bottom: 10px;
+  }
+
+  .actions {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 0;
+  }
+
+  .actions button {
+    margin-right: 10px;
+    margin-bottom: 0;
+  }
+
+  .form-buttons {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .form-buttons button {
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+
+  .popup-content {
+    padding: 10px;
   }
 }
 </style>

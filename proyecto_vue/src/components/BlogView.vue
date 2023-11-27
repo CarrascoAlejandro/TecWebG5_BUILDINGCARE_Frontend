@@ -1,7 +1,7 @@
 <template>
   <NavigationBar></NavigationBar>
   <div class="container">
-    <button @click="openForm"> Nuevo Post + </button>
+    <button @click="openForm"> Nuevo Post </button>
       <div class="announcement-board">
           
           <div v-for="(post, index) in posts" :key="index" class="announcement-post">
@@ -282,13 +282,14 @@
   }
   
   .container {
+    margin-top: 1rem;
       display: flex;
       flex-direction: column;
       align-items: center;
       min-height: 100%;
       min-width: 100%;
       padding: 20px;
-      background-color: #fea162;
+      background-color: #F2F1E4;
       width: 100%;
       justify-content: center;
       text-align: center;
@@ -303,17 +304,17 @@
       width: 100%;
       height: 100%;
       background: rgba(0, 0, 0, 0.7);
-      z-index: 999;
       display: flex;
       justify-content: center;
       align-items: center;
   }
   
   .popup-content {
-      background: #fff;
+      background: #fffaf1;
       padding: 20px;
-      border-radius: 4px;
+      border-radius: 10px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      border: 5px solid #A69B8D ;
   }
   
   form {
@@ -328,12 +329,12 @@
       width: 100%;
       padding: 10px;
       margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      border: 2px solid #A69B8D;
+      border-radius: 10px;
   }
   
   select {
-      height: 40px;
+      height: 50px;
   }
   
   .form-buttons {
@@ -343,15 +344,17 @@
   
   button {
       padding: 10px 20px;
-      background-color: #007BFF;
-      color: #fff;
+      background-color: #498c79;
+      color: #101e26;
       border: none;
-      border-radius: 4px;
+      border-radius: 10px;
       cursor: pointer;
   }
   
   button:hover {
-      background-color: #0056b3;
+      color: #f2d1b3;
+      transition: all 0.5s ease-in-out;
+      transform: scale(1.05);
   }
   
   .announcement-board {
@@ -369,11 +372,11 @@
       display: flex;
       flex-direction: column;
       padding: 20px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      background-color: #fff;
+      border: 3px solid #A69B8D;
+      border-radius: 10px;
+      background-color: #fffaf1;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      transition: transform 0.3s ease-in-out;
+      transition: transform 0.5s ease-in-out;
       margin: 10px;
   
       .header-date {
@@ -382,6 +385,7 @@
           align-items: center;
           margin-bottom: 10px;
           width: 100%;
+          color: #101e26;
   
           .header {
               font-weight: bold;
@@ -391,13 +395,15 @@
   
               .post-title {
                   margin-right: 10px;
+                  font-size: 25px;
+                  padding: 5px;
               }
   
               .post-type {
-                  font-size: 10px;
-                  color: #fff;
-                  background-color: #22abb3;
-                  padding: 5px;
+                  font-size: 20px;
+                  color: #101e26;
+                  background-color: #498c79;
+                  padding: 10px;
                   border-radius: 10px;
               }
           }
@@ -408,6 +414,7 @@
               flex-direction: row;
               justify-content: space-between;
               align-items: center;
+              font-size: 14px;
   
               .post-date {
                   margin-right: 10px;
@@ -420,22 +427,23 @@
           display: flex;
           flex-wrap: wrap;
           gap: 20px;
+          color: #101e26;
       }
   
       .post-image {
           flex: 1;
-          max-width: 10%;
+          max-width: 20%;
           margin-right: 20px;
   
           img {
               width: 100%;
-              border-radius: 5px;
+              border-radius: 10px;
           }
       }
   
       .post-description {
           flex: 1;
-          font-size: 14px;
+          font-size: 20px;
           text-align: start;
       }
   

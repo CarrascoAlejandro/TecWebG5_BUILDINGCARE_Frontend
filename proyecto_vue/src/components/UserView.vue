@@ -1,22 +1,21 @@
 <template>
     <NavigationBar />
     <div class="container">
-      <h1 class="text-center">Lista de Usuarios</h1>
       <!-- <button class="btn btn-primary" @click="addUsers">Añadir Usuarios</button> -->
       <div
-        class="row align-items-center profile-header"
+        class="profile-card"
         v-for="(user, index) in users"
         :key="user.userId"
       >
-        <div class="col-md-2 mb-3">
+        <div class="profile-header">
           <img
             :src="user?.picture"
             alt="User's profile picture"
-            class="square img-fluid profile-picture"
+            class="profile-picture"
           />
+          <h2 class="profile-name">{{ user?.name }}</h2>
         </div>
-        <div class="col-md text-center profile-info">
-          <h2>{{ user?.name }}</h2>
+        <div class="profile-info">
           <p>Correo: {{ user?.email }}</p>
           <p>Usuario: {{ user?.usename }}</p>
           <p>Rol: {{ user?.typeUser }}</p>
@@ -217,77 +216,71 @@
   html,
   body,
   #app {
-    height: 100%;
     overflow-y: auto;
   }
   .container {
+    margin-top: 1rem;
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
     align-items: center;
+    gap: 20px;
+    width: 100%;
+    height: 100%;
+    min-width: 100%;
+    min-height: 100%;
+    flex-direction: row;
+    background-color: #F2F1E4;
+    padding: 20px;
   }
-  .profile-header {
-      margin: 1rem;
-    padding: 2rem;
-    border: 2px solid #222;
-    border-radius: 15px;
-    flex-direction: column;
-  }
-  .profile-picture:hover {
-    box-shadow: 0 0 11px rgba(33, 33, 33, 0.2);
-    transition: all 0.2s ease-in-out;
-    scale: 1.1;
-    filter: grayscale(100%);
-  }
-  .profile-picture {
-    border-radius: 50%;
-    width: 150px;
-    height: 150px;
-  }
-  .profile-info {
-    margin-bottom: 1rem;
-    text-align: center;
+  .profile-card {
     display: flex;
+    margin: 1rem;
+    padding: 2rem;
+    border: 3px solid #A69B8D;
+    border-radius: 10px;
+    color: #101E26;
+    background-color: FFFAF1;
     flex-direction: column;
   }
-  .profile-header {
-    margin-bottom: 2rem;
-    padding: 2rem;
-    border: 2px solid #222;
-    border-radius: 15px;
-    flex-direction: column;
+  .profile-card:hover {
+    transition: all 0.5s ease-in-out;
+    scale: 1.1;
   }
   .profile-picture:hover {
-    box-shadow: 0 0 11px rgba(33, 33, 33, 0.2);
-    transition: all 0.2s ease-in-out;
+    transition: all 0.5s ease-in-out;
     scale: 1.1;
-    filter: grayscale(100%);
   }
   .profile-picture {
     border-radius: 50%;
     width: 150px;
     height: 150px;
   }
+  .profile-name {
+    font-weight: 800;
+    margin-top: 1rem;
+  }
+  .profile-header {
+    margin-bottom: 1rem;
+    padding: 2rem;
+    border-radius: 10px;
+    flex-direction: column;
+    width: 100%;
+    text-align: center;
+    height: 100%;
+  }
+
   .profile-info {
     margin-bottom: 1rem;
     text-align: center;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
+    align-items: self-start;
   }
-  .profile-info h2 {
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-    background-color: #dcbe87;
-    color: #222;
-    border-radius: 20px;
-    padding: 1rem;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-    width: fit-content;
-  }
+
   .profile-info p {
-    font-weight: 400;
+    font-weight: 500;
   }
   .actionButtons {
     margin-top: 1rem;
@@ -296,18 +289,18 @@
     align-items: center;
   }
   .btn-primary {
-    color: #dcbe87;
-    background-color: #222;
+    color: #101E26;
+    background-color: #498C79;
     transition: all 0.5s ease-in-out;
-    border-radius: 15px;
+    border-radius: 10px;
     border: 0px;
-    padding: 0.5rem;
+    padding: 10px;
   }
   .btn-primary:hover {
-    color: #222;
-    background-color: #dcbe87;
+    color: #F2D1B3;
+    background-color: #498C79;
     transform: scale(1.1);
-    transition: all 0.2s ease-in-out;
+    transition: all 0.5s ease-in-out;
     border: 0px;
   }
   .userForm {
