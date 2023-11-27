@@ -255,6 +255,11 @@ html,
 body,
 #app {
     height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    overflow-y: auto;
 }
 
 .utilities {
@@ -283,8 +288,13 @@ body,
         input {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            border: 3px solid #A69B8D;
+            border-radius: 10px;
+            background-color: #FFFAF1;
+        }
+
+        input:focus {
+            outline: #A69B8D solid 1px;
         }
     }
 }
@@ -294,12 +304,14 @@ body,
     flex-direction: column;
     align-items: center;
     min-height: 100%;
+    min-width: 100%;
     padding: 20px;
-    background-color: #fea162;
+    background-color: #F2F1E4;
     width: 100%;
     justify-content: center;
     text-align: center;
-    height: 100vh;
+    height: 100%;
+    
 }
 
 .popup {
@@ -314,13 +326,15 @@ body,
     display: flex;
     justify-content: center;
     align-items: center;
+    transition: all 0.3s ease-in-out;
 }
 
 .popup-content {
-    background: #fff;
+    background: #F2F1E4;
     padding: 20px;
-    border-radius: 4px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    border-color: #A69B8D;
+    border: #A69B8D solid 5px;
 }
 
 form {
@@ -335,8 +349,9 @@ select {
     width: 100%;
     padding: 10px;
     margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    border: 2px solid #A69B8D;
+    border-radius: 10px;
+    background-color: #FFFAF1;
 }
 
 select {
@@ -350,15 +365,18 @@ select {
 
 button {
     padding: 10px 20px;
-    background-color: #007BFF;
-    color: #fff;
+    background-color: #498C79;
+    color: #101E26;
     border: none;
-    border-radius: 4px;
+    border-radius: 10px;
     cursor: pointer;
 }
 
 button:hover {
-    background-color: #0056b3;
+    background-color: #498C79;
+    color: #F2D1B3;
+    transition: all 0.3s ease-in-out;
+    transform: scale(1.05);
 }
 
 .property-list {
@@ -376,9 +394,9 @@ button:hover {
     display: flex;
     flex-direction: column;
     padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #fff;
+    border: 3px solid #A69B8D;
+    border-radius: 10px;
+    background-color: #FFFAF1;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease-in-out;
     margin: 10px;
@@ -395,6 +413,7 @@ button:hover {
             display: flex;
             flex-direction: row;
             align-items: flex-start;
+            color: #101E26;
 
             .property-type {
                 font-size: 25px;
@@ -404,8 +423,8 @@ button:hover {
 
             .property-value {
                 font-size: 20px;
-                color: #fff;
-                background-color: #22abb3;
+                color: #101E26;
+                background-color: #498C79;
                 padding: 10px;
                 border-radius: 10px;
             }
@@ -417,6 +436,7 @@ button:hover {
             flex-direction: row;
             justify-content: space-between;
             align-items: center;
+            color: #101E26;
 
             .property-environments {
                 margin-right: 10px;
@@ -429,16 +449,17 @@ button:hover {
         display: flex;
         flex-wrap: wrap;
         gap: 20px;
+        color: #101E26;
     }
 
     .property-image {
         flex: 1;
-        max-width: 10%;
+        max-width: 15%;
         margin-right: 20px;
 
         img {
             width: 100%;
-            border-radius: 5px;
+            border-radius: 10px;
         }
     }
 
@@ -470,20 +491,145 @@ button:hover {
 }
 
 @media screen and (max-width: 768px) {
-    .announcement-post {
-        .post-content {
-            flex-direction: column;
-        }
+    .property-list {
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+    }
+    .property-post {
+        width: 100%;
+        flex-direction: column;
+    }
 
-        .post-image {
-            max-width: 100%;
-            margin-right: 0;
-            margin-bottom: 20px;
-
-            img {
-                height: 100%;
-            }
+    .property-image {
+        max-width: 100%;
+        min-width: 100%;
+        margin-right: 0;
+        margin-bottom: 10px;
+        img {
+            width: 100%;
+            border-radius: 10px;
         }
     }
+
+    .property-content {
+        flex-direction: column;
+    }
+
+    .property-description {
+        flex: 1;
+    }
+
+    .actions {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .actions button {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    .popup-content {
+        width: 100%;
+    }
+
+    .popup {
+        align-items: flex-start;
+    }
+
+    .utilities {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+
+        .filter-add {
+            flex-direction: row;
+            width: 100%;
+            justify-content: space-between;
+            align-items: center;
+
+            .filter {
+                margin-bottom: 0;
+            }
+        }
+
+        .search-container {
+            width: 100%;
+        }
+    }
+
+    .search-container {
+        margin-bottom: 10px;
+    }
+
+    .property-details {
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 10px;
+
+        .header {
+            flex-direction: column;
+            align-items: flex-start;
+            margin-bottom: 10px;
+
+            .property-type {
+                margin-bottom: 10px;
+            }
+
+            .property-value {
+                margin-bottom: 10px;
+            }
+        }
+
+        .specs {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+
+    .property-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .property-image {
+        max-width: 100%;
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    .property-description {
+        flex: 1;
+        margin-bottom: 10px;
+    }
+
+    .actions {
+        flex-direction: row;
+        align-items: center;
+        margin-top: 0;
+    }
+
+    .actions button {
+        margin-right: 10px;
+        margin-bottom: 0;
+    }
+
+    .form-buttons {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+
+    .form-buttons button {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    .popup-content {
+        padding: 10px;
+    }
+
+
+
 }
 </style>
