@@ -104,10 +104,23 @@
                 },
                 // Agregar más opciones según sea necesario
             ],
+            typeUser: '',
+            nameUser: '',
         };
     },
     created() {
         this.postService = new PostService();
+        this.typeUser = localStorage.getItem("typeUser");
+        const storedData = localStorage.getItem("userID");
+        // Parsear el JSON almacenado
+        const parsedData = JSON.parse(storedData);
+        // Acceder al campo "name" dentro del objeto parsedData
+        this.nameUser = parsedData.name;
+        console.log("typeUser", this.typeUser);
+        console.log("nameUser", this.nameUser);
+        if (this.typeUser == null) {
+            this.$router.push('/');
+        }
     },
     mounted() {
         this.getPosts();

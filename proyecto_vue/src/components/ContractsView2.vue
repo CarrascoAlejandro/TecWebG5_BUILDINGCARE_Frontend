@@ -1,7 +1,7 @@
 <template>
 <NavigationBar></NavigationBar>
     <div class="payment-app">
-        <button @click="openForm" id="newPaymentbtn">Registrar Nuevo Contrato</button>
+        <button v-if="typeUser != 'Inquilino'" @click="openForm" id="newPaymentbtn">Registrar Nuevo Contrato</button>
     
         <div class="payment-list">
             <div v-for="(contract, index) in paymentReceipts" :key="index" class="payment-card">
@@ -19,8 +19,8 @@
                     </div>
                 </div>
                 <div class="receipt-actions">
-                    <button @click="editReceipt(index)">Editar</button>
-                    <button @click="deleteReceipt(index)">Eliminar</button>
+                    <button v-if="typeUser != 'Inquilino'" @click="editReceipt(index)">Editar</button>
+                    <button v-if="typeUser == 'Administrador'" @click="deleteReceipt(index)">Eliminar</button>
                 </div>
             </div>
         </div>
