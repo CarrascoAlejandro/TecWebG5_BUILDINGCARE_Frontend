@@ -21,8 +21,8 @@
                   </div>
                   <div class="post-description">{{ post.postContent }}</div>
                   <div class="actions">
-                      <button @click="editPost(index)">Editar</button>
-                      <button @click="deletePost(post.id)">Eliminar</button>
+                      <button @click="editPost(index)" v-if="typeUser == 'Administrador' || post.postUser == userName">Editar</button>
+                      <button @click="deletePost(post.id)" v-if="typeUser == 'Administrador' || post.postUser == userName">Eliminar</button>
                   </div>
               </div>
           </div>
@@ -105,7 +105,7 @@
                 // Agregar más opciones según sea necesario
             ],
             typeUser: '',
-            nameUser: '',
+            userName: '',
         };
     },
     created() {
@@ -114,10 +114,11 @@
         const storedData = localStorage.getItem("userID");
         // Parsear el JSON almacenado
         const parsedData = JSON.parse(storedData);
+        console.log("parsedData", parsedData);
         // Acceder al campo "name" dentro del objeto parsedData
-        this.nameUser = parsedData.name;
+        this.userName = parsedData.usename;
         console.log("typeUser", this.typeUser);
-        console.log("nameUser", this.nameUser);
+        console.log("userName", this.userName);
         if (this.typeUser == null) {
             this.$router.push('/');
         }
