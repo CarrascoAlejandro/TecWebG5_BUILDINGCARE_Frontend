@@ -54,7 +54,8 @@
           </div>
           <div class="property-description">{{ property.description }}</div>
           <div class="actions">
-            <button @click="editProperty(index)" v-if="typeUser != 'Inquilino' && ((typeUser == 'Socio' && nameUser === property.propertyOwner) || typeUser == 'Administrador')">Editar</button><button @click="deleteProperty(index)" v-if="typeUser === 'Administrador'">Borrar</button>
+            <button @click="editProperty(index)" v-if="typeUser != 'Inquilino' && ((typeUser == 'Socio' && nameUser === property.propertyOwner) || typeUser == 'Administrador')">Editar</button>
+            <button @click="deleteProperty(index)" v-if="typeUser === 'Administrador'">Borrar</button>
           </div>
         </div>
       </div>
