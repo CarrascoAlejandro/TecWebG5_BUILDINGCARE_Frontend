@@ -3,9 +3,9 @@
     <div class="utilities">
       <div class="filter-add">
         <div class="filter">
-          <select v-model="filter" @change="filterProperties">
+          <select v-model="filter" @change="filteredProperties">
             <option value="all">Todas las propiedades</option>
-            <option v-for="type in types" :key="type.id" :value="type.type">
+            <option v-for="(type) in types" :key="type.id" :value="type.type">
               {{ type.type }}
             </option>
           </select>
@@ -15,22 +15,13 @@
         </div>
       </div>
       <div class="search-container">
-        <input
-          v-model="searchText"
-          type="text"
-          placeholder="Buscar Propiedad..."
-          @input="searchProperties"
-        />
+        <input v-model="searchText" type="text" placeholder="Buscar Propiedad..." @input="fetchProperties" />
       </div>
     </div>
 
     <!-- Lista de Propiedades -->
     <div class="property-list">
-      <div
-        v-for="(property, index) in properties"
-        :key="index"
-        class="property-post"
-      >
+      <div v-for="(property, index) in properties" :key="index" class="property-post">
         <!-- Contenido de Propiedad -->
 
         <div class="property-details">
@@ -49,7 +40,8 @@
         </div>
         <div class="property-content">
           <div class="property-image">
-            <img v-if="property.propertyImage" :src="require(`../../../image_server/img/${property.propertyImage}`)" alt="Imagen de la propiedad" />
+            <img v-if="property.image" :src="require(`../../../image_server/img/${property.image}`)"
+              alt="Imagen de la propiedad" />
           </div>
           <div class="property-description">{{ property.description }}</div>
           <div class="actions">
@@ -60,7 +52,7 @@
       </div>
     </div>
 
-    <!-- Formulario de Propiedad -->
+    <!-- Formulario de  Propiedad -->
     <div class="popup" v-if="showPopup">
       <div class="popup-content">
         <form>
@@ -72,31 +64,10 @@
           </select>
 
           <input type="hidden" id="PropertyId" />
-          <input
-            v-model="value"
-            placeholder="Valor de la Propiedad"
-            type="number"
-            step="0.01"
-            required
-          />
-          <input
-            v-model="environments"
-            placeholder="Ambientes de la Propiedad"
-            type="number"
-            required
-          />
-          <input
-            v-model="dimensions"
-            placeholder="Dimensiones de la Propiedad"
-            type="number"
-            step="0.01"
-            required
-          />
-          <textarea
-            v-model="description"
-            placeholder="Descripción"
-            required
-          ></textarea>
+          <input v-model="value" placeholder="Valor de la Propiedad" type="number" step="0.01" required />
+          <input v-model="environments" placeholder="Ambientes de la Propiedad" type="number" required />
+          <input v-model="dimensions" placeholder="Dimensiones de la Propiedad" type="number" step="0.01" required />
+          <textarea v-model="description" placeholder="Descripción" required></textarea>
           <input type="file" @change="handleImageUpload" accept="image/*" />
           <!-- Botones de acción -->
           <div class="form-buttons">
@@ -155,6 +126,11 @@ export default {
     },
   },
   methods: {
+    //temp
+      logAndReturnImage(image) {
+        console.log(image);
+        return require(`../../../image_server/img/${image}`);
+      },
     async fetchProperties() {
       try {
         const data = await PropertiesService.fetchProperties();
@@ -348,8 +324,8 @@ export default {
     },
   },
   mounted() {
-    this.fetchTypes();
     this.fetchProperties();
+    this.fetchTypes();
   },
 };
 </script>
@@ -572,6 +548,7 @@ button:hover {
       margin-right: 10px;
     }
   }
+
   &:hover {
     transform: scale(1.05);
   }
