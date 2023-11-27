@@ -13,8 +13,8 @@
                     </div>
                     <div class="payment-info">
                         <div class="payment-detail">Detalle: {{ receipt.detail }}</div>
-                        <div class="payment-buyer">Paga: {{ receipt.buyer }}</div>
-                        <div class="payment-seller">Recibe: {{ receipt.seller }}</div>
+                        <div class="payment-buyer">Paga: {{ receipt.nameUserPays }}</div>
+                        <div class="payment-seller">Recibe: {{ receipt.nameUserReceives }}</div>
                     </div>
                 </div>
 
