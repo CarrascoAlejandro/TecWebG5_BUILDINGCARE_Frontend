@@ -4,9 +4,9 @@
     <div class="utilities">
       <div class="filter-add">
         <div class="filter">
-          <select v-model="filter" @change="filterProperties">
+          <select v-model="filter" @change="filteredProperties">
             <option value="all">Todas las propiedades</option>
-            <option v-for="type in types" :key="type.id" :value="type.type">
+            <option v-for="(type) in types" :key="type.id" :value="type.type">
               {{ type.type }}
             </option>
           </select>
@@ -16,12 +16,7 @@
         </div>
       </div>
       <div class="search-container">
-        <input
-          v-model="searchText"
-          type="text"
-          placeholder="Buscar Propiedad..."
-          @input="searchProperties"
-        />
+        <input v-model="searchText" type="text" placeholder="Buscar Propiedad..." @input="fetchProperties" />
       </div>
     </div>
 
@@ -44,7 +39,8 @@
         </div>
         <div class="property-content">
           <div class="property-image">
-            <img :src="property.image" alt="Imagen de la propiedad" />
+            <img v-if="property.image" :src="require(`../../../image_server/img/${property.image}`)"
+              alt="Imagen de la propiedad" />
           </div>
           <div class="property-description">{{ property.description }}</div>
           <div class="actions">
@@ -55,7 +51,7 @@
       </div>
     </div>
 
-    <!-- Formulario de Propiedad -->
+    <!-- Formulario de  Propiedad -->
     <div class="popup" v-if="showPopup">
       <div class="popup-content">
         <form>
@@ -67,26 +63,9 @@
           </select>
 
           <input type="hidden" id="PropertyId" />
-          <input
-            v-model="value"
-            placeholder="Valor de la Propiedad"
-            type="number"
-            step="0.01"
-            required
-          />
-          <input
-            v-model="environments"
-            placeholder="Ambientes de la Propiedad"
-            type="number"
-            required
-          />
-          <input
-            v-model="dimensions"
-            placeholder="Dimensiones de la Propiedad"
-            type="number"
-            step="0.01"
-            required
-          />
+          <input v-model="value" placeholder="Valor de la Propiedad" type="number" step="0.01" required />
+          <input v-model="environments" placeholder="Ambientes de la Propiedad" type="number" required />
+          <input v-model="dimensions" placeholder="Dimensiones de la Propiedad" type="number" step="0.01" required />
           <textarea v-model="description" placeholder="Descripción" required></textarea>
           <input type="file" @change="handleImageUpload" accept="image/*" />
           <!-- Botones de acción -->
@@ -104,6 +83,9 @@
 
 <script>
 import PropertiesService from "../service/PropertiesService.js";
+
+import { uploadImage } from "../service/ImageService.js";
+
 import NavigationBar from "./NavigationBar.vue";
 export default {
   name: "PropertiesView",
@@ -148,10 +130,16 @@ export default {
     },
   },
   methods: {
+    //temp
+      logAndReturnImage(image) {
+        console.log(image);
+        return require(`../../../image_server/img/${image}`);
+      },
     async fetchProperties() {
       try {
         const data = await PropertiesService.fetchProperties();
         if (data.responseCode === "PROP-0000" && data.data) {
+          console.log("data", data);
           // Mapear los datos recibidos a la estructura esperada por el componente
           this.properties = data.data.map((item) => ({
             id: item.id,
@@ -201,14 +189,15 @@ export default {
       this.index = null;
     },
     handleImageUpload(event) {
-      const file = event.target.files[0];
+      /* const file = event.target.files[0];
       if (file) {
         const reader = new FileReader();
         reader.onload = (e) => {
           this.image = e.target.result;
         };
         reader.readAsDataURL(file);
-      }
+      } */
+      this.image = event.target.files[0];
     },
     async createPost() {
       if (
@@ -222,12 +211,21 @@ export default {
         return;
       }
 
+      let imageUrl = null;
+      try {
+        if (this.image) {
+          imageUrl = await uploadImage(this.image);
+        }
+      } catch (error) {
+        console.error("Failed to upload image:", error);
+      }
+
       const newProperty = {
         propertyEnvironments: parseInt(this.environments),
         propertyDimensions: parseFloat(this.dimensions),
         propertyValue: parseFloat(this.value),
         propertyDescription: this.description,
-        propertyImage: "una_imagen.jpg",
+        propertyImage: imageUrl,
         propertyIdSection: 1,
         propertyIdType: this.selectedType ? this.selectedType.id : null,
       };
@@ -270,12 +268,21 @@ export default {
         return;
       }
 
+      let imageUrl = null;
+      try {
+        if (this.image) {
+          imageUrl = await uploadImage(this.image);
+        }
+      } catch (error) {
+        console.error("Failed to upload image:", error);
+      }
+
       const updatedProperty = {
         propertyEnvironments: parseInt(this.environments),
         propertyDimensions: parseFloat(this.dimensions),
         propertyValue: parseFloat(this.value),
         propertyDescription: this.description,
-        propertyImage: "una_imagen.jpg",
+        propertyImage: imageUrl,
         propertyIdSection: 1, // Asegúrate de establecer este valor correctamente
         propertyIdType: this.selectedType ? this.selectedType.id : null,
       };
@@ -565,6 +572,7 @@ button:hover {
       margin-right: 10px;
     }
   }
+
   &:hover {
     transform: scale(1.05);
   }
