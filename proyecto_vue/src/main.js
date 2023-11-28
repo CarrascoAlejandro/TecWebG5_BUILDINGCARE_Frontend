@@ -9,6 +9,7 @@ import BlogView from "./components/BlogView.vue";
 import PropertiesView from "./components/PropertiesView.vue";
 import PaymentsView from "./components/PaymentsView.vue";
 import ContractsView from "./components/ContractsView2.vue";
+import CommonAreaView from "./components/CommonAreaView.vue";
 
 /**end pages **/
 
@@ -46,6 +47,11 @@ const routes = [
     name: "contracts",
     path: "/contractsView",
     component: ContractsView,
+  },
+  {
+    name: "commonArea",
+    path: "/commonAreaView",
+    component: CommonAreaView,
   },
 ];
 
