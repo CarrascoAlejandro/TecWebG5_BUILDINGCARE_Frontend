@@ -121,7 +121,7 @@ export default {
 
       // contractService: new ContractService(),
       // propertiesService: new PropertiesService(),
-      token: 1, //localStorage.getItem("token"),
+      token: '', //localStorage.getItem("token"),
       contracts: [],
     };
   },
@@ -129,17 +129,21 @@ export default {
     // await this.loadContracts();
     this.contractService = new ContractService();
     this.typeUser = localStorage.getItem("typeUser");
-        const storedData = localStorage.getItem("userID");
-        // Parsear el JSON almacenado
-        const parsedData = JSON.parse(storedData);
-        console.log("parsedData", parsedData);
-        // Acceder al campo "name" dentro del objeto parsedData
-        this.userName = parsedData.usename;
-        console.log("typeUser", this.typeUser);
-        console.log("userName", this.userName);
-        if (this.typeUser == null) {
-            this.$router.push('/');
-        }
+    const storedData = localStorage.getItem("userID");
+    // Parsear el JSON almacenado
+    const parsedData = JSON.parse(storedData);
+    console.log("parsedData", parsedData);
+    // Acceder al campo "name" dentro del objeto parsedData
+    this.userName = parsedData.usename;
+    // idUser
+    this.token = parsedData.idUser;
+    //
+    console.log("typeUser", this.typeUser);
+    console.log("userName", this.userName);
+    console.log("token", this.token);
+    if (this.typeUser == null) {
+        this.$router.push('/');
+    }
   },
   async mounted() {
     await this.loadContracts();
