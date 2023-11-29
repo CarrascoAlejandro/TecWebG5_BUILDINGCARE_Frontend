@@ -12,6 +12,38 @@
             <div class="input-group">
               <input
                 type="text"
+                v-model="newName"
+                placeholder="Nombre Completo"
+                required
+              />
+            </div>
+            <div class="input-group">
+              <input
+                type="text"
+                v-model="newCI"
+                placeholder="Cédula de Identidad"
+                required
+              />
+            </div>
+            <div class="input-group">
+              <input
+                type="text"
+                v-model="newPhone"
+                placeholder="Teléfono"
+                required
+              />
+            </div>
+            <div class="input-group">
+              <input
+                type="text"
+                v-model="newEmail"
+                placeholder="email"
+                required
+              />
+            </div>
+            <div class="input-group">
+              <input
+                type="text"
                 v-model="newUsername"
                 placeholder="Nombre de Usuario"
                 required
@@ -97,16 +129,24 @@
 
 <script>
 import axios from "axios";
-
+import UserService from '../service/UserService';
 export default {
+  
   data() {
     return {
       newUsername: "",
       newPassword: "",
       confirmPassword: "",
+      newName: "",
+      newCI: "",
+      newPhone: "",
+      newEmail: "",
       username: "",
       password: "",
     };
+  },
+  created() {
+    this.userService= new UserService();
   },
   methods: {
     toggle() {
@@ -165,7 +205,13 @@ export default {
         return;
       } else {
         // Aquí puedes agregar la llamada API para registrar al usuario si lo necesitas.
-        alert("Registro exitoso");
+        this.UserService.signUpUser(this.newName, this.newUsername, this.newPassword, this.newEmail, this.newCI, this.newPhone, 3).then((response) => {//se manda el tipo de user como inquilino
+          //verificar el codigo de envio
+          
+          alert("Registro exitoso")
+          console.log(response);
+        });
+        
       }
     },
     signIn() {
