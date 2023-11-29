@@ -34,6 +34,35 @@ export default class PostService{
         }
     }
 
+    async updatePost(title, content, idTypePost) {
+        try {
+            // Define los datos que se enviarán en el cuerpo de la solicitud
+            const data = {
+                "title" : title,
+                "content" : content,
+                "state": "Activo",
+                "idTypePost" : idTypePost,
+                "idPostRequest" : null
+            };
+    
+            // Define los encabezados, incluyendo el token
+            const headers = {
+                'Content-Type': 'application/json',
+                'token': this.token
+            };
+    
+            // Realiza la solicitud POST utilizando Axios
+            const response = await axios.post(this.url, data, { headers });
+    
+            // Devuelve la respuesta
+            return response.data;
+        } catch (error) {
+            // Maneja cualquier error que ocurra durante la solicitud
+            console.error('Error al crear el post:', error);
+            throw error;
+        }
+    }
+
     async getPosts() {
         const baseURL = 'http://localhost:8080/api/v1/blog/all';
         try {
@@ -91,24 +120,25 @@ export default class PostService{
             throw error;
         }
     }
-    async updatePostById  ( title, content, state, idTypePost, idPostRequest, postIdToUpdate){
+    async updatePostById  ( title, content, state, idTypePost, idPostRequest, postIdToUpdate, tokenUser){
         const baseURL = 'http://localhost:8080/api/v1/blog/';
-        const token = 2;
+        
         try {
             const updateData = {
                 title: title,
                 content: content,
                 state: state,
                 idTypePost: idTypePost,
-                idPostRequest: idPostRequest
+                idPostRequest: "null"
             };
             // Define los encabezados, incluyendo el token y el tipo de contenido
             const headers = {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
-                'token': token
+                'token': tokenUser
             };
-    
+            console.log('Datos a enviar:', updateData);
+            console.log('Token:', tokenUser);
             // Realiza la solicitud PUT utilizando Axios
             const response = await axios.put(`${baseURL}${postIdToUpdate}`, updateData, { headers });
     

@@ -16,9 +16,9 @@
                   </div>
               </div>
               <div class="post-content">
-                  <div class="post-image">
+                  <!-- <div class="post-image">
                       <img :src="this.image" alt="post image" />
-                  </div>
+                  </div> -->
                   <div class="post-description">{{ post.postContent }}</div>
 
                   <span>{{ post.postState }}</span>
@@ -27,7 +27,7 @@
                     <button v-if="typeUser == 'Administrador'" @click="postStatus(post.id, post.postState)">
                     {{ post.postState !== 'Done' ? 'Completar' : 'Completado' }}
                     </button>
-                      <button @click="editPost(index)" v-if="typeUser == 'Administrador' || post.postUser == userName">Editar</button>
+                      <button @click="editPost(post.id, post.postTitle,post.postContent, post.postType, post.postState)" v-if="typeUser == 'Administrador' || post.postUser == userName">Editar</button>
                       <button @click="deletePost(post.id)" v-if="typeUser == 'Administrador' || post.postUser == userName">Eliminar</button>
                   </div>
               </div>
@@ -40,7 +40,7 @@
           <form>
               <input v-model="title" placeholder="Titulo del Post" type="text" required />
               <textarea v-model="description" placeholder="Descripción" required></textarea>
-              <input type="file" @change="handleImageUpload" accept="image/*" />
+              <!-- <input type="file" @change="handleImageUpload" accept="image/*" /> -->
               <select v-model="type" required>
                   <option value="">Selecciona una opción</option>
                   <option v-for="option in options" :key="option.value" :value="option.value">{{ option.text }}</option>
@@ -74,6 +74,7 @@
                     time: '',
                     image: '',
                     description: '',
+                    state: '',
                 }],
             image: require("@/assets/images/living1.jpg"),
             posts: [],
@@ -98,20 +99,21 @@
             },
             options: [{
                     value: '1',
-                    text: 'Mantenimiento'
+                    text: 'mantenimiento'
                 },
                 {
                     value: '2',
-                    text: 'Anuncio'
+                    text: 'anuncio'
                 },
                 {
                     value: '3',
-                    text: 'Pedido'
+                    text: 'pedido'
                 },
                 // Agregar más opciones según sea necesario
             ],
             typeUser: '',
             userName: '',
+            idUserHeader: '',
         };
     },
     created() {
@@ -123,8 +125,10 @@
         console.log("parsedData", parsedData);
         // Acceder al campo "name" dentro del objeto parsedData
         this.userName = parsedData.usename;
+        this.isUserHeader = parsedData.idUser;
         console.log("typeUser", this.typeUser);
         console.log("userName", this.userName);
+        console.log("isUserHeader", this.isUserHeader);
         if (this.typeUser == null) {
             this.$router.push('/');
         }
@@ -241,42 +245,59 @@
                 Swal.fire('¡Ups!', 'Por favor, complete todos los campos.', 'question');
             }
         },
-        editPost(index) {
+        editPost(id, postTitle,postContent, postType, postState) {
             // Abre el formulario de edición con los detalles del post seleccionado
-            this.title = this.posts[index].title;
-            this.description = this.posts[index].description;
-            this.type = this.posts[index].type;
+            console.log("estamos en la edicion del post")
+            console.log("id: " + id)
+            console.log("title: " + postTitle)
+            console.log("description: " + postContent)
+            console.log("type: " + postType)
+
+            this.title = postTitle;
+            this.description = postContent;
             // Puedes guardar el índice del post que se está editando para actualizarlo después
-            this.editingIndex = index;
+            const foundOption = this.options.find(option => option.text === postType);
+            this.type = foundOption.value;
+            this.state = postState;
+            this.editingIndex = id;
             this.editing = true;
             // Abre la ventana emergente o muestra el formulario de edición
             this.showPopup = true;
         },
         updatePost() {
             // Verifica que los campos estén completos antes de actualizar el post
-            if (this.title && this.description && this.type) {
-                const updatedPost = {
-                    title: this.title,
-                    type: this.type,
-                    date: this.posts[this.editingIndex].date,
-                    time: this.posts[this.editingIndex].time,
-                    image: this.posts[this.editingIndex].image,
-                    description: this.description,
-                };
-                // Actualiza el post en la lista
-                this.posts.splice(this.editingIndex, 1, updatedPost);
-                // Restablece los campos del formulario
-                this.title = '';
-                this.description = '';
-                this.type = '';
-                // Cierra la ventana emergente o formulario de edición
+            console.log("estamos en la actualizacion del post")
+            console.log("id: " + this.editingIndex)
+            console.log("title: " + this.title)
+            console.log("description: " + this.description)
+            console.log("type: " + this.type)
+            console.log("state: " + this.state)
+            console.log("isUserHeader", this.isUserHeader);
+                
+                this.postService.updatePostById(this.title,this.description,this.state, this.type, "null" ,this.editingIndex, this.isUserHeader).then((data) => {
+                    console.log("codigo de respuesta http: " + data.responseCode);
+                    console.log("codigo de respuesta http: " + data);
+                    if (data.responseCode == "POST-0002") {
+                        //se insertó correctamente el post :D
+                        console.log('se actualizó el post correctamente :D');
+                        // Restablece los campos del formulario
+                        this.title = '';
+                        this.description = '';
+                        this.type = '';
+                        Swal.fire('¡Actualizado!', 'La publicación ha sido actualizada.', 'success');
+                        // Cierra la ventana emergente o formulario de edición
+                        this.closeForm();
+                        this.getPosts();
+                    }
+                    else {
+                        console.log('no se pudo actualizar el post :(');
+                    }
+                }).catch((error) => {
+                    console.error('Error en la solicitud:', error);
+                });
                 this.showPopup = false;
                 this.editing = false;
-            }
-            else {
-                // Puedes agregar lógica adicional para manejar campos incompletos
-                alert('Por favor, complete todos los campos.');
-            }
+            
         },
         deletePostDB(deleteId) {
             try {
