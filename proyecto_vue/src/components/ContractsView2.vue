@@ -412,8 +412,6 @@ export default {
   height: 100%;
   width: 100%;
   transition: all 0.5s ease-in-out;
-  position: fixed;
-  z-index: 100;
   /* Posición por encima de todo */
   background: rgba(0, 0, 0, 0.5);
 
@@ -462,7 +460,7 @@ export default {
 button {
   padding: 10px 15px;
   border: none;
-  border-radius: 5px;
+  border-radius: 10px;
   cursor: pointer;
   background-color: #498c79;
   color: #101e26;
@@ -471,18 +469,6 @@ button {
     color: #f2d1b3;
     transform: scale(1.05);
     transition: all 0.5s ease-in-out;
-  }
-}
-/* Media query for responsiveness */
-@media (max-width: 768px) {
-  .payment-card {
-    width: calc(50% - 20px);
-  }
-}
-
-@media (max-width: 480px) {
-  .payment-card {
-    width: calc(100% - 20px);
   }
 }
 </style>

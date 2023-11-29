@@ -33,6 +33,7 @@ export default {
         { name: "blog", label: "Anuncios" },
         { name: "payments", label: "Pagos" },
         { name: "houses", label: "Propiedades" },
+        { name: "commonAreas", label: "Áreas Comunes" },
         { name: "contracts", label: "Contratos" },
         { name: "logOut", label: "Cerrar Sesión" },
       ],
@@ -68,6 +69,8 @@ export default {
         this.$router.push("/login");
       } else if (item === "contracts") {
         this.$router.push("/contractsView");
+      } else if (item === "commonAreas") {
+        this.$router.push("/commonAreaView");
       }
     },
     toggleMenu() {

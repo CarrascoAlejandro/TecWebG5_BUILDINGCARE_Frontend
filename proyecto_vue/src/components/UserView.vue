@@ -8,11 +8,9 @@
         :key="user.userId"
       >
         <div class="profile-header">
-          <img
-            :src="user?.picture"
-            alt="User's profile picture"
-            class="profile-picture"
-          />
+          <img class="profile-picture" v-if="user.typeUser === 'Administrador'" :src="admin_pic" alt="profile-pic" />
+          <img class="profile-picture" v-else-if="user.typeUser === 'Inquilino'" :src="inquilino_pic" alt="profile-pic" />
+          <img class="profile-picture" v-else :src="propietario_pic" alt="profile-pic" />
           <h2 class="profile-name">{{ user?.name }}</h2>
         </div>
         <div class="profile-info">
@@ -49,7 +47,6 @@
                 {{ role }}
               </option>
             </select>
-            <input type="file" @change="handleImageUpload" accept="image/*" />
             <!-- Botones de acción -->
             <div class="form-buttons">
               <button type="submit" v-if="userEditing">Actualizar</button>
@@ -64,6 +61,9 @@
   <script>
   import UserService from '@/service/UserService';
   import NavigationBar from './NavigationBar.vue';
+  import Administrador from '@/assets/images/admin.png';
+  import Inquilino from '@/assets/images/user.png';
+  import Propietario from '@/assets/images/property.png';
 
   export default {
     data() {
@@ -83,6 +83,9 @@
         roles: [],
         typeUser: null,
         idUserStore: null,
+        admin_pic: Administrador,
+        inquilino_pic: Inquilino,
+        propietario_pic: Propietario,
       };
     },
     created() {
@@ -105,6 +108,13 @@
       this.loadRoles();
     },
     methods: {
+      /* getProfilePic() {
+        if (this.users.typeUser === "Administrador") {
+          return require("@/assets/images/admin.png");
+        } else {
+          return require("@/assets/images/user.png");
+        }
+      }, */
       loadRoles() {
         // Logic to load all roles
         this.userService
@@ -147,7 +157,6 @@
           password: this.password,
           nickname: this.nickname,
           role: this.role,
-          picture: this.picture,
           userId: this.userId,
         };
         this.users.push(newUser);
@@ -164,7 +173,6 @@
         this.nickname = this.users[index].usename;
         this.carnet = this.users[index].ci;
         this.role = this.users[index].typeUser;
-        this.picture = this.users[index].picture;
         this.index = index;
         this.userEditing = true;
       },
@@ -218,9 +226,6 @@
         // Change the role of a user
         this.adminCredential = true;
       },
-      handleImageUpload() {
-        // Logic to upload an image
-      },
     },
     components: {
       NavigationBar,
@@ -269,14 +274,12 @@
     transition: all 0.5s ease-in-out;
     scale: 1.1;
   }
-  .profile-picture:hover {
-    transition: all 0.5s ease-in-out;
-    scale: 1.1;
-  }
   .profile-picture {
     border-radius: 50%;
     width: 150px;
     height: 150px;
+    object-fit: cover;
+    border: 5px solid #A69B8D;
   }
   .profile-name {
     font-weight: 800;
@@ -338,13 +341,14 @@
     z-index: 100;
   }
   .popup-content {
-    background-color: #222;
+    background-color: #F2F1E4;
     padding: 2rem;
     border-radius: 15px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    border: #A69B8D 5px solid;
   }
   .popup-content form {
     display: flex;
@@ -355,58 +359,145 @@
   .popup-content form input {
     margin-bottom: 1rem;
     padding: 0.5rem;
-    border-radius: 15px;
+    border-radius: 10px;
     border: 0px;
     width: 100%;
-  }
-  .popup-content form input[type="file"] {
-    margin-bottom: 1rem;
-    padding: 0.5rem;
-    border-radius: 15px;
-    border: 0px;
-    width: 100%;
-    background-color: #dcbe87;
-    color: #222;
-  }
-  .popup-content form input[type="file"]:hover {
-    background-color: #222;
-    color: #dcbe87;
+    background-color: #FFFAF1;
+    border: #A69B8D 3px solid;
   }
   .popup-content form select {
     margin-bottom: 1rem;
     padding: 0.5rem;
-    border-radius: 15px;
+    border-radius: 10px;
     border: 0px;
     width: 100%;
-  }
-  .popup-content form select:hover {
-    background-color: #dcbe87;
-    color: #222;
+    background-color: #FFFAF1;
+    border: #A69B8D 3px solid;
   }
   .popup-content form button {
     margin-top: 1rem;
     padding: 0.5rem;
-    border-radius: 15px;
+    border-radius: 10px;
     border: 0px;
     width: 100%;
-    background-color: #dcbe87;
-    color: #222;
+    background-color: #498C79;
+    color: #101E26;
   }
   .popup-content form button:hover {
-    background-color: #222;
-    color: #dcbe87;
+    color: #F2D1B3;
+    transition: all 0.5s ease-in-out;
+    transform: scale(1.1);
   }
   .popup-content form .form-buttons {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 10px;
     width: 100%;
   }
-  .popup-content form .form-buttons button {
-    width: 45%;
-  }
-  .popup-content form .form-buttons button:hover {
-    background-color: #222;
-    color: #dcbe87;
+
+
+  @media screen and (max-width: 768px) {
+    .container {
+      flex-direction: column;
+    }
+    .profile-card {
+      width: 90%;
+    }
+
+    .profile-picture {
+      width: 100px;
+      height: 100px;
+    }
+
+    .profile-header {
+      padding: 1rem;
+    }
+
+    .profile-info {
+      margin-bottom: 1rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .profile-info p {
+      font-weight: 500;
+    }
+
+    .actionButtons {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .btn-primary {
+      color: #101E26;
+      background-color: #498C79;
+      transition: all 0.5s ease-in-out;
+      border-radius: 10px;
+      border: 0px;
+      padding: 10px;
+    }
+
+    .btn-primary:hover {
+      color: #F2D1B3;
+      background-color: #498C79;
+      transform: scale(1.1);
+      transition: all 0.5s ease-in-out;
+      border: 0px;
+    }
+
+    .userForm {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      justify-content: center;
+      align-items: center;
+      display: flex;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+    }
+
+    .popup-content {
+      padding: 2rem;
+      border-radius: 10px;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .popup-content form {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .popup-content form input {
+      margin-bottom: 1rem;
+      padding: 0.5rem;
+      border-radius: 10px;
+      border: 0px;
+      width: 100%;
+      background-color: #FFFAF1;
+      border: #A69B8D 3px solid;
+    }
+
+    .popup-content form button {
+      margin-top: 1rem;
+      padding: 0.5rem;
+      border-radius: 10px;
+      border: 0px;
+      width: 100%;
+      background-color: #498C79;
+      color: #101E26;
+      flex-direction: column;
+    }
   }
   </style>

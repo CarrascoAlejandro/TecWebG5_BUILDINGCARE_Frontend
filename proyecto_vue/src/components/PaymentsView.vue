@@ -278,7 +278,7 @@ export default {
                 margin-bottom: 15px;
                 padding: 10px;
                 border: 2px solid #A69B8D;
-                border-radius: 5px;
+                border-radius: 10px;
                 width: 100%;
                 /* Ancho del input descontando el padding */
                 font-size: 16px;
@@ -296,7 +296,7 @@ export default {
                 button {
                     padding: 10px 20px;
                     border: none;
-                    border-radius: 5px;
+                    border-radius: 10px;
                     cursor: pointer;
                     font-size: 16px;
                     background-color: #498c79;
@@ -317,7 +317,7 @@ export default {
 button {
     padding: 10px 20px;
     border: none;
-    border-radius: 5px;
+    border-radius: 10px;
     cursor: pointer;
     font-size: 16px;
     background-color: #498c79;

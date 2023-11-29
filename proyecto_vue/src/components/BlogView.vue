@@ -16,12 +16,8 @@
                   </div>
               </div>
               <div class="post-content">
-                  <!-- <div class="post-image">
-                      <img :src="this.image" alt="post image" />
-                  </div> -->
                   <div class="post-description">{{ post.postContent }}</div>
-
-                  <span>{{ post.postState }}</span>
+                  <div class="post-state">{{ post.postState }}</div>
 
                   <div class="actions">
                     <button v-if="typeUser == 'Administrador'" @click="postStatus(post.id, post.postState)">
@@ -40,7 +36,6 @@
           <form>
               <input v-model="title" placeholder="Titulo del Post" type="text" required />
               <textarea v-model="description" placeholder="Descripción" required></textarea>
-              <!-- <input type="file" @change="handleImageUpload" accept="image/*" /> -->
               <select v-model="type" required>
                   <option value="">Selecciona una opción</option>
                   <option v-for="option in options" :key="option.value" :value="option.value">{{ option.text }}</option>
@@ -60,7 +55,6 @@
   <script>
     import PostService from "../service/PostService.js";
     import NavigationBar from "./NavigationBar.vue";
-//   import NavigationBar from "./components/NavigationBar.vue";
   import Swal from 'sweetalert2';
   
   export default {
@@ -76,16 +70,7 @@
                     description: '',
                     state: '',
                 }],
-            image: require("@/assets/images/living1.jpg"),
             posts: [],
-            // posts: [{
-            //     title: "Living 1",
-            //     type: "Living",
-            //     date: "2021-01-01",
-            //     time: "10:00",
-            //     image: require("@/assets/images/living1.jpg"),
-            //     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi tincidunt risus eu porttitor volutpat. Phasellus justo justo, tristique eget elit vel, sodales posuere purus. Fusce id massa ac lorem maximus auctor non eu ante. In sapien leo, scelerisque non venenatis at, ullamcorper eu mauris. Proin id velit vel ipsum commodo hendrerit. Donec eleifend augue ut mi hendrerit, in feugiat lectus tincidunt. Suspendisse quis odio in arcu finibus consectetur sed a dolor. Suspendisse mattis velit in condimentum dictum. Aenean non magna sem.",
-            // }],
             showPopup: false,
             editing: false,
             formData: {
@@ -165,17 +150,6 @@
         },
         closeForm() {
             this.showPopup = false;
-        },
-        handleImageUpload(event) {
-            // Obtiene el archivo de imagen seleccionado por el usuario
-            const file = event.target.files[0];
-            // Comprueba si se seleccionó un archivo
-            if (file) {
-                // Crea una URL de objeto (Blob URL) para la imagen
-                const imageUrl = URL.createObjectURL(file);
-                // Asigna la URL de la imagen al atributo 'image' en los datos del componente
-                this.image = imageUrl;
-            }
         },
         async postStatus(post, status) {
             console.log("post a completar: "+post);
@@ -258,7 +232,7 @@
             this.description = postContent;
             // Puedes guardar el índice del post que se está editando para actualizarlo después
             const foundOption = this.options.find(option => option.text === postType);
-            this.type = foundOption.value;
+            this.type = foundOption;
             this.state = postState;
             this.editingIndex = id;
             this.editing = true;
@@ -495,17 +469,7 @@
           flex-wrap: wrap;
           gap: 20px;
           color: #101e26;
-      }
-  
-      .post-image {
-          flex: 1;
-          max-width: 20%;
-          margin-right: 20px;
-  
-          img {
-              width: 100%;
-              border-radius: 10px;
-          }
+          flex-direction: column;
       }
   
       .post-description {
@@ -513,6 +477,15 @@
           font-size: 20px;
           text-align: start;
       }
+
+        .post-state {
+            flex: 1;
+            font-size: 20px;
+            text-align: center;
+            background-color: #101e26;
+            color: #fffaf1;
+            border-radius: 20px;
+        }
   
       .actions {
           flex: 1;
@@ -538,19 +511,34 @@
   
   @media screen and (max-width: 768px) {
       .announcement-post {
+            .header-date {
+                flex-direction: column;
+                
+                .header {
+                    flex-direction: column;
+                    align-items: center;
+                }
+
+                .date-time {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    margin-top: 10px;
+                }
+            }
           .post-content {
               flex-direction: column;
+                width: 100%;
+                flex-wrap: wrap;
           }
-  
-          .post-image {
-              max-width: 100%;
-              margin-right: 0;
-              margin-bottom: 20px;
-  
-              img {
-                  height: 100%;
-              }
+
+          .actions {
+              flex-direction: column;
+              align-items: center;
+              width: 100%;
+              gap: 5px;
           }
+
+
       }
   }
   </style>

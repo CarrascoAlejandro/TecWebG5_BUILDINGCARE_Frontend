@@ -280,7 +280,7 @@ body,
   width: 100%;
   padding: 0.5rem 1rem;
   border: none;
-  border-radius: 0.25rem;
+  border-radius: 10px;
   background-color: #333;
   color: #fff;
   font-size: 1rem;
@@ -307,7 +307,7 @@ body,
   width: 300px;
   margin: 0.5rem;
   padding: 1rem;
-  border-radius: 0.25rem;
+  border-radius: 10px;
   background-color: #fff;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
@@ -390,7 +390,7 @@ body,
   width: 100%;
   padding: 0.5rem 1rem;
   border: none;
-  border-radius: 0.25rem;
+  border-radius: 10px;
   background-color: #333;
   color: #fff;
   font-size: 1rem;
@@ -418,7 +418,7 @@ body,
   transform: translate(-50%, -50%);
   width: 400px;
   padding: 1rem;
-  border-radius: 0.25rem;
+  border-radius: 10px;
   background-color: #fff;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
@@ -439,7 +439,7 @@ body,
   margin-bottom: 1rem;
   padding: 0.5rem 1rem;
   border: none;
-  border-radius: 0.25rem;
+  border-radius: 10px;
   background-color: #eee;
   color: #333;
   font-size: 1rem;
@@ -453,7 +453,7 @@ body,
   margin-bottom: 1rem;
   padding: 0.5rem 1rem;
   border: none;
-  border-radius: 0.25rem;
+  border-radius: 10px;
   background-color: #eee;
   color: #333;
   font-size: 1rem;
@@ -467,7 +467,7 @@ body,
   margin-bottom: 1rem;
   padding: 0.5rem 1rem;
   border: none;
-  border-radius: 0.25rem;
+  border-radius: 10px;
   background-color: #eee;
   color: #333;
   font-size: 1rem;
@@ -481,7 +481,7 @@ body,
   margin-bottom: 1rem;
   padding: 0.5rem 1rem;
   border: none;
-  border-radius: 0.25rem;
+  border-radius: 10px;
   background-color: #333;
   color: #fff;
   font-size: 1rem;
