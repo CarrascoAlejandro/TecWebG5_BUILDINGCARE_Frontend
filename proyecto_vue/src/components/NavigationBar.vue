@@ -48,9 +48,9 @@ export default {
         this.userName = parsedData.usename;
         console.log("typeUser", this.typeUser);
         console.log("userName", this.userName);
-        if (this.typeUser == null) {
-            this.$router.push('/');
-        }
+        // if (this.typeUser == null) {
+        //     this.$router.push('/');
+        // }
     },
   methods: {
     setActiveNavItem(item) {
