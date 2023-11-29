@@ -20,7 +20,13 @@
                       <img :src="this.image" alt="post image" />
                   </div>
                   <div class="post-description">{{ post.postContent }}</div>
+
+                  <span>{{ post.postState }}</span>
+
                   <div class="actions">
+                    <button @click="postStatus(post.id, post.postState)">
+                    {{ post.postState !== 'Done' ? 'Completar' : 'Completado' }}
+                    </button>
                       <button @click="editPost(index)">Editar</button>
                       <button @click="deletePost(post.id)">Eliminar</button>
                   </div>
@@ -150,6 +156,31 @@
                 const imageUrl = URL.createObjectURL(file);
                 // Asigna la URL de la imagen al atributo 'image' en los datos del componente
                 this.image = imageUrl;
+            }
+        },
+        async postStatus(post, status) {
+            console.log("post a completar: "+post);
+            try {
+                if (status !== 'Done') {
+                    await this.postService.markPostAsDone(post).then((data) => {
+                        console.log("codigo de respuesta http: " + data.responseCode);
+                        if (data.responseCode == "POST-0002") {
+                            //se actualizo correctamente el post
+                            console.log('se actualizó el post correctamente :D');
+                            Swal.fire('¡Actualizado!', 'La publicación ha sido actualizada.', 'success');
+                            this.getPosts();
+                        }
+                        else {
+                            console.log('no se pudo actualizar el post :(');
+                        }
+                    });
+                }
+                else {
+                    console.log('el post est en done');
+                }
+                
+            } catch (error) {
+                console.error('Error al cambiar el estado de la tarea:', error);
             }
         },
         newPost() {
