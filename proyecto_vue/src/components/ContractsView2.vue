@@ -1,7 +1,7 @@
 <template>
 <NavigationBar></NavigationBar>
-    <div class="payment-app">
-        <button v-if="typeUser != 'Inquilino'" @click="openForm" id="newPaymentbtn">Registrar Nuevo Contrato</button>
+    <div class="payment-app" v-if="typeUser === 'Administrador'">
+        <button v-if="typeUser === 'Administrador'" @click="openForm" id="newPaymentbtn">Registrar Nuevo Contrato</button>
     
         <div class="payment-list">
             <div v-for="(contract, index) in paymentReceipts" :key="index" class="payment-card">
@@ -99,6 +99,18 @@
     created() {
         // await this.loadContracts();
         this.contractService= new ContractService();
+        this.typeUser = localStorage.getItem("typeUser");
+        const storedData = localStorage.getItem("userID");
+        // Parsear el JSON almacenado
+        const parsedData = JSON.parse(storedData);
+        console.log("parsedData", parsedData);
+        // Acceder al campo "name" dentro del objeto parsedData
+        this.userName = parsedData.usename;
+        console.log("typeUser", this.typeUser);
+        console.log("userName", this.userName);
+        if (this.typeUser == null) {
+            this.$router.push('/');
+        }
     },
     async mounted() {
         await this.loadContracts();
