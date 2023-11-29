@@ -24,7 +24,7 @@
                   <span>{{ post.postState }}</span>
 
                   <div class="actions">
-                    <button @click="postStatus(post.id, post.postState)">
+                    <button v-if="typeUser == 'Administrador'" @click="postStatus(post.id, post.postState)">
                     {{ post.postState !== 'Done' ? 'Completar' : 'Completado' }}
                     </button>
                       <button @click="editPost(index)" v-if="typeUser == 'Administrador' || post.postUser == userName">Editar</button>

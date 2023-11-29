@@ -1,81 +1,111 @@
 <template>
-<NavigationBar></NavigationBar>
-    <div class="payment-app">
-        <button v-if="typeUser !== 'Inquilino'" @click="openForm" id="newPaymentbtn">Registrar Nuevo Contrato</button>
-    
-        <div class="payment-list">
-            <div v-for="(contract, index) in paymentReceipts" :key="index" class="payment-card">
-                <div class="receipt-content">
-                    <div class="header">
-                        <div class="receipt-detail">Propiedad: {{ propertyNames[contract.contractProperty] }}</div>
-                        <div class="receipt-detail">Propietario: {{ contract.contractOwner }}</div>
-                        <div class="receipt-detail">Tipo: {{ typeContractNames[contract.contractType] }}</div>
-                    </div>
-                    <div class="receipt-info">
-                        <div class="receipt-detail">Monto pagado: {{ contract.contractAmount }}</div>
-                        <div class="receipt-detail">Fecha de inicio: {{ contract.contractSignatureDate }}</div>
-                        <div class="receipt-detail">Fecha de conclusión: {{ contract.contractEndDate }}</div>
-                        
-                    </div>
-                </div>
-                <div class="receipt-actions">
-                    <button v-if="typeUser != 'Inquilino'" @click="editReceipt(index)">Editar</button>
-                    <button v-if="typeUser == 'Administrador'" @click="deleteReceipt(index)">Eliminar</button>
-                </div>
-            </div>
+  <NavigationBar></NavigationBar>
+  <div v-if="typeUser === 'Administrador'" class="contract-app">
+    <button v-if="typeUser === 'Administrador'" @click="openForm" id="newPaymentbtn">
+      Registrar Nuevo Contrato
+    </button>
+
+    <div class="contract-list">
+      <div
+        v-for="(contract, index) in paymentReceipts"
+        :key="index"
+        class="contract"
+      >
+        <div class="contract-content">
+          <div class="property">
+            Propiedad: {{ propertyNames[contract.contractProperty] }}
+          </div>
+          <div class="owner">Propietario: {{ contract.contractOwner }}</div>
+          <div class="type">
+            Tipo: {{ typeContractNames[contract.contractType] }}
+          </div>
+          <div class="payed-ammount">
+            Monto pagado: {{ contract.contractAmount }}
+          </div>
+          <div class="date start-date">
+            Fecha de inicio: {{ contract.contractSignatureDate }}
+          </div>
+          <div class="date end-date">
+            Fecha de conclusión: {{ contract.contractEndDate }}
+          </div>
         </div>
-    
-        <!-- Payment Receipt Form -->
-        <div class="receipt-popup" v-if="showReceiptForm">
-            <div class="popup-content">
-                <form @submit.prevent="editing ? updateReceipt() : createReceipt()">
-                    <label for="propiedad">Propiedad:</label>
-                    <select id="propiedad" v-model="propiedad" required>
-                        <option value="">Selecciona una propiedad</option>
-                        <option v-for="propiedad in propiedades" :key="propiedad.id" :value="propiedad.id">
-                            {{ propiedad.propertyDescription }}
-                        </option>
-                    </select>
-                    <label for="propiedad">Fecha de inicio:</label>
-                    <input v-model="signatureDate" placeholder="Fecha de inicio" type="date" required />
-                    <label for="propiedad">Fecha de conclusión:</label>
-                    
-                    <input v-model="endDate" placeholder="Fecha de conclusión" type="date" required />
-                    <label for="propiedad">Monto pagado:</label>
-                    
-                    <input v-model="amount" placeholder="Monto pagado" type="text" required />
-                    <label for="propiedad">Tipo de contrato:</label>
-                    
-                    <select v-model="type" required>
-                        <option value="">Seleccione un tipo de contrato:</option>
-                        <option v-for="option in typeContract" :key="option.id" :value="option.id">
-                            {{ option.type }}
-                        </option>
-                    </select>
-                    <!-- Action buttons -->
-                    <div class="form-buttons">
-                        <button @click="createContract" v-if="!editing">Añadir</button>
-                        <button @click="updateReceipt(index)" v-if="editing">Actualizar</button>
-                        <button @click="deleteReceipt(index)" v-if="editing">Eliminar</button>
-                        <button @click="closeForm">Cerrar</button>
-                    </div>
-                </form>
-            </div>
+        <div class="actions">
+          <button v-if="typeUser != 'Inquilino'" @click="editReceipt(index)">Editar</button>
+          <button v-if="typeUser == 'Administrador'" @click="deleteReceipt(index)">Eliminar</button>
         </div>
+      </div>
     </div>
-    </template>
-    
-    <script>
-    import NavigationBar from "./NavigationBar.vue";
-    import ContractService from "../service/ContractService.js";
-    import PropertiesService from "../service/PropertiesService.js";
-    export default {
-    data() {
-        return {
-            propiedades: [],
-            typeContract: [],
-            paymentReceipts: [],
-            showReceiptForm: false,
+
+    <!-- Payment Receipt Form -->
+    <div class="receipt-popup" v-if="showReceiptForm">
+      <div class="popup-content">
+        <form @submit.prevent="editing ? updateReceipt() : createReceipt()">
+          <select id="propiedad" v-model="propiedad" required>
+            <option value="">Selecciona una propiedad</option>
+            <option
+              v-for="propiedad in propiedades"
+              :key="propiedad.id"
+              :value="propiedad.id"
+            >
+              {{ propiedad.propertyDescription }}
+            </option>
+          </select>
+          <input
+            v-model="signatureDate"
+            placeholder="Fecha de inicio"
+            type="date"
+            required
+          />
+          <input
+            v-model="endDate"
+            placeholder="Fecha de conclusión"
+            type="date"
+            required
+          />
+          <input
+            v-model="amount"
+            placeholder="Monto pagado"
+            type="text"
+            required
+          />
+          <select v-model="type" required>
+            <option value="">Seleccione un tipo de contrato:</option>
+            <option
+              v-for="option in typeContract"
+              :key="option.id"
+              :value="option.id"
+            >
+              {{ option.type }}
+            </option>
+          </select>
+          <!-- Action buttons -->
+          <div class="form-buttons">
+            <button @click="createContract" v-if="!editing">Añadir</button>
+            <button @click="updateReceipt(index)" v-if="editing">
+              Actualizar
+            </button>
+            <button @click="deleteReceipt(index)" v-if="editing">
+              Eliminar
+            </button>
+            <button @click="closeForm">Cerrar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import NavigationBar from "./NavigationBar.vue";
+import ContractService from "../service/ContractService.js";
+import PropertiesService from "../service/PropertiesService.js";
+export default {
+  data() {
+    return {
+      propiedades: [],
+      typeContract: [],
+      paymentReceipts: [],
+      showReceiptForm: false,
 
       propertyNames: {},
       typeContractNames: {},
@@ -89,17 +119,16 @@
       editing: false,
       index: null,
 
-            // contractService: new ContractService(),
-            // propertiesService: new PropertiesService(),
-            token: 1,//localStorage.getItem("token"),
-            contracts: [],
-            
-        };
-    },
-    created() {
-        // await this.loadContracts();
-        this.contractService= new ContractService();
-        this.typeUser = localStorage.getItem("typeUser");
+      // contractService: new ContractService(),
+      // propertiesService: new PropertiesService(),
+      token: 1, //localStorage.getItem("token"),
+      contracts: [],
+    };
+  },
+  created() {
+    // await this.loadContracts();
+    this.contractService = new ContractService();
+    this.typeUser = localStorage.getItem("typeUser");
         const storedData = localStorage.getItem("userID");
         // Parsear el JSON almacenado
         const parsedData = JSON.parse(storedData);
@@ -111,23 +140,25 @@
         if (this.typeUser == null) {
             this.$router.push('/');
         }
-    },
-    async mounted() {
-        await this.loadContracts();
-    },
-    methods: {
-        async loadContracts() {
-            try {
-                const contracts = await this.contractService.getAllContracts(this.token);
-                this.paymentReceipts = contracts;
-                // const prop = await this.contractService.getProperties(this.token);
-                const prop = await PropertiesService.fetchProperties();
-                this.propiedades = prop.data;
-                console.log("propiedades: "+JSON.stringify(this.propiedades));
-                
-                const typeC = await this.contractService.getTypeContract(this.token);
-                this.typeContract = typeC;
-                console.log("tipos: "+JSON.stringify(this.typeContract));
+  },
+  async mounted() {
+    await this.loadContracts();
+  },
+  methods: {
+    async loadContracts() {
+      try {
+        const contracts = await this.contractService.getAllContracts(
+          this.token
+        );
+        this.paymentReceipts = contracts;
+        // const prop = await this.contractService.getProperties(this.token);
+        const prop = await PropertiesService.fetchProperties();
+        this.propiedades = prop.data;
+        console.log("propiedades: " + JSON.stringify(this.propiedades));
+
+        const typeC = await this.contractService.getTypeContract(this.token);
+        this.typeContract = typeC;
+        console.log("tipos: " + JSON.stringify(this.typeContract));
 
         // Cargar los nombres de todas las propiedades únicas en los contratos
         const propertyIds = [
