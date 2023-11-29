@@ -101,7 +101,7 @@
                     value: '1',
                     text: 'mantenimiento'
                 },
-                {
+                { 
                     value: '2',
                     text: 'anuncio'
                 },
@@ -117,7 +117,7 @@
         };
     },
     created() {
-        this.postService = new PostService();
+        
         this.typeUser = localStorage.getItem("typeUser");
         const storedData = localStorage.getItem("userID");
         // Parsear el JSON almacenado
@@ -126,6 +126,7 @@
         // Acceder al campo "name" dentro del objeto parsedData
         this.userName = parsedData.usename;
         this.isUserHeader = parsedData.idUser;
+        this.postService = new PostService(this.isUserHeader);
         console.log("typeUser", this.typeUser);
         console.log("userName", this.userName);
         console.log("isUserHeader", this.isUserHeader);

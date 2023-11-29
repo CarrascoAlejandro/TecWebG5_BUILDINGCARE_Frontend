@@ -86,13 +86,14 @@
       };
     },
     created() {
-      this.userService = new UserService();
+      
       this.typeUser = localStorage.getItem("typeUser");
         const storedData = localStorage.getItem("userID");
         // Parsear el JSON almacenado
         const parsedData = JSON.parse(storedData);
         // Acceder al campo "name" dentro del objeto parsedData
         this.idUserStore = parsedData.idUser;
+        this.userService = new UserService(this.idUserStore);
         console.log("typeUser", this.typeUser);
         console.log("idUser", this.idUserStore);
         if (this.typeUser == null) {

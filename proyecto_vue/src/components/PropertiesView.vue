@@ -109,6 +109,7 @@ export default {
       index: null,
       image: null,
       selectedType: null,
+      idUserHeader: '',
     };
   },
   computed: {
@@ -136,6 +137,8 @@ export default {
         const parsedData = JSON.parse(storedData);
         // Acceder al campo "name" dentro del objeto parsedData
         this.nameUser = parsedData.name;
+        this.idUserHeader = parsedData.idUser;
+        this.propertiesService = new PropertiesService(this.idUserHeader);
         console.log("typeUser", this.typeUser);
         console.log("nameUser", this.nameUser);
         if (this.typeUser == null) {
@@ -150,7 +153,7 @@ export default {
       },
     async fetchProperties() {
       try {
-        const data = await PropertiesService.fetchProperties();
+        const data = await this.propertiesService.fetchProperties();
         if (data.responseCode === "PROP-0000" && data.data) {
           console.log("data", data);
           // Mapear los datos recibidos a la estructura esperada por el componente
@@ -172,7 +175,7 @@ export default {
     },
     async fetchTypes() {
       try {
-        const data = await PropertiesService.fetchTypes();
+        const data = await this.propertiesService.fetchTypes();
         if (data.responseCode === "PROP-0004" && data.data) {
           // Mapear los datos recibidos a la estructura esperada por el componente
           this.types = data.data.map((item) => ({
@@ -241,7 +244,7 @@ export default {
       };
 
       try {
-        const responseData = await PropertiesService.addProperty(newProperty);
+        const responseData = await this.propertiesService.addProperty(newProperty);
         if (responseData && responseData.responseCode === "PROP-0001") {
           this.properties.push(responseData.data);
         } else {
@@ -300,7 +303,7 @@ export default {
 
       try {
         const propertyId = this.properties[this.index].id;
-        const responseData = await PropertiesService.updateProperty(
+        const responseData = await this.propertiesService.updateProperty(
           propertyId,
           updatedProperty
         );
@@ -323,7 +326,7 @@ export default {
       const property = this.properties[index];
       if (confirm("¿Seguro que desea eliminar esta propiedad?")) {
         try {
-          const success = await PropertiesService.deleteProperty(property.id);
+          const success = await this.propertiesService.deleteProperty(property.id);
           if (success) {
             this.properties.splice(index, 1);
           } else {

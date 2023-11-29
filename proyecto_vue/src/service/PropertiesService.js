@@ -1,4 +1,8 @@
 class PropertiesService {
+  constructor(token='1') {
+
+    this.tokenValue = token;
+}
   async fetchProperties() {
     try {
       const response = await fetch("http://localhost:8080/api/v1/property/all");
@@ -15,7 +19,7 @@ class PropertiesService {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          token: "1", // Tu token se establece aquí
+          token: this.tokenValue, // Tu token se establece aquí
         },
         body: JSON.stringify(property),
       });
@@ -47,7 +51,7 @@ class PropertiesService {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            token: "1",
+            token: this.tokenValue,
           },
           body: JSON.stringify(updatedProperty),
         }

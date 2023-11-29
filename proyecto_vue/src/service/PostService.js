@@ -1,9 +1,9 @@
 import axios from 'axios';
 
 export default class PostService{
-    constructor() {
+    constructor(token='1') {
         this.url = "http://localhost:8080/api/v1/blog";
-        this.token = '1';
+        this.token = token;
     }
     async newPost(title, content, idTypePost) {
         try {
