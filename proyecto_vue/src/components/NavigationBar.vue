@@ -64,6 +64,7 @@ export default {
       } else if (item === "houses") {
         this.$router.push("/propertyView");
       } else if (item === "logOut") {
+        localStorage.clear();
         this.$router.push("/login");
       } else if (item === "contracts") {
         this.$router.push("/contractsView");
