@@ -273,6 +273,20 @@ export default {
             ],
         };
     },
+    created() {
+        this.typeUser = localStorage.getItem("typeUser");
+        const storedData = localStorage.getItem("userID");
+        // Parsear el JSON almacenado
+        const parsedData = JSON.parse(storedData);
+        console.log("parsedData", parsedData);
+        // Acceder al campo "name" dentro del objeto parsedData
+        this.userName = parsedData.usename;
+        console.log("typeUser", this.typeUser);
+        console.log("userName", this.userName);
+        // if (this.typeUser == null) {
+        //     this.$router.push('/');
+        // }
+    },
     methods: {
         setActiveNavItem(item) {
             this.activeNavItem = item;
