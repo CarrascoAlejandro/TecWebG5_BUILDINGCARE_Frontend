@@ -1,4 +1,4 @@
-class PropertiesService {
+export default class PropertiesService {
   constructor(token='1') {
 
     this.tokenValue = token;
@@ -76,4 +76,4 @@ class PropertiesService {
   }
 }
 
-export default new PropertiesService();
+

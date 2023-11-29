@@ -44,7 +44,7 @@
             />
             <input v-model="nickname" placeholder="Alias" type="text" required />
             <input v-model="carnet" placeholder="Carnet de Identidad" type="text" required />
-            <select v-model="role" required>
+            <select v-model="role" :disabled="typeUser !== 'Administrador'" required>
               <option v-for="role in roles" :key="role" :value="role">
                 {{ role }}
               </option>
