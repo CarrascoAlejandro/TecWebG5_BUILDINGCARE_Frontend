@@ -5,7 +5,7 @@
 
         <div class="payment-list">
             <div v-for="(receipt, index) in paymentReceipts" :key="index" class="payment-card">
-                <div class="payment-content">
+                <div class="payment-content"> 
                     <div class="payment-header">
                         <div class="payment-concept">Concepto: {{ receipt.concept }}</div>
                         <div class="payment-date">Fecha del Pago: {{ receipt.date }}</div>
@@ -69,11 +69,15 @@ export default {
             index: null,
             users: [],
             typeUser: '',
+            idUserHeader: '',
         };
     },
     created() {
         this.paymentService = new PaymentService();
         this.userService = new UserService();
+        const storedData = localStorage.getItem("userID");
+        const parsedData = JSON.parse(storedData);
+        this.idUserHeader = parsedData.idUser;
     },
     mounted() {
         this.typeUser = localStorage.getItem('typeUser');
@@ -113,7 +117,7 @@ export default {
             const detail = this.detail;
             const buyer = this.buyer;
             const seller = this.seller;
-            this.paymentService.newPayment(amount, date, concept, detail, buyer, seller)
+            this.paymentService.newPayment(amount, date, concept, detail, buyer, seller,this.idUserHeader)
                 .then((response) => {
                     console.log(response.data);
                     this.paymentReceipts = response.data;

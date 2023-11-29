@@ -5,7 +5,7 @@ export default class PaymentService {
         this.url = "http://localhost:8080/api/v1/payment";
         this.token = '1';
     }
-    async newPayment(amount, date, concept, detail, idUserPays, idUserReceives) {
+    async newPayment(amount, date, concept, detail, idUserPays, idUserReceives, tokenValue) {
         try {
             // Define los datos que se enviarán en el cuerpo de la solicitud
             const data = {
@@ -20,7 +20,7 @@ export default class PaymentService {
             // Define los encabezados, incluyendo el token
             const headers = {
                 'Content-Type': 'application/json',
-                'token': this.token
+                'token': tokenValue
             };
     
             // Realiza la solicitud POST utilizando Axios
@@ -73,7 +73,7 @@ export default class PaymentService {
         }
     }
 
-    async updatePaymentById (paymentId, amount, date, concept, detail, idUserPays, idUserReceives){
+    async updatePaymentById (paymentId, amount, date, concept, detail, idUserPays, idUserReceives, tokenValue){
         try {
             // Define los datos que se enviarán en el cuerpo de la solicitud
             const data = {
@@ -88,7 +88,7 @@ export default class PaymentService {
             // Define los encabezados, incluyendo el token
             const headers = {
                 'Content-Type': 'application/json',
-                'token': this.token
+                'token': tokenValue
             };
     
             // Realiza la solicitud PUT utilizando Axios
