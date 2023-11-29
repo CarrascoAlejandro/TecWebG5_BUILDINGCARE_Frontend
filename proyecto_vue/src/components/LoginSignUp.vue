@@ -135,6 +135,14 @@ export default {
           } else if (data.data) {
             localStorage.setItem("userID", JSON.stringify(data.data));
             alert("Ingreso exitoso");
+            //guardamos los datos de data.data en el local storage
+            const typeUser = data.data.typeUser;
+            localStorage.setItem('typeUser', typeUser);
+            //guardando los datos del usuario por si fueran de utilidad 
+            localStorage.setItem("userID", JSON.stringify(data.data));
+            //redireccionamos a la vista de payments
+            const storedTypeUser = localStorage.getItem('typeUser');
+            console.log("el tipo de usuario es "+storedTypeUser);
             this.$router.push("/paymentsView");
           } else if (data.errorMessage) {
             alert(data.errorMessage);

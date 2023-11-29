@@ -12,7 +12,7 @@
           </select>
         </div>
         <div class="add-btn">
-          <button class="add-button" @click="openForm">Añadir Propiedad</button>
+          <button class="add-button" @click="openForm" v-if="typeUser !== 'Inquilino'">Añadir Propiedad</button>
         </div>
       </div>
       <div class="search-container">
@@ -44,8 +44,8 @@
           </div>
           <div class="property-description">{{ property.description }}</div>
           <div class="actions">
-            <button @click="editProperty(index)">Editar</button>
-            <button @click="deleteProperty(index)">Borrar</button>
+            <button @click="editProperty(index)" v-if="typeUser != 'Inquilino' && ((typeUser == 'Socio' && nameUser === property.propertyOwner) || typeUser == 'Administrador')">Editar</button>
+            <button @click="deleteProperty(index)" v-if="typeUser === 'Administrador'">Borrar</button>
           </div>
         </div>
       </div>
@@ -129,6 +129,19 @@ export default {
       return filtered;
     },
   },
+  created() {
+        this.typeUser = localStorage.getItem("typeUser");
+        const storedData = localStorage.getItem("userID");
+        // Parsear el JSON almacenado
+        const parsedData = JSON.parse(storedData);
+        // Acceder al campo "name" dentro del objeto parsedData
+        this.nameUser = parsedData.name;
+        console.log("typeUser", this.typeUser);
+        console.log("nameUser", this.nameUser);
+        if (this.typeUser == null) {
+            this.$router.push('/');
+        }
+    },
   methods: {
     //temp
       logAndReturnImage(image) {

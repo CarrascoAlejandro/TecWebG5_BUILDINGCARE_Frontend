@@ -1,7 +1,7 @@
 <template>
   <NavigationBar></NavigationBar>
-  <div class="contract-app">
-    <button @click="openForm" id="newPaymentbtn">
+  <div v-if="typeUser === 'Administrador'" class="contract-app">
+    <button v-if="typeUser === 'Administrador'" @click="openForm" id="newPaymentbtn">
       Registrar Nuevo Contrato
     </button>
 
@@ -30,8 +30,8 @@
           </div>
         </div>
         <div class="actions">
-          <button @click="editReceipt(index)">Editar</button>
-          <button @click="deleteReceipt(index)">Eliminar</button>
+          <button v-if="typeUser != 'Inquilino'" @click="editReceipt(index)">Editar</button>
+          <button v-if="typeUser == 'Administrador'" @click="deleteReceipt(index)">Eliminar</button>
         </div>
       </div>
     </div>
@@ -128,6 +128,18 @@ export default {
   created() {
     // await this.loadContracts();
     this.contractService = new ContractService();
+    this.typeUser = localStorage.getItem("typeUser");
+        const storedData = localStorage.getItem("userID");
+        // Parsear el JSON almacenado
+        const parsedData = JSON.parse(storedData);
+        console.log("parsedData", parsedData);
+        // Acceder al campo "name" dentro del objeto parsedData
+        this.userName = parsedData.usename;
+        console.log("typeUser", this.typeUser);
+        console.log("userName", this.userName);
+        if (this.typeUser == null) {
+            this.$router.push('/');
+        }
   },
   async mounted() {
     await this.loadContracts();

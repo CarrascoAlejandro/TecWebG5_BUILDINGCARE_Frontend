@@ -81,10 +81,23 @@
         showpopup: false,
         userEditing: false,
         roles: [],
+        typeUser: null,
+        idUserStore: null,
       };
     },
     created() {
       this.userService = new UserService();
+      this.typeUser = localStorage.getItem("typeUser");
+        const storedData = localStorage.getItem("userID");
+        // Parsear el JSON almacenado
+        const parsedData = JSON.parse(storedData);
+        // Acceder al campo "name" dentro del objeto parsedData
+        this.idUserStore = parsedData.idUser;
+        console.log("typeUser", this.typeUser);
+        console.log("idUser", this.idUserStore);
+        if (this.typeUser == null) {
+            this.$router.push('/');
+        }
     },
     mounted() {
       this.loadUsers();
@@ -105,6 +118,13 @@
             console.log(error);
           });
       },
+      verifyPermission() {
+        if (this.typeUser != "Administrador") {
+          // Buscar el registro en this.users con idUser igual a this.idUserStore
+          this.users = this.users.filter(user => user.idUser === this.idUserStore);
+          }
+          console.log("estamos en verifyPermission", this.users);
+        },
       loadUsers() {
         // Logic to load all users
         this.userService
@@ -112,6 +132,7 @@
           .then((response) => {
             console.log(response.data.data);
             this.users = response.data.data;
+            this.verifyPermission();
           })
           .catch((error) => {
             console.log(error);

@@ -24,11 +24,11 @@
                   <span>{{ post.postState }}</span>
 
                   <div class="actions">
-                    <button @click="postStatus(post.id, post.postState)">
+                    <button v-if="typeUser == 'Administrador'" @click="postStatus(post.id, post.postState)">
                     {{ post.postState !== 'Done' ? 'Completar' : 'Completado' }}
                     </button>
-                      <button @click="editPost(index)">Editar</button>
-                      <button @click="deletePost(post.id)">Eliminar</button>
+                      <button @click="editPost(index)" v-if="typeUser == 'Administrador' || post.postUser == userName">Editar</button>
+                      <button @click="deletePost(post.id)" v-if="typeUser == 'Administrador' || post.postUser == userName">Eliminar</button>
                   </div>
               </div>
           </div>
@@ -110,10 +110,24 @@
                 },
                 // Agregar más opciones según sea necesario
             ],
+            typeUser: '',
+            userName: '',
         };
     },
     created() {
         this.postService = new PostService();
+        this.typeUser = localStorage.getItem("typeUser");
+        const storedData = localStorage.getItem("userID");
+        // Parsear el JSON almacenado
+        const parsedData = JSON.parse(storedData);
+        console.log("parsedData", parsedData);
+        // Acceder al campo "name" dentro del objeto parsedData
+        this.userName = parsedData.usename;
+        console.log("typeUser", this.typeUser);
+        console.log("userName", this.userName);
+        if (this.typeUser == null) {
+            this.$router.push('/');
+        }
     },
     mounted() {
         this.getPosts();
