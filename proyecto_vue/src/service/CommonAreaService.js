@@ -10,14 +10,14 @@ class CommonAreaService {
       throw error;
     }
   }
-  async addCommonArea(commonArea) {
+  async addCommonArea(commonArea, token) {
     try {
       const response = await fetch("http://localhost:8080/api/v1/commonarea", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          Token: "1", // Asegúrate de que este token sea el correcto o necesario
+          Token: token, // Asegúrate de que este token sea el correcto o necesario
         },
         body: JSON.stringify({
           description: commonArea.description,
@@ -43,7 +43,7 @@ class CommonAreaService {
       throw error;
     }
   }
-  async updateCommonArea(commonAreaId, updatedCommonArea) {
+  async updateCommonArea(commonAreaId, updatedCommonArea, token) {
     try {
       const response = await fetch(
         `http://localhost:8080/api/v1/commonarea/${commonAreaId}`,
@@ -52,7 +52,7 @@ class CommonAreaService {
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
-            Token: "1", // Asegúrate de que este token sea el correcto o necesario
+            Token: token, // Asegúrate de que este token sea el correcto o necesario
           },
           body: JSON.stringify({
             description: updatedCommonArea.description,

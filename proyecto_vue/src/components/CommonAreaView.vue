@@ -91,8 +91,27 @@ export default {
         { text: "Gimnasio", value: "Gimnasio" },
         { text: "Salón de Eventos", value: "Salón de Eventos" },
       ],
+      typeUser: '',
+      userName: '',
+      idUserHeader: '',
     };
   },
+  created() {
+        this.typeUser = localStorage.getItem("typeUser");
+        const storedData = localStorage.getItem("userID");
+        // Parsear el JSON almacenado
+        const parsedData = JSON.parse(storedData);
+        console.log("parsedData", parsedData);
+        // Acceder al campo "name" dentro del objeto parsedData
+        this.userName = parsedData.usename;
+        this.idUserHeader = parsedData.idUser;
+        console.log("typeUser", this.typeUser);
+        console.log("userName", this.userName);
+        console.log("isUserHeader", this.idUserHeader);
+        if (this.typeUser == null) {
+            this.$router.push('/');
+        }
+    },
   methods: {
     async fetchCommonAreas() {
       try {
@@ -136,7 +155,7 @@ export default {
       };
 
       try {
-        const response = await CommonAreaService.addCommonArea(newArea);
+        const response = await CommonAreaService.addCommonArea(newArea, this.idUserHeader);
         if (response.responseCode === "CARE-0001" && response.data) {
           // Agrega la nueva área a tu lista local
           this.commonAreas.push({
@@ -170,7 +189,8 @@ export default {
       try {
         const response = await CommonAreaService.updateCommonArea(
           this.commonAreas[this.index].id,
-          updatedArea
+          updatedArea,
+          this.idUserHeader
         );
         if (response.responseCode === "CARE-0002" && response.data) {
           // Actualiza el área en el array local
