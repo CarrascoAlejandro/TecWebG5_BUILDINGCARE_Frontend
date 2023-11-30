@@ -130,6 +130,7 @@
 <script>
 import axios from "axios";
 import UserService from '../service/UserService';
+import Swal from 'sweetalert2';
 export default {
   
   data() {
@@ -155,7 +156,11 @@ export default {
     },
     loginUser() {
       if (this.username === "" || this.password === "") {
-        alert("Uno o más campos están vacíos");
+        //alert("Uno o más campos están vacíos");
+        Swal.fire({
+          icon: 'error',
+          title: 'Uno o más campos están vacíos'
+        })
         return;
       }
       axios //TODO consumir service de login -> UserServie
@@ -169,12 +174,21 @@ export default {
             data.data === null &&
             data.errorMessage === null
           ) {
-            alert(
+            /* alert(
               "Los datos ingresados son incorrectos. Por favor, intente nuevamente."
-            );
+            ); */
+            Swal.fire({
+              icon: 'error',
+              title: 'Los datos ingresados son incorrectos.',
+              text: 'Por favor, intente nuevamente.'
+            })
           } else if (data.data) {
             localStorage.setItem("userID", JSON.stringify(data.data));
-            alert("Ingreso exitoso");
+            /* alert("Ingreso exitoso"); */
+            Swal.fire({
+              icon: 'success',
+              title: 'Ingreso exitoso'
+            })
             //guardamos los datos de data.data en el local storage
             const typeUser = data.data.typeUser;
             localStorage.setItem('typeUser', typeUser);
@@ -198,17 +212,29 @@ export default {
         this.newPassword === "" ||
         this.confirmPassword === ""
       ) {
-        alert("Uno o más campos están vacíos");
+        /* alert("Uno o más campos están vacíos"); */
+        Swal.fire({
+          icon: 'error',
+          title: 'Uno o más campos están vacíos'
+        })
         return;
       } else if (this.newPassword !== this.confirmPassword) {
-        alert("Las contraseñas no coinciden");
+        /* alert("Las contraseñas no coinciden"); */
+        Swal.fire({
+          icon: 'error',
+          title: 'Las contraseñas no coinciden'
+        })
         return;
       } else {
         // Aquí puedes agregar la llamada API para registrar al usuario si lo necesitas.
         this.UserService.signUpUser(this.newName, this.newUsername, this.newPassword, this.newEmail, this.newCI, this.newPhone, 3).then((response) => {//se manda el tipo de user como inquilino
           //verificar el codigo de envio
           
-          alert("Registro exitoso")
+          /* alert("Registro exitoso") */
+          Swal.fire({
+            icon: 'success',
+            title: 'Registro exitoso'
+          })
           console.log(response);
         });
         
