@@ -16,9 +16,9 @@
                   </div>
               </div>
               <div class="post-content">
-                  <div class="post-image">
+                  <!-- <div class="post-image">
                       <img :src="this.image" alt="post image" />
-                  </div>
+                  </div> -->
                   <div class="post-description">{{ post.postContent }}</div>
                   <div class="actions">
                       <button @click="editPost(index)">Editar</button>
