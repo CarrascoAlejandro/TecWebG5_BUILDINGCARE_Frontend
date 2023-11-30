@@ -38,22 +38,24 @@ export default class UserService{
         
     }
     async signUpUser(name, usename, password, email, CI, phone, itTypeUser){
-        const url = "http://localhost:8080/api/v1/user/signUp";
+        const url = "http://localhost:8080/api/v1/user/signup";
         try{
             const headers = {
                 'Content-Type': 'application/json',
             };
             const data = {
                 name: name,
-                usename: usename,
+                username: usename,
                 password: password,
                 email: email,
-                CI: CI,
+                ci: CI,
                 phone: phone,
-                itTypeUser: itTypeUser,
+                typeUser: itTypeUser,
             }
+            console.log("aquiiiii")
+            console.log(data)
             const response = await axios.post(url, data, { headers });
-            return response;
+            return response.data;
         }catch(err){
             console.error('Error al iniciar sesion:', err);
             throw err;

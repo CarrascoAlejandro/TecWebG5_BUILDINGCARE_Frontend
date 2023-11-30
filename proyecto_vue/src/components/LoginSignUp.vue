@@ -227,15 +227,14 @@ export default {
         return;
       } else {
         // Aquí puedes agregar la llamada API para registrar al usuario si lo necesitas.
-        this.UserService.signUpUser(this.newName, this.newUsername, this.newPassword, this.newEmail, this.newCI, this.newPhone, 3).then((response) => {//se manda el tipo de user como inquilino
+        this.userService.signUpUser(this.newName, this.newUsername, this.newPassword, this.newEmail, this.newCI, this.newPhone, 3).then((response) => {//se manda el tipo de user como inquilino
           //verificar el codigo de envio
-          
-          /* alert("Registro exitoso") */
-          Swal.fire({
-            icon: 'success',
-            title: 'Registro exitoso'
-          })
-          console.log(response);
+          if(response.responseCode =="USER-0002" ){
+            alert("Registro exitoso")
+            this.$router.push("/login");
+          }else{
+            alert("Error en el registro")
+          }
         });
         
       }
