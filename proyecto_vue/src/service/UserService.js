@@ -1,13 +1,16 @@
 import axios from 'axios';
 
 export default class UserService{
+    constructor(token='1') {
+        this.tokenValue = token;
+    }
     url = "http://localhost:8080/api/v1/user";
     token = '1';
     async listAllUsers(){
         try{
             const headers = {
                 'Content-Type': 'application/json',
-                'Authorization': this.token,
+                'Authorization': this.tokenValue,
             };
             const response = await axios.get(this.url+'/all', { headers });
             return response;
@@ -62,7 +65,7 @@ export default class UserService{
         try{
             const headers = {
                 'Content-Type': 'application/json',
-                'Authorization': this.token,
+                'Authorization': this.tokenValue,
             };
             const response = await axios.get(this.url+'/type/all', { headers });
             return response;
@@ -76,7 +79,7 @@ export default class UserService{
         try{
             const headers = {
                 'Content-Type': 'application/json',
-                'Authorization': this.token,
+                'Authorization': this.tokenValue,
             };
             const data = {
                 idUser: id,

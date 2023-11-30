@@ -12,6 +12,38 @@
             <div class="input-group">
               <input
                 type="text"
+                v-model="newName"
+                placeholder="Nombre Completo"
+                required
+              />
+            </div>
+            <div class="input-group">
+              <input
+                type="text"
+                v-model="newCI"
+                placeholder="Cédula de Identidad"
+                required
+              />
+            </div>
+            <div class="input-group">
+              <input
+                type="text"
+                v-model="newPhone"
+                placeholder="Teléfono"
+                required
+              />
+            </div>
+            <div class="input-group">
+              <input
+                type="text"
+                v-model="newEmail"
+                placeholder="email"
+                required
+              />
+            </div>
+            <div class="input-group">
+              <input
+                type="text"
                 v-model="newUsername"
                 placeholder="Nombre de Usuario"
                 required
@@ -97,16 +129,25 @@
 
 <script>
 import axios from "axios";
-
+import UserService from '../service/UserService';
+import Swal from 'sweetalert2';
 export default {
+  
   data() {
     return {
       newUsername: "",
       newPassword: "",
       confirmPassword: "",
+      newName: "",
+      newCI: "",
+      newPhone: "",
+      newEmail: "",
       username: "",
       password: "",
     };
+  },
+  created() {
+    this.userService= new UserService();
   },
   methods: {
     toggle() {
@@ -115,7 +156,11 @@ export default {
     },
     loginUser() {
       if (this.username === "" || this.password === "") {
-        alert("Uno o más campos están vacíos");
+        //alert("Uno o más campos están vacíos");
+        Swal.fire({
+          icon: 'error',
+          title: 'Uno o más campos están vacíos'
+        })
         return;
       }
       axios //TODO consumir service de login -> UserServie
@@ -129,12 +174,29 @@ export default {
             data.data === null &&
             data.errorMessage === null
           ) {
-            alert(
+            /* alert(
               "Los datos ingresados son incorrectos. Por favor, intente nuevamente."
-            );
+            ); */
+            Swal.fire({
+              icon: 'error',
+              title: 'Los datos ingresados son incorrectos.',
+              text: 'Por favor, intente nuevamente.'
+            })
           } else if (data.data) {
             localStorage.setItem("userID", JSON.stringify(data.data));
-            alert("Ingreso exitoso");
+            /* alert("Ingreso exitoso"); */
+            Swal.fire({
+              icon: 'success',
+              title: 'Ingreso exitoso'
+            })
+            //guardamos los datos de data.data en el local storage
+            const typeUser = data.data.typeUser;
+            localStorage.setItem('typeUser', typeUser);
+            //guardando los datos del usuario por si fueran de utilidad 
+            localStorage.setItem("userID", JSON.stringify(data.data));
+            //redireccionamos a la vista de payments
+            const storedTypeUser = localStorage.getItem('typeUser');
+            console.log("el tipo de usuario es "+storedTypeUser);
             this.$router.push("/paymentsView");
           } else if (data.errorMessage) {
             alert(data.errorMessage);
@@ -150,14 +212,32 @@ export default {
         this.newPassword === "" ||
         this.confirmPassword === ""
       ) {
-        alert("Uno o más campos están vacíos");
+        /* alert("Uno o más campos están vacíos"); */
+        Swal.fire({
+          icon: 'error',
+          title: 'Uno o más campos están vacíos'
+        })
         return;
       } else if (this.newPassword !== this.confirmPassword) {
-        alert("Las contraseñas no coinciden");
+        /* alert("Las contraseñas no coinciden"); */
+        Swal.fire({
+          icon: 'error',
+          title: 'Las contraseñas no coinciden'
+        })
         return;
       } else {
         // Aquí puedes agregar la llamada API para registrar al usuario si lo necesitas.
-        alert("Registro exitoso");
+        this.UserService.signUpUser(this.newName, this.newUsername, this.newPassword, this.newEmail, this.newCI, this.newPhone, 3).then((response) => {//se manda el tipo de user como inquilino
+          //verificar el codigo de envio
+          
+          /* alert("Registro exitoso") */
+          Swal.fire({
+            icon: 'success',
+            title: 'Registro exitoso'
+          })
+          console.log(response);
+        });
+        
       }
     },
     signIn() {
@@ -193,7 +273,7 @@ export default {
 }
 
 .head-signUp h2 {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 600;
   margin: 1rem 0;
 }
@@ -315,7 +395,7 @@ export default {
 }
 
 .img img {
-  width: 30vh;
+  width: 100%;
   transition: 1s ease-in-out;
   transition-delay: 0.4s;
 }
@@ -380,11 +460,11 @@ export default {
 
 /* RESPONSIVE */
 
-@media only screen and (max-width: 425px) {
+@media only screen and (max-width: 768px) {
   .container::before,
   .container.sign-in::before,
   .container.sign-up::before {
-    height: 100vh;
+    height: 100%;
     border-bottom-right-radius: 0;
     border-top-left-radius: 0;
     z-index: 0;
@@ -403,14 +483,12 @@ export default {
 
   .content-row .col {
     transform: translateY(0);
-    background-color: unset;
   }
 
   .col {
     width: 100%;
     position: absolute;
-    padding: 2rem;
-    background-color: #fffaf1;
+    padding: 1rem;
     border-top-left-radius: 2rem;
     border-top-right-radius: 2rem;
     transform: translateY(100%);

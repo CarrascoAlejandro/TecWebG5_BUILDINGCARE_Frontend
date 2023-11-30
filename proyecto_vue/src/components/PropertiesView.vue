@@ -2,19 +2,9 @@
   <NavigationBar/>
   <div class="property-app">
     <div class="utilities">
-      <div class="filter-add">
-        <div class="filter">
-          <select v-model="filter" @change="filteredProperties">
-            <option value="all">Todas las propiedades</option>
-            <option v-for="(type) in types" :key="type.id" :value="type.type">
-              {{ type.type }}
-            </option>
-          </select>
-        </div>
         <div class="add-btn">
-          <button class="add-button" @click="openForm">Añadir Propiedad</button>
+          <button class="add-button" @click="openForm" v-if="typeUser !== 'Inquilino'">Añadir Propiedad</button>
         </div>
-      </div>
       <div class="search-container">
         <input v-model="searchText" type="text" placeholder="Buscar Propiedad..." @input="fetchProperties" />
       </div>
@@ -44,8 +34,8 @@
           </div>
           <div class="property-description">{{ property.description }}</div>
           <div class="actions">
-            <button @click="editProperty(index)">Editar</button>
-            <button @click="deleteProperty(index)">Borrar</button>
+            <button @click="editProperty(index)" v-if="typeUser != 'Inquilino' && ((typeUser == 'Socio' && nameUser === property.propertyOwner) || typeUser == 'Administrador')">Editar</button>
+            <button @click="deleteProperty(index)" v-if="typeUser === 'Administrador'">Borrar</button>
           </div>
         </div>
       </div>
@@ -109,6 +99,7 @@ export default {
       index: null,
       image: null,
       selectedType: null,
+      idUserHeader: '',
     };
   },
   computed: {
@@ -129,6 +120,21 @@ export default {
       return filtered;
     },
   },
+  created() {
+        this.typeUser = localStorage.getItem("typeUser");
+        const storedData = localStorage.getItem("userID");
+        // Parsear el JSON almacenado
+        const parsedData = JSON.parse(storedData);
+        // Acceder al campo "name" dentro del objeto parsedData
+        this.nameUser = parsedData.name;
+        this.idUserHeader = parsedData.idUser;
+        this.propertiesService = new PropertiesService(this.idUserHeader);
+        console.log("typeUser", this.typeUser);
+        console.log("nameUser", this.nameUser);
+        if (this.typeUser == null) {
+            this.$router.push('/');
+        }
+    },
   methods: {
     //temp
       logAndReturnImage(image) {
@@ -137,7 +143,7 @@ export default {
       },
     async fetchProperties() {
       try {
-        const data = await PropertiesService.fetchProperties();
+        const data = await this.propertiesService.fetchProperties();
         if (data.responseCode === "PROP-0000" && data.data) {
           console.log("data", data);
           // Mapear los datos recibidos a la estructura esperada por el componente
@@ -159,7 +165,7 @@ export default {
     },
     async fetchTypes() {
       try {
-        const data = await PropertiesService.fetchTypes();
+        const data = await this.propertiesService.fetchTypes();
         if (data.responseCode === "PROP-0004" && data.data) {
           // Mapear los datos recibidos a la estructura esperada por el componente
           this.types = data.data.map((item) => ({
@@ -228,7 +234,7 @@ export default {
       };
 
       try {
-        const responseData = await PropertiesService.addProperty(newProperty);
+        const responseData = await this.propertiesService.addProperty(newProperty);
         if (responseData && responseData.responseCode === "PROP-0001") {
           this.properties.push(responseData.data);
         } else {
@@ -287,7 +293,7 @@ export default {
 
       try {
         const propertyId = this.properties[this.index].id;
-        const responseData = await PropertiesService.updateProperty(
+        const responseData = await this.propertiesService.updateProperty(
           propertyId,
           updatedProperty
         );
@@ -310,7 +316,7 @@ export default {
       const property = this.properties[index];
       if (confirm("¿Seguro que desea eliminar esta propiedad?")) {
         try {
-          const success = await PropertiesService.deleteProperty(property.id);
+          const success = await this.propertiesService.deleteProperty(property.id);
           if (success) {
             this.properties.splice(index, 1);
           } else {
@@ -630,18 +636,13 @@ button:hover {
 
   .utilities {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     width: 100%;
+    margin-bottom: 20px;
+    
+    .add-button {
+      margin-bottom: 10px;
 
-    .filter-add {
-      flex-direction: row;
-      width: 100%;
-      justify-content: space-between;
-      align-items: center;
-
-      .filter {
-        margin-bottom: 0;
-      }
     }
 
     .search-container {

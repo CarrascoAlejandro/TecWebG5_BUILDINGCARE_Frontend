@@ -91,8 +91,27 @@ export default {
         { text: "Gimnasio", value: "Gimnasio" },
         { text: "Salón de Eventos", value: "Salón de Eventos" },
       ],
+      typeUser: '',
+      userName: '',
+      idUserHeader: '',
     };
   },
+  created() {
+        this.typeUser = localStorage.getItem("typeUser");
+        const storedData = localStorage.getItem("userID");
+        // Parsear el JSON almacenado
+        const parsedData = JSON.parse(storedData);
+        console.log("parsedData", parsedData);
+        // Acceder al campo "name" dentro del objeto parsedData
+        this.userName = parsedData.usename;
+        this.idUserHeader = parsedData.idUser;
+        console.log("typeUser", this.typeUser);
+        console.log("userName", this.userName);
+        console.log("isUserHeader", this.idUserHeader);
+        if (this.typeUser == null) {
+            this.$router.push('/');
+        }
+    },
   methods: {
     async fetchCommonAreas() {
       try {
@@ -136,7 +155,7 @@ export default {
       };
 
       try {
-        const response = await CommonAreaService.addCommonArea(newArea);
+        const response = await CommonAreaService.addCommonArea(newArea, this.idUserHeader);
         if (response.responseCode === "CARE-0001" && response.data) {
           // Agrega la nueva área a tu lista local
           this.commonAreas.push({
@@ -170,7 +189,8 @@ export default {
       try {
         const response = await CommonAreaService.updateCommonArea(
           this.commonAreas[this.index].id,
-          updatedArea
+          updatedArea,
+          this.idUserHeader
         );
         if (response.responseCode === "CARE-0002" && response.data) {
           // Actualiza el área en el array local
@@ -243,13 +263,13 @@ body,
 
 .add-area {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   width: 100%;
 }
 
 .add-btn {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   width: 100%;
 }
 
@@ -257,18 +277,19 @@ body,
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
   padding: 0.5rem 1rem;
   border: none;
-  border-radius: 0.25rem;
-  background-color: #333;
-  color: #fff;
+  border-radius: 10px;
+  background-color: #498c79;
+  color: #101e26;
   font-size: 1rem;
   cursor: pointer;
 }
 
 .add-button:hover {
-  background-color: #222;
+  color: #f2d1b3;
+  transition: all 0.5s ease-in-out;
+  transform: scale(1.1);
 }
 
 .area-list {
@@ -277,6 +298,7 @@ body,
   justify-content: center;
   align-items: center;
   width: 100%;
+  padding: 40px;
 }
 
 .area-item {
@@ -284,16 +306,19 @@ body,
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 300px;
+  min-width: 80%;
+  min-height: 200px;
   margin: 0.5rem;
-  padding: 1rem;
-  border-radius: 0.25rem;
-  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: #fffaf1;
+  border: #a69b8d 2px solid;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .area-item:hover {
-  background-color: #eee;
+  transition: all 0.5s ease-in-out;
+  transform: scale(1.05);
 }
 
 .area-details {
@@ -330,6 +355,8 @@ body,
   align-items: center;
   width: 100%;
   margin-bottom: 1rem;
+  font-size: 1rem;
+  font-weight: bold;
 }
 
 .area-icon {
@@ -354,13 +381,15 @@ body,
   align-items: center;
   width: 100%;
   margin-bottom: 1rem;
+  font-size: 1.5rem;
 }
 
 .actions {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
+  gap: 1rem;
+  
 }
 
 .actions button {
@@ -370,15 +399,17 @@ body,
   width: 100%;
   padding: 0.5rem 1rem;
   border: none;
-  border-radius: 0.25rem;
-  background-color: #333;
-  color: #fff;
+  border-radius: 10px;
+  background-color: #498c79;
+  color: #101e26;
   font-size: 1rem;
   cursor: pointer;
 }
 
 .actions button:hover {
-  background-color: #222;
+  color: #f2d1b3;
+  transition: all 0.5s ease-in-out;
+  transform: scale(1.1);
 }
 
 .popup {
@@ -398,8 +429,9 @@ body,
   transform: translate(-50%, -50%);
   width: 400px;
   padding: 1rem;
-  border-radius: 0.25rem;
-  background-color: #fff;
+  border-radius: 10px;
+  background-color: #F2f1e4;
+  border: #a69b8d 5px solid;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
@@ -418,10 +450,10 @@ body,
   width: 100%;
   margin-bottom: 1rem;
   padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 0.25rem;
-  background-color: #eee;
-  color: #333;
+  border: #a69b8d 2px solid;
+  border-radius: 10px;
+  background-color: #fffaf1;
+  color: #101e26;
   font-size: 1rem;
 }
 
@@ -432,10 +464,10 @@ body,
   width: 100%;
   margin-bottom: 1rem;
   padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 0.25rem;
-  background-color: #eee;
-  color: #333;
+  border: #a69b8d 2px solid;
+  border-radius: 10px;
+  background-color: #fffaf1;
+  color: #101e26;
   font-size: 1rem;
 }
 
@@ -446,29 +478,41 @@ body,
   width: 100%;
   margin-bottom: 1rem;
   padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 0.25rem;
-  background-color: #eee;
-  color: #333;
+  border: #a69b8d 2px solid;
+  border-radius: 10px;
+  background-color: #fffaf1;
+  color: #101e26;
   font-size: 1rem;
 }
 
-.popup-content form button {
+.popup-content form .form-buttons {
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
-  margin-bottom: 1rem;
+  margin-top: 1rem;
+  gap: 10px;
+  font-size: 1rem;
+  padding: 20px;
+}
+
+.popup-content form .form-buttons button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
   padding: 0.5rem 1rem;
   border: none;
-  border-radius: 0.25rem;
-  background-color: #333;
-  color: #fff;
+  border-radius: 10px;
+  background-color: #498c79;
+  color: #101e26;
   font-size: 1rem;
   cursor: pointer;
 }
 
-.popup-content form button:hover {
-  background-color: #222;
+.popup-content form .form-buttons button:hover {
+  color: #f2d1b3;
+  transition: all 0.5s ease-in-out;
+  transform: scale(1.1);
 }
 </style>

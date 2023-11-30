@@ -16,13 +16,16 @@
                   </div>
               </div>
               <div class="post-content">
-                  <!-- <div class="post-image">
-                      <img :src="this.image" alt="post image" />
-                  </div> -->
+
                   <div class="post-description">{{ post.postContent }}</div>
+                  <div class="post-state">{{ post.postState }}</div>
+
                   <div class="actions">
-                      <button @click="editPost(index)">Editar</button>
-                      <button @click="deletePost(post.id)">Eliminar</button>
+                    <button v-if="typeUser == 'Administrador'" @click="postStatus(post.id, post.postState)">
+                    {{ post.postState !== 'Done' ? 'Completar' : 'Completado' }}
+                    </button>
+                      <button @click="editPost(post.id, post.postTitle,post.postContent, post.postType, post.postState)" v-if="typeUser == 'Administrador' || post.postUser == userName">Editar</button>
+                      <button @click="deletePost(post.id)" v-if="typeUser == 'Administrador' || post.postUser == userName">Eliminar</button>
                   </div>
               </div>
           </div>
@@ -34,7 +37,6 @@
           <form>
               <input v-model="title" placeholder="Titulo del Post" type="text" required />
               <textarea v-model="description" placeholder="Descripción" required></textarea>
-              <input type="file" @change="handleImageUpload" accept="image/*" />
               <select v-model="type" required>
                   <option value="">Selecciona una opción</option>
                   <option v-for="option in options" :key="option.value" :value="option.value">{{ option.text }}</option>
@@ -54,7 +56,6 @@
   <script>
     import PostService from "../service/PostService.js";
     import NavigationBar from "./NavigationBar.vue";
-//   import NavigationBar from "./components/NavigationBar.vue";
   import Swal from 'sweetalert2';
   
   export default {
@@ -68,17 +69,9 @@
                     time: '',
                     image: '',
                     description: '',
+                    state: '',
                 }],
-            image: require("@/assets/images/living1.jpg"),
             posts: [],
-            // posts: [{
-            //     title: "Living 1",
-            //     type: "Living",
-            //     date: "2021-01-01",
-            //     time: "10:00",
-            //     image: require("@/assets/images/living1.jpg"),
-            //     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi tincidunt risus eu porttitor volutpat. Phasellus justo justo, tristique eget elit vel, sodales posuere purus. Fusce id massa ac lorem maximus auctor non eu ante. In sapien leo, scelerisque non venenatis at, ullamcorper eu mauris. Proin id velit vel ipsum commodo hendrerit. Donec eleifend augue ut mi hendrerit, in feugiat lectus tincidunt. Suspendisse quis odio in arcu finibus consectetur sed a dolor. Suspendisse mattis velit in condimentum dictum. Aenean non magna sem.",
-            // }],
             showPopup: false,
             editing: false,
             formData: {
@@ -92,22 +85,40 @@
             },
             options: [{
                     value: '1',
-                    text: 'Mantenimiento'
+                    text: 'mantenimiento'
                 },
-                {
+                { 
                     value: '2',
-                    text: 'Anuncio'
+                    text: 'anuncio'
                 },
                 {
                     value: '3',
-                    text: 'Pedido'
+                    text: 'pedido'
                 },
                 // Agregar más opciones según sea necesario
             ],
+            typeUser: '',
+            userName: '',
+            idUserHeader: '',
         };
     },
     created() {
-        this.postService = new PostService();
+        
+        this.typeUser = localStorage.getItem("typeUser");
+        const storedData = localStorage.getItem("userID");
+        // Parsear el JSON almacenado
+        const parsedData = JSON.parse(storedData);
+        console.log("parsedData", parsedData);
+        // Acceder al campo "name" dentro del objeto parsedData
+        this.userName = parsedData.usename;
+        this.isUserHeader = parsedData.idUser;
+        this.postService = new PostService(this.isUserHeader);
+        console.log("typeUser", this.typeUser);
+        console.log("userName", this.userName);
+        console.log("isUserHeader", this.isUserHeader);
+        if (this.typeUser == null) {
+            this.$router.push('/');
+        }
     },
     mounted() {
         this.getPosts();
@@ -141,15 +152,29 @@
         closeForm() {
             this.showPopup = false;
         },
-        handleImageUpload(event) {
-            // Obtiene el archivo de imagen seleccionado por el usuario
-            const file = event.target.files[0];
-            // Comprueba si se seleccionó un archivo
-            if (file) {
-                // Crea una URL de objeto (Blob URL) para la imagen
-                const imageUrl = URL.createObjectURL(file);
-                // Asigna la URL de la imagen al atributo 'image' en los datos del componente
-                this.image = imageUrl;
+        async postStatus(post, status) {
+            console.log("post a completar: "+post);
+            try {
+                if (status !== 'Done') {
+                    await this.postService.markPostAsDone(post).then((data) => {
+                        console.log("codigo de respuesta http: " + data.responseCode);
+                        if (data.responseCode == "POST-0002") {
+                            //se actualizo correctamente el post
+                            console.log('se actualizó el post correctamente :D');
+                            Swal.fire('¡Actualizado!', 'La publicación ha sido actualizada.', 'success');
+                            this.getPosts();
+                        }
+                        else {
+                            console.log('no se pudo actualizar el post :(');
+                        }
+                    });
+                }
+                else {
+                    console.log('el post est en done');
+                }
+                
+            } catch (error) {
+                console.error('Error al cambiar el estado de la tarea:', error);
             }
         },
         newPost() {
@@ -196,42 +221,59 @@
                 Swal.fire('¡Ups!', 'Por favor, complete todos los campos.', 'question');
             }
         },
-        editPost(index) {
+        editPost(id, postTitle,postContent, postType, postState) {
             // Abre el formulario de edición con los detalles del post seleccionado
-            this.title = this.posts[index].title;
-            this.description = this.posts[index].description;
-            this.type = this.posts[index].type;
+            console.log("estamos en la edicion del post")
+            console.log("id: " + id)
+            console.log("title: " + postTitle)
+            console.log("description: " + postContent)
+            console.log("type: " + postType)
+
+            this.title = postTitle;
+            this.description = postContent;
             // Puedes guardar el índice del post que se está editando para actualizarlo después
-            this.editingIndex = index;
+            const foundOption = this.options.find(option => option.text === postType);
+            this.type = foundOption;
+            this.state = postState;
+            this.editingIndex = id;
             this.editing = true;
             // Abre la ventana emergente o muestra el formulario de edición
             this.showPopup = true;
         },
         updatePost() {
             // Verifica que los campos estén completos antes de actualizar el post
-            if (this.title && this.description && this.type) {
-                const updatedPost = {
-                    title: this.title,
-                    type: this.type,
-                    date: this.posts[this.editingIndex].date,
-                    time: this.posts[this.editingIndex].time,
-                    image: this.posts[this.editingIndex].image,
-                    description: this.description,
-                };
-                // Actualiza el post en la lista
-                this.posts.splice(this.editingIndex, 1, updatedPost);
-                // Restablece los campos del formulario
-                this.title = '';
-                this.description = '';
-                this.type = '';
-                // Cierra la ventana emergente o formulario de edición
+            console.log("estamos en la actualizacion del post")
+            console.log("id: " + this.editingIndex)
+            console.log("title: " + this.title)
+            console.log("description: " + this.description)
+            console.log("type: " + this.type)
+            console.log("state: " + this.state)
+            console.log("isUserHeader", this.isUserHeader);
+                
+                this.postService.updatePostById(this.title,this.description,this.state, this.type, "null" ,this.editingIndex, this.isUserHeader).then((data) => {
+                    console.log("codigo de respuesta http: " + data.responseCode);
+                    console.log("codigo de respuesta http: " + data);
+                    if (data.responseCode == "POST-0002") {
+                        //se insertó correctamente el post :D
+                        console.log('se actualizó el post correctamente :D');
+                        // Restablece los campos del formulario
+                        this.title = '';
+                        this.description = '';
+                        this.type = '';
+                        Swal.fire('¡Actualizado!', 'La publicación ha sido actualizada.', 'success');
+                        // Cierra la ventana emergente o formulario de edición
+                        this.closeForm();
+                        this.getPosts();
+                    }
+                    else {
+                        console.log('no se pudo actualizar el post :(');
+                    }
+                }).catch((error) => {
+                    console.error('Error en la solicitud:', error);
+                });
                 this.showPopup = false;
                 this.editing = false;
-            }
-            else {
-                // Puedes agregar lógica adicional para manejar campos incompletos
-                alert('Por favor, complete todos los campos.');
-            }
+            
         },
         deletePostDB(deleteId) {
             try {
@@ -428,17 +470,7 @@
           flex-wrap: wrap;
           gap: 20px;
           color: #101e26;
-      }
-  
-      .post-image {
-          flex: 1;
-          max-width: 20%;
-          margin-right: 20px;
-  
-          img {
-              width: 100%;
-              border-radius: 10px;
-          }
+          flex-direction: column;
       }
   
       .post-description {
@@ -446,6 +478,15 @@
           font-size: 20px;
           text-align: start;
       }
+
+        .post-state {
+            flex: 1;
+            font-size: 20px;
+            text-align: center;
+            background-color: #101e26;
+            color: #fffaf1;
+            border-radius: 20px;
+        }
   
       .actions {
           flex: 1;
@@ -471,19 +512,34 @@
   
   @media screen and (max-width: 768px) {
       .announcement-post {
+            .header-date {
+                flex-direction: column;
+                
+                .header {
+                    flex-direction: column;
+                    align-items: center;
+                }
+
+                .date-time {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    margin-top: 10px;
+                }
+            }
           .post-content {
               flex-direction: column;
+                width: 100%;
+                flex-wrap: wrap;
           }
-  
-          .post-image {
-              max-width: 100%;
-              margin-right: 0;
-              margin-bottom: 20px;
-  
-              img {
-                  height: 100%;
-              }
+
+          .actions {
+              flex-direction: column;
+              align-items: center;
+              width: 100%;
+              gap: 5px;
           }
+
+
       }
   }
   </style>

@@ -5,7 +5,7 @@
 
         <div class="payment-list">
             <div v-for="(receipt, index) in paymentReceipts" :key="index" class="payment-card">
-                <div class="payment-content">
+                <div class="payment-content"> 
                     <div class="payment-header">
                         <div class="payment-concept">Concepto: {{ receipt.concept }}</div>
                         <div class="payment-date">Fecha del Pago: {{ receipt.date }}</div>
@@ -68,15 +68,26 @@ export default {
             seller: '',
             index: null,
             users: [],
+            typeUser: '',
+            idUserHeader: '',
         };
     },
     created() {
         this.paymentService = new PaymentService();
         this.userService = new UserService();
+        const storedData = localStorage.getItem("userID");
+        const parsedData = JSON.parse(storedData);
+        this.idUserHeader = parsedData.idUser;
     },
     mounted() {
+        this.typeUser = localStorage.getItem('typeUser');
+        //si el typeUser es null, redirige a la vista raiz
+        if (this.typeUser == null) {
+            this.$router.push('/');
+        }   
         this.getReceipts();
         this.listAllUsers();
+        
     },
     methods: {
         listAllUsers() {
@@ -106,7 +117,7 @@ export default {
             const detail = this.detail;
             const buyer = this.buyer;
             const seller = this.seller;
-            this.paymentService.newPayment(amount, date, concept, detail, buyer, seller)
+            this.paymentService.newPayment(amount, date, concept, detail, buyer, seller,this.idUserHeader)
                 .then((response) => {
                     console.log(response.data);
                     this.paymentReceipts = response.data;
@@ -267,7 +278,7 @@ export default {
                 margin-bottom: 15px;
                 padding: 10px;
                 border: 2px solid #A69B8D;
-                border-radius: 5px;
+                border-radius: 10px;
                 width: 100%;
                 /* Ancho del input descontando el padding */
                 font-size: 16px;
@@ -285,7 +296,7 @@ export default {
                 button {
                     padding: 10px 20px;
                     border: none;
-                    border-radius: 5px;
+                    border-radius: 10px;
                     cursor: pointer;
                     font-size: 16px;
                     background-color: #498c79;
@@ -306,7 +317,7 @@ export default {
 button {
     padding: 10px 20px;
     border: none;
-    border-radius: 5px;
+    border-radius: 10px;
     cursor: pointer;
     font-size: 16px;
     background-color: #498c79;

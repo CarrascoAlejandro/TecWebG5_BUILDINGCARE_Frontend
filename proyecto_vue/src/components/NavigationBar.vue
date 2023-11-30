@@ -33,11 +33,26 @@ export default {
         { name: "blog", label: "Anuncios" },
         { name: "payments", label: "Pagos" },
         { name: "houses", label: "Propiedades" },
+        { name: "commonAreas", label: "Áreas Comunes" },
         { name: "contracts", label: "Contratos" },
         { name: "logOut", label: "Cerrar Sesión" },
       ],
     };
   },
+  created() {
+        this.typeUser = localStorage.getItem("typeUser");
+        const storedData = localStorage.getItem("userID");
+        // Parsear el JSON almacenado
+        const parsedData = JSON.parse(storedData);
+        console.log("parsedData", parsedData);
+        // Acceder al campo "name" dentro del objeto parsedData
+        this.userName = parsedData.usename;
+        console.log("typeUser", this.typeUser);
+        console.log("userName", this.userName);
+        // if (this.typeUser == null) {
+        //     this.$router.push('/');
+        // }
+    },
   methods: {
     setActiveNavItem(item) {
       this.activeNavItem = item;
@@ -50,9 +65,12 @@ export default {
       } else if (item === "houses") {
         this.$router.push("/propertyView");
       } else if (item === "logOut") {
+        localStorage.clear();
         this.$router.push("/login");
       } else if (item === "contracts") {
         this.$router.push("/contractsView");
+      } else if (item === "commonAreas") {
+        this.$router.push("/commonAreaView");
       }
     },
     toggleMenu() {

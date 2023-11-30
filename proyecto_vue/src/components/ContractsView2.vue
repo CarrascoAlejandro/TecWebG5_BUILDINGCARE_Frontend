@@ -1,7 +1,7 @@
 <template>
   <NavigationBar></NavigationBar>
-  <div class="contract-app">
-    <button @click="openForm" id="newPaymentbtn">
+  <div v-if="typeUser === 'Administrador'" class="contract-app">
+    <button v-if="typeUser === 'Administrador'" @click="openForm" id="newPaymentbtn">
       Registrar Nuevo Contrato
     </button>
 
@@ -30,8 +30,8 @@
           </div>
         </div>
         <div class="actions">
-          <button @click="editReceipt(index)">Editar</button>
-          <button @click="deleteReceipt(index)">Eliminar</button>
+          <button v-if="typeUser != 'Inquilino'" @click="editReceipt(index)">Editar</button>
+          <button v-if="typeUser == 'Administrador'" @click="deleteReceipt(index)">Eliminar</button>
         </div>
       </div>
     </div>
@@ -121,13 +121,29 @@ export default {
 
       // contractService: new ContractService(),
       // propertiesService: new PropertiesService(),
-      token: 1, //localStorage.getItem("token"),
+      token: '', //localStorage.getItem("token"),
       contracts: [],
     };
   },
   created() {
     // await this.loadContracts();
     this.contractService = new ContractService();
+    this.typeUser = localStorage.getItem("typeUser");
+    const storedData = localStorage.getItem("userID");
+    // Parsear el JSON almacenado
+    const parsedData = JSON.parse(storedData);
+    console.log("parsedData", parsedData);
+    // Acceder al campo "name" dentro del objeto parsedData
+    this.userName = parsedData.usename;
+    // idUser
+    this.token = parsedData.idUser;
+    //
+    console.log("typeUser", this.typeUser);
+    console.log("userName", this.userName);
+    console.log("token", this.token);
+    if (this.typeUser == null) {
+        this.$router.push('/');
+    }
   },
   async mounted() {
     await this.loadContracts();
@@ -390,20 +406,23 @@ export default {
 /* Make the form responsive */
 /* Estilos para el formulario con aspecto de carta y espaciado entre elementos */
 .receipt-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100%;
   width: 100%;
   transition: all 0.5s ease-in-out;
-  position: fixed;
-  z-index: 100;
   /* Posición por encima de todo */
   background: rgba(0, 0, 0, 0.5);
 
-  /* Fondo semi-transparente para resaltar el formulario */
+
 
   .popup-content {
+    position: fixed;
     background: #f2f1e4;
     border: #a69b8d 5px solid;
     border-radius: 10px;
@@ -446,7 +465,7 @@ export default {
 button {
   padding: 10px 15px;
   border: none;
-  border-radius: 5px;
+  border-radius: 10px;
   cursor: pointer;
   background-color: #498c79;
   color: #101e26;
@@ -455,18 +474,6 @@ button {
     color: #f2d1b3;
     transform: scale(1.05);
     transition: all 0.5s ease-in-out;
-  }
-}
-/* Media query for responsiveness */
-@media (max-width: 768px) {
-  .payment-card {
-    width: calc(50% - 20px);
-  }
-}
-
-@media (max-width: 480px) {
-  .payment-card {
-    width: calc(100% - 20px);
   }
 }
 </style>
