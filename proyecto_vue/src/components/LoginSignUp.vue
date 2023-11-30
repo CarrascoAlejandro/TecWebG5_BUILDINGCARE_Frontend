@@ -247,7 +247,7 @@ export default {
 }
 
 .head-signUp h2 {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 600;
   margin: 1rem 0;
 }
@@ -369,7 +369,7 @@ export default {
 }
 
 .img img {
-  width: 30vh;
+  width: 100%;
   transition: 1s ease-in-out;
   transition-delay: 0.4s;
 }
@@ -434,11 +434,11 @@ export default {
 
 /* RESPONSIVE */
 
-@media only screen and (max-width: 425px) {
+@media only screen and (max-width: 768px) {
   .container::before,
   .container.sign-in::before,
   .container.sign-up::before {
-    height: 100vh;
+    height: 100%;
     border-bottom-right-radius: 0;
     border-top-left-radius: 0;
     z-index: 0;
@@ -457,14 +457,12 @@ export default {
 
   .content-row .col {
     transform: translateY(0);
-    background-color: unset;
   }
 
   .col {
     width: 100%;
     position: absolute;
-    padding: 2rem;
-    background-color: #fffaf1;
+    padding: 1rem;
     border-top-left-radius: 2rem;
     border-top-right-radius: 2rem;
     transform: translateY(100%);

@@ -406,6 +406,10 @@ export default {
 /* Make the form responsive */
 /* Estilos para el formulario con aspecto de carta y espaciado entre elementos */
 .receipt-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -415,9 +419,10 @@ export default {
   /* Posición por encima de todo */
   background: rgba(0, 0, 0, 0.5);
 
-  /* Fondo semi-transparente para resaltar el formulario */
+
 
   .popup-content {
+    position: fixed;
     background: #f2f1e4;
     border: #a69b8d 5px solid;
     border-radius: 10px;

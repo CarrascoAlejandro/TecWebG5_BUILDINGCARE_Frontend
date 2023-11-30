@@ -2,19 +2,9 @@
   <NavigationBar/>
   <div class="property-app">
     <div class="utilities">
-      <div class="filter-add">
-        <div class="filter">
-          <select v-model="filter" @change="filteredProperties">
-            <option value="all">Todas las propiedades</option>
-            <option v-for="(type) in types" :key="type.id" :value="type.type">
-              {{ type.type }}
-            </option>
-          </select>
-        </div>
         <div class="add-btn">
           <button class="add-button" @click="openForm" v-if="typeUser !== 'Inquilino'">Añadir Propiedad</button>
         </div>
-      </div>
       <div class="search-container">
         <input v-model="searchText" type="text" placeholder="Buscar Propiedad..." @input="fetchProperties" />
       </div>
@@ -646,18 +636,13 @@ button:hover {
 
   .utilities {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     width: 100%;
+    margin-bottom: 20px;
+    
+    .add-button {
+      margin-bottom: 10px;
 
-    .filter-add {
-      flex-direction: row;
-      width: 100%;
-      justify-content: space-between;
-      align-items: center;
-
-      .filter {
-        margin-bottom: 0;
-      }
     }
 
     .search-container {
