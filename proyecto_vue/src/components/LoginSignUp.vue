@@ -197,7 +197,7 @@ export default {
             //redireccionamos a la vista de payments
             const storedTypeUser = localStorage.getItem('typeUser');
             console.log("el tipo de usuario es "+storedTypeUser);
-            this.$router.push("/paymentsView");
+            this.$router.push("/propertyView");
           } else if (data.errorMessage) {
             alert(data.errorMessage);
           }

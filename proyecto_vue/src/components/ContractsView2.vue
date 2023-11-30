@@ -128,6 +128,7 @@ export default {
   created() {
     // await this.loadContracts();
     this.contractService = new ContractService();
+    this.propertiesService = new PropertiesService();
     this.typeUser = localStorage.getItem("typeUser");
     const storedData = localStorage.getItem("userID");
     // Parsear el JSON almacenado
@@ -156,7 +157,7 @@ export default {
         );
         this.paymentReceipts = contracts;
         // const prop = await this.contractService.getProperties(this.token);
-        const prop = await PropertiesService.fetchProperties();
+        const prop = await this.propertiesService.fetchProperties();
         this.propiedades = prop.data;
         console.log("propiedades: " + JSON.stringify(this.propiedades));
 
