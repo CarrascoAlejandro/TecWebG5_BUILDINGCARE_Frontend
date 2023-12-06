@@ -231,7 +231,7 @@ export default {
 .payment-info {
     display: flex;
     justify-content: space-between;
-    align-items: start;
+    align-items: flex-start;
     flex-direction: column;
     font-weight: 450;
     padding: 10px;

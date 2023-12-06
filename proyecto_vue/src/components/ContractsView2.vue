@@ -401,7 +401,7 @@ export default {
   flex-wrap: wrap;
   gap: 1px;
   justify-content: space-between;
-  align-items: start;
+  align-items: flex-start;
   flex-direction: column;
   font-weight: 500;
   font-size: 18px;
