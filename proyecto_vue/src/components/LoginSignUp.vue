@@ -9,62 +9,69 @@
               <img src="@/assets/logos/bcareNegro.png" />
               <h2>Registrarse</h2>
             </div>
-            <div class="input-group">
-              <input
-                type="text"
-                v-model="newName"
-                placeholder="Nombre Completo"
-                required
-              />
+            <div class="sign-up-inputs">
+              <div class="personal-info">
+                <div class="input-group">
+                  <input
+                    type="text"
+                    v-model="newName"
+                    placeholder="Nombre Completo"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="input-group">
+                <input
+                  type="text"
+                  v-model="newCI"
+                  placeholder="Cédula de Identidad"
+                  required
+                />
+              </div>
+              <div class="input-group">
+                <input
+                  type="text"
+                  v-model="newPhone"
+                  placeholder="Teléfono"
+                  required
+                />
+              </div>
             </div>
-            <div class="input-group">
-              <input
-                type="text"
-                v-model="newCI"
-                placeholder="Cédula de Identidad"
-                required
-              />
+            <div class="site-info">
+              <div class="input-group">
+                <input
+                  type="text"
+                  v-model="newEmail"
+                  placeholder="email"
+                  required
+                />
+              </div>
+              <div class="input-group">
+                <input
+                  type="text"
+                  v-model="newUsername"
+                  placeholder="Nombre de Usuario"
+                  required
+                />
+              </div>
+              <div class="input-group">
+                <input
+                  type="password"
+                  v-model="newPassword"
+                  placeholder="Contraseña"
+                  required
+                />
+              </div>
+              <div class="input-group">
+                <input
+                  type="password"
+                  v-model="confirmPassword"
+                  placeholder="Confirmar Contraseña"
+                  required
+                />
+              </div>
             </div>
-            <div class="input-group">
-              <input
-                type="text"
-                v-model="newPhone"
-                placeholder="Teléfono"
-                required
-              />
-            </div>
-            <div class="input-group">
-              <input
-                type="text"
-                v-model="newEmail"
-                placeholder="email"
-                required
-              />
-            </div>
-            <div class="input-group">
-              <input
-                type="text"
-                v-model="newUsername"
-                placeholder="Nombre de Usuario"
-                required
-              />
-            </div>
-            <div class="input-group">
-              <input
-                type="password"
-                v-model="newPassword"
-                placeholder="Contraseña"
-                required
-              />
-            </div>
-            <div class="input-group">
-              <input
-                type="password"
-                v-model="confirmPassword"
-                placeholder="Confirmar Contraseña"
-                required
-              />
-            </div>
+            
             <button @click="signUp">Registrarse</button>
             <div class="footer-sign-up">
               <p>
@@ -291,7 +298,7 @@ export default {
 .row {
   display: flex;
   flex-wrap: wrap;
-  height: 100vh;
+  height: 100%;
 }
 
 .col {
@@ -325,7 +332,7 @@ export default {
 .input-group {
   position: relative;
   width: 100%;
-  margin: 1rem 0;
+  margin: 10px 0;
 }
 .input-group input {
   width: 100%;
@@ -389,7 +396,7 @@ export default {
   top: 0;
   left: 0;
   pointer-events: none;
-  z-index: 6;
+  z-index: 0;
   width: 100%;
 }
 
