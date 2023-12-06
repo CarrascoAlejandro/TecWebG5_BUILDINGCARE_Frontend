@@ -5,9 +5,9 @@
         <div class="add-btn">
           <button class="add-button" @click="openForm" v-if="typeUser !== 'Inquilino'">Añadir Propiedad</button>
         </div>
-      <div class="search-container">
+      <!-- <div class="search-container">
         <input v-model="searchText" type="text" placeholder="Buscar Propiedad..." @input="fetchProperties" />
-      </div>
+      </div> -->
     </div>
 
     <!-- Lista de Propiedades -->

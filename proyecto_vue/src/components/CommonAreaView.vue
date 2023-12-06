@@ -4,9 +4,9 @@
     <div class="utilities">
       <div class="add-area">
         <div class="add-btn">
-          <button class="add-button" @click="openForm">
+          <!-- <button class="add-button" @click="openForm">
             Añadir Area Común
-          </button>
+          </button> -->
         </div>
       </div>
     </div>
@@ -25,8 +25,8 @@
             {{ area.description }}
           </div>
           <div class="actions">
-            <button @click="editArea(index)">Editar</button>
-            <button @click="deleteArea(index)">Borrar</button>
+            <button v-if="typeUser== 'Administrador'" @click="editArea(index)">Editar</button>
+            <button v-if="typeUser== 'Administrador'" @click="deleteArea(index)">Borrar</button>
           </div>
         </div>
       </div>
