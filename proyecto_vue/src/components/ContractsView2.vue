@@ -1,16 +1,24 @@
 <template>
   <NavigationBar></NavigationBar>
   <div v-if="typeUser === 'Administrador'" class="contract-app">
+    <div class="search-container">
+      <input type="text" v-model="searchQuery" @input="filterContracts" placeholder="Buscar propietario...">
+    </div>
     <button v-if="typeUser === 'Administrador'" @click="openForm" id="newPaymentbtn">
       Registrar Nuevo Contrato
     </button>
 
     <div class="contract-list">
       <div
-        v-for="(contract, index) in paymentReceipts"
+        v-for="(contract, index) in filteredReceipts"
         :key="index"
         class="contract"
       >
+      <!-- <div
+        v-for="(contract, index) in paymentReceipts"
+        :key="index"
+        class="contract"
+      > -->
         <div class="contract-content">
           <div class="property">
             Propiedad: {{ propertyNames[contract.contractProperty] }}
@@ -123,6 +131,9 @@ export default {
       // propertiesService: new PropertiesService(),
       token: '', //localStorage.getItem("token"),
       contracts: [],
+
+      searchQuery: '',
+      filteredReceipts: [],
     };
   },
   created() {
@@ -178,6 +189,8 @@ export default {
         await Promise.all(
           typeContractIds.map((id) => this.fetchTypeContractName(id))
         );
+        // 
+        this.filteredReceipts = this.paymentReceipts;
       } catch (error) {
         console.error("Error al cargar contratos:", error);
       }
@@ -316,6 +329,23 @@ export default {
         console.error(
           "Error al obtener el nombre del tipo de contrato:",
           error
+        );
+      }
+    },
+    // filterContracts() {
+    //   this.filteredReceipts = this.paymentReceipts.filter((receipt) => {
+    //     return receipt.contractOwner
+    //       .toLowerCase()
+    //       .includes(this.searchQuery.toLowerCase());
+    //   });
+    // },
+    filterContracts() {
+      if (this.searchQuery === '') {
+        this.filteredReceipts = this.paymentReceipts;
+      } else {
+        this.filteredReceipts = this.paymentReceipts.filter(contract =>
+          contract.contractOwner.toLowerCase().includes(this.searchQuery.toLowerCase()) //||
+          // Puedes añadir más condiciones aquí para filtrar por otras propiedades
         );
       }
     },
@@ -476,5 +506,27 @@ button {
     transform: scale(1.05);
     transition: all 0.5s ease-in-out;
   }
+}
+.search-container {
+    width: 80%;
+    position: relative;
+
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 3px solid #a69b8d;
+      border-radius: 10px;
+      background-color: #fffaf1;
+    }
+
+    input:focus {
+      outline: #a69b8d solid 1px;
+    }
+  }
+.search-container {
+    width: 93%;
+  }
+.search-container {
+  margin-bottom: 10px;
 }
 </style>
