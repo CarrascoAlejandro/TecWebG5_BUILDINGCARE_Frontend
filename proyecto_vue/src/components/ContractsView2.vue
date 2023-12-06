@@ -332,13 +332,6 @@ export default {
         );
       }
     },
-    // filterContracts() {
-    //   this.filteredReceipts = this.paymentReceipts.filter((receipt) => {
-    //     return receipt.contractOwner
-    //       .toLowerCase()
-    //       .includes(this.searchQuery.toLowerCase());
-    //   });
-    // },
     filterContracts() {
       if (this.searchQuery === '') {
         this.filteredReceipts = this.paymentReceipts;
