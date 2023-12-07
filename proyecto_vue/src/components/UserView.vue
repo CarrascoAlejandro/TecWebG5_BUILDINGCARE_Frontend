@@ -2,7 +2,7 @@
   <NavigationBar />
   <div class="container">
     <div class="utilities">
-      <button class="btn btn-primary" @click="addUser">Añadir Usuarios</button>
+      <button v-if="typeUser=== 'Administrador'" class="btn btn-primary" @click="addUser">Añadir Usuarios</button>
     </div>
     <div class="user-list">
       <div class="profile-card" v-for="(user, index) in users" :key="user.userId">
