@@ -4,10 +4,14 @@ import { createRouter, createWebHistory } from "vue-router";
 /**Pages */
 import App from "./App.vue";
 import login from "./components/LoginSignUp.vue";
+import UserView from "./components/UserView.vue";
 import BlogView from "./components/BlogView.vue";
 import PropertiesView from "./components/PropertiesView.vue";
+import PaymentsView from "./components/PaymentsView.vue";
+import ContractsView from "./components/ContractsView2.vue";
+import CommonAreaView from "./components/CommonAreaView.vue";
 
-/**end pages */
+/**end pages **/
 
 const routes = [
   {
@@ -20,6 +24,11 @@ const routes = [
     component: login,
   },
   {
+    name: "user",
+    path: "/userView",
+    component: UserView,
+  },
+  {
     name: "blog",
     path: "/blogView",
     component: BlogView,
@@ -28,6 +37,21 @@ const routes = [
     name: "property",
     path: "/propertyView",
     component: PropertiesView,
+  },
+  {
+    name: "payments",
+    path: "/paymentsView",
+    component: PaymentsView,
+  },
+  {
+    name: "contracts",
+    path: "/contractsView",
+    component: ContractsView,
+  },
+  {
+    name: "commonArea",
+    path: "/commonAreaView",
+    component: CommonAreaView,
   },
 ];
 

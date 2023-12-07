@@ -1,630 +1,544 @@
 <template>
-  <body>
-    <div class="container">
-      <div class="utilities-container">
-        <div class="filter-and-add">
-          <select v-model="filter" @change="filterProperties">
-            <option value="all">Todas los posts</option>
-            <option value="typeA">Garzonier</option>
-            <option value="typeB">Departamento</option>
-          </select>
-          <button class="add-btn" @click="openForm()">
-            <span>Nuevo Post</span>
-          </button>
-        </div>
-        <div class="search-container">
-          <input
-            v-model="searchText"
-            type="text"
-            placeholder="Buscar Propiedad..."
-            @input="searchProperties"
-          />
-        </div>
-      </div>
-    </div>
-    <div class="container">
+  <NavigationBar></NavigationBar>
+  <div class="container">
+    <button @click="openForm"> Nuevo Post </button>
       <div class="announcement-board">
-        <div
-          v-for="(post, index) in posts"
-          :key="index"
-          class="announcement-post"
-        >
-          <div class="post-title">{{ post.postTitle }}</div>
-          <div class="post-content">
-            <div class="post-image">
-              <img :src="'../assets/images/living1.jpg'" alt="post image" />
-            </div>
-            <div class="post-description">{{ post.postContent }}</div>
+          
+          <div v-for="(post, index) in posts" :key="index" class="announcement-post">
+              <div class="header-date">
+                  <div class="header">
+                      <div class="post-title">{{ post.postTitle }}</div>
+                      <div class="post-type">{{ post.postType }}</div>
+                  </div>
+                  <div class="date-time">
+                      <div class="post-date">{{ post.postDateAndHour }}</div>
+                      <div class="post-time">{{ post.time }}</div>
+                  </div>
+              </div>
+              <div class="post-content">
+                  <div class="post-description">{{ post.postContent }}</div>
+                  <div class="post-state">{{ post.postState }}</div>
+
+                  <div class="actions">
+                    <button v-if="typeUser == 'Administrador'" @click="postStatus(post.id, post.postState)">
+                    {{ post.postState !== 'Done' ? 'Completar' : 'Completado' }}
+                    </button>
+                      <button @click="editPost(post.id, post.postTitle,post.postContent, post.postType, post.postState)" v-if="typeUser == 'Administrador' || post.postUser == userName">Editar</button>
+                      <button @click="deletePost(post.id)" v-if="typeUser == 'Administrador' || post.postUser == userName">Eliminar</button>
+                  </div>
+              </div>
           </div>
-          <button @click="editPostId(post.id, post.postTitle, post.postContent)">Editar</button>
-          <button @click="deletePostId(post.id)">Borrar</button>
-        </div>
       </div>
-    </div>
-    <div id="propertyForm" >
-      <h1>Nuevo post</h1>
-      <form @submit.prevent="newPost()">
-        <input
-          v-model="title"
-          placeholder="Título"
-          type="text"
-          required
-        />
-        <textarea v-model="description" rows="4" cols="50" required>
-          Escriba el contenido del post aqui...
-        </textarea>
-        
-        <select v-model="type" required>
-          <option value="2" selected>Anuncio</option>
-          <!-- <option value="1">Garzonier</option>
-          <option value="2">Departamento</option> -->
-        </select>
-        <div class="form-buttons">
-          <input class="submitBtn" type="submit" value="Añadir" />
-          <input class="resetBtn" type="reset" value="Limpiar Campos" />
-          <input
-            class="cancelBtn"
-            type="button"
-            value="Cancelar"
-            @click="closeForm"
-          />
-        </div>
-      </form>
-    </div>
-    <div id="editProperty" style="display: none">
-      <h1>Editar Propiedad</h1>
-      <form @submit.prevent="updatePost()">
-        <input
-          v-model="titleEdit"
-          placeholder="Título"
-          type="text"
-          required
-        />
-        <textarea v-model="descriptionEdit" rows="4" cols="50" required>
-          Escriba el contenido del post aqui...
-        </textarea>
-        
-        <select v-model="typeEdit" required>
-          <option value="2" selected>Anuncio</option>
-          <!-- <option value="1">Garzonier</option>
-          <option value="2">Departamento</option> -->
-        </select>
-        <div class="form-buttons">
-          <input class="submitBtn" type="submit" value="Guardar" />
-          <input class="resetBtn" type="reset" value="Limpiar Campos" />
-          <input
-            class="cancelBtn"
-            type="button"
-            value="Cancelar"
-            @click="closeFormEdit"
-          />
-        </div>
-      </form>
-    </div>
-  </body>
-</template>
+  </div>
+  
+  <div class="popup" v-if="showPopup">
+      <div class="popup-content">
+          <form>
+              <input v-model="title" placeholder="Titulo del Post" type="text" required />
+              <textarea v-model="description" placeholder="Descripción" required></textarea>
+              <select v-model="type" required>
+                  <option value="">Selecciona una opción</option>
+                  <option v-for="option in options" :key="option.value" :value="option.value">{{ option.text }}</option>
+              </select>
+              <!-- Botones de acción -->
+              <div class="form-buttons">
+                  <button @click="createPost" v-if="!editing">Crear</button>
+                  <button @click="updatePost" v-if="editing">Actualizar</button>
+                  <button @click="deletePost(index)">Eliminar</button>
+                  <button @click="closeForm">Cerrar</button>
+              </div>
+          </form>
+      </div>
+  </div>
+  </template>
   
   <script>
-  import PostService from "../service/PostService.js";
+    import PostService from "../service/PostService.js";
+    import NavigationBar from "./NavigationBar.vue";
   import Swal from 'sweetalert2';
+  
   export default {
     data() {
-      return {
-        title: "",
-        description: "",
-        type: 2,
-        titleEdit: "",
-        descriptionEdit: "",
-        typeEdit: 2,
-        idEdit: 1,
-        idDelete: 1,
-        posts: [],
-        // posts: [
-        //   {
-        //     postTitle: "Living 1",
-        //     image: require("@/assets/images/living1.jpg"),
-        //     postContent:
-        //       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi tincidunt risus eu porttitor volutpat. Phasellus justo justo, tristique eget elit vel, sodales posuere purus. Fusce id massa ac lorem maximus auctor non eu ante. In sapien leo, scelerisque non venenatis at, ullamcorper eu mauris. Proin id velit vel ipsum commodo hendrerit. Donec eleifend augue ut mi hendrerit, in feugiat lectus tincidunt. Suspendisse quis odio in arcu finibus consectetur sed a dolor. Suspendisse mattis velit in condimentum dictum. Aenean non magna sem.",
-        //   },
-        //   {
-        //     postTitle: "Living 2",
-        //     image: require("@/assets/images/living2.jpg"),
-        //     postContent:
-        //       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi tincidunt risus eu porttitor volutpat. Phasellus justo justo, tristique eget elit vel, sodales posuere purus. Fusce id massa ac lorem maximus auctor non eu ante. In sapien leo, scelerisque non venenatis at, ullamcorper eu mauris. Proin id velit vel ipsum commodo hendrerit. Donec eleifend augue ut mi hendrerit, in feugiat lectus tincidunt. Suspendisse quis odio in arcu finibus consectetur sed a dolor. Suspendisse mattis velit in condimentum dictum. Aenean non magna sem.",
-        //   },
-        //   {
-        //     postTitle: "Living 3",
-        //     image: require("@/assets/images/living3.jpg"),
-        //     postContent:
-        //       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi tincidunt risus eu porttitor volutpat. Phasellus justo justo, tristique eget elit vel, sodales posuere purus. Fusce id massa ac lorem maximus auctor non eu ante. In sapien leo, scelerisque non venenatis at, ullamcorper eu mauris. Proin id velit vel ipsum commodo hendrerit. Donec eleifend augue ut mi hendrerit, in feugiat lectus tincidunt. Suspendisse quis odio in arcu finibus consectetur sed a dolor. Suspendisse mattis velit in condimentum dictum. Aenean non magna sem.",
-        //   },
-        // ],
-      };
+        return {
+            editPostForm: [{
+                    id: '',
+                    title: '',
+                    type: '',
+                    date: '',
+                    time: '',
+                    image: '',
+                    description: '',
+                    state: '',
+                }],
+            posts: [],
+            showPopup: false,
+            editing: false,
+            formData: {
+                id: '',
+                title: '',
+                type: '',
+                date: '',
+                time: '',
+                image: '',
+                description: '',
+            },
+            options: [{
+                    value: '1',
+                    text: 'mantenimiento'
+                },
+                { 
+                    value: '2',
+                    text: 'anuncio'
+                },
+                {
+                    value: '3',
+                    text: 'pedido'
+                },
+                // Agregar más opciones según sea necesario
+            ],
+            typeUser: '',
+            userName: '',
+            idUserHeader: '',
+        };
     },
-    created(){
-        this.postService = new PostService();
+    created() {
+        
+        this.typeUser = localStorage.getItem("typeUser");
+        const storedData = localStorage.getItem("userID");
+        // Parsear el JSON almacenado
+        const parsedData = JSON.parse(storedData);
+        console.log("parsedData", parsedData);
+        // Acceder al campo "name" dentro del objeto parsedData
+        this.userName = parsedData.usename;
+        this.isUserHeader = parsedData.idUser;
+        this.postService = new PostService(this.isUserHeader);
+        console.log("typeUser", this.typeUser);
+        console.log("userName", this.userName);
+        console.log("isUserHeader", this.isUserHeader);
+        if (this.typeUser == null) {
+            this.$router.push('/');
+        }
     },
-    mounted(){
-      try{
-        this.postService.getPosts().then((data) => {
+    mounted() {
+        this.getPosts();
+    },
+    methods: {
+        getTypePosts() {
+            try {
+                this.postService.getPosts().then((data) => {
                     this.posts = data.data;
                     console.log(this.posts);
                 });
-      }catch(e){
-        console.log("error " + e);
-      }
-    },
-    methods: {
-      getPosts(){
-          try{
-            this.postService.getPosts().then((data) => {
-                        this.posts = data.data;
-                        console.log(this.posts);
+            }
+            catch (e) {
+                console.log("error " + e);
+            }
+        },
+        getPosts() {
+            try {
+                this.postService.getPosts().then((data) => {
+                    this.posts = data.data;
+                    console.log(this.posts);
+                });
+            }
+            catch (e) {
+                console.log("error " + e);
+            }
+        },
+        openForm() {
+            this.showPopup = true;
+        },
+        closeForm() {
+            this.showPopup = false;
+        },
+        async postStatus(post, status) {
+            console.log("post a completar: "+post);
+            try {
+                if (status !== 'Done') {
+                    await this.postService.markPostAsDone(post).then((data) => {
+                        console.log("codigo de respuesta http: " + data.responseCode);
+                        if (data.responseCode == "POST-0002") {
+                            //se actualizo correctamente el post
+                            console.log('se actualizó el post correctamente :D');
+                            Swal.fire('¡Actualizado!', 'La publicación ha sido actualizada.', 'success');
+                            this.getPosts();
+                        }
+                        else {
+                            console.log('no se pudo actualizar el post :(');
+                        }
                     });
-          }catch(e){
-            console.log("error " + e);
-          }
-      },
-      newPost(){
-        
-        this.postService.newPost(this.title, this.description, this.type).then((data) => {
-          console.log("codigo de respuesta http: "+ data.responseCode);
-          if(data.responseCode == "POST-0001"){
-                    //se insertó correctamente el post :D
-                    console.log('se creó el post correctamente :D');
-                    Swal.fire(
-                        '¡Creado!',
-                        'La publicación ha sido creada.',
-                        'success'
-                    )
-                    this.closeForm();
-                    this.getPosts();
-                }else{
-                    console.log('no se pudo crear el post :(');
                 }
-        });
-      },
-      updatePost(){
-        const stateEdit = "Activo";
-        const idPostRequest = null; 
-        this.postService.updatePostById(this.titleEdit, this.descriptionEdit, stateEdit, this.typeEdit, idPostRequest, this.idEdit).then((data) => {
-          console.log("codigo de respuesta http: "+ data.responseCode);
-          if(data.responseCode == "POST-0002"){
-                    //se insertó correctamente el post :D
-                    console.log('se actualizó el post correctamente :D');
-                    Swal.fire(
-                        '¡Actualizado!',
-                        'La publicación ha sido editada.',
-                        'success'
-                    )
-                    this.closeFormEdit();
-                    this.getPosts();
-                }else{
-                    console.log('no se pudo actualizar el post :(');
+                else {
+                    console.log('el post est en done');
                 }
-        });
-      },
-      deletePost(){
-        this.postService.deletePostById(this.idDelete).then((data) => {
-          console.log("codigo de respuesta http: "+ data.responseCode);
-          if(data.responseCode == "POST-0003"){
-                    //se insertó correctamente el post :D
-                    console.log('se eliminó el post correctamente :D');
-                    Swal.fire(
-                        '¡Eliminado!',
-                        'La publicación ha sido eliminada.',
-                        'success'
-                    )
-                    this.getPosts();
-                }else{
-                    console.log('no se pudo actualizar el post :(');
-                }
-        });
-      },
-      editPostId(id, title, content){
-        this.idEdit = id;
-        this.titleEdit = title;
-        this.descriptionEdit = content;
-        this.openFormEdit();
-      },
-      deletePostId(id){
-        this.idDelete = id;
-        this.deletePost();
-      },
-      openForm() {
-        document.getElementById("propertyForm").style.display = "block";
-      },
-      closeForm() {
-        document.getElementById("propertyForm").style.display = "none";
-      },
-      openFormEdit() {
-        document.getElementById("editProperty").style.display = "block";
-      },
-      closeFormEdit() {
-        document.getElementById("editProperty").style.display = "none";
-        this.resetEditForm();
-      },
-      resetEditForm() {
-        this.titleEdit = "";
-        this.descriptionEdit = "";
-      },
-    }
-  };
+                
+            } catch (error) {
+                console.error('Error al cambiar el estado de la tarea:', error);
+            }
+        },
+        newPost() {
+            console.log("title: " + this.title);
+            console.log("description: " + this.description);
+            console.log("type: " + this.type);
+            try {
+                this.postService.newPost(this.title, this.description, this.type).then((data) => {
+                    console.log("codigo de respuesta http: " + data.responseCode);
+                    if (data.responseCode == "POST-0001") {
+                        //se insertó correctamente el post :D
+                        console.log('se creó el post correctamente :D');
+                        Swal.fire('¡Creado!', 'La publicación ha sido creada.', 'success');
+                        this.closeForm();
+                        this.getPosts();
+                    }
+                    else {
+                        console.log('no se pudo crear el post :(');
+                    }
+                });
+            }
+            catch (e) {
+                console.log("error " + e);
+            }
+        },
+        createPost() {
+            // Verificar que los campos estén completos antes de agregar el post
+            if (this.title && this.description && this.type) {
+                // const newPost = {
+                //     title: this.title,
+                //     type: this.type,
+                //     description: this.description,
+                // };
+                this.newPost();
+                // Limpiar los campos del formulario
+                this.title = '';
+                this.description = '';
+                this.type = '';
+                // Cerrar la ventana emergente u ocultar el formulario
+                this.showPopup = false;
+            }
+            else {
+                // Puedes agregar lógica adicional para manejar campos incompletos
+                Swal.fire('¡Ups!', 'Por favor, complete todos los campos.', 'question');
+            }
+        },
+        editPost(id, postTitle,postContent, postType, postState) {
+            // Abre el formulario de edición con los detalles del post seleccionado
+            console.log("estamos en la edicion del post")
+            console.log("id: " + id)
+            console.log("title: " + postTitle)
+            console.log("description: " + postContent)
+            console.log("type: " + postType)
+
+            this.title = postTitle;
+            this.description = postContent;
+            // Puedes guardar el índice del post que se está editando para actualizarlo después
+            const foundOption = this.options.find(option => option.text === postType);
+            this.type = foundOption;
+            this.state = postState;
+            this.editingIndex = id;
+            this.editing = true;
+            // Abre la ventana emergente o muestra el formulario de edición
+            this.showPopup = true;
+        },
+        updatePost() {
+            // Verifica que los campos estén completos antes de actualizar el post
+            console.log("estamos en la actualizacion del post")
+            console.log("id: " + this.editingIndex)
+            console.log("title: " + this.title)
+            console.log("description: " + this.description)
+            console.log("type: " + this.type)
+            console.log("state: " + this.state)
+            console.log("isUserHeader", this.isUserHeader);
+                
+                this.postService.updatePostById(this.title,this.description,this.state, this.type, "null" ,this.editingIndex, this.isUserHeader).then((data) => {
+                    console.log("codigo de respuesta http: " + data.responseCode);
+                    console.log("codigo de respuesta http: " + data);
+                    if (data.responseCode == "POST-0002") {
+                        //se insertó correctamente el post :D
+                        console.log('se actualizó el post correctamente :D');
+                        // Restablece los campos del formulario
+                        this.title = '';
+                        this.description = '';
+                        this.type = '';
+                        Swal.fire('¡Actualizado!', 'La publicación ha sido actualizada.', 'success');
+                        // Cierra la ventana emergente o formulario de edición
+                        this.closeForm();
+                        this.getPosts();
+                    }
+                    else {
+                        console.log('no se pudo actualizar el post :(');
+                    }
+                }).catch((error) => {
+                    console.error('Error en la solicitud:', error);
+                });
+                this.showPopup = false;
+                this.editing = false;
+            
+        },
+        deletePostDB(deleteId) {
+            try {
+                this.postService.deletePostById(deleteId).then((data) => {
+                    console.log("codigo de respuesta http: " + data.responseCode);
+                    if (data.responseCode == "POST-0003") {
+                        //se insertó correctamente el post :D
+                        console.log('se eliminó el post correctamente :D');
+                        Swal.fire('¡Eliminado!', 'La publicación ha sido eliminada.', 'success');
+                        this.getPosts();
+                    }
+                    else {
+                        console.log('no se pudo actualizar el post :(');
+                    }
+                });
+            }
+            catch (e) {
+                console.log("error " + e);
+            }
+        },
+        deletePost(index) {
+            // Pregunta al usuario si realmente desea eliminar el post
+            const confirmDelete = window.confirm('¿Está seguro de que desea eliminar este post?');
+            if (confirmDelete) {
+                // Elimina el post de la lista
+                this.deletePostDB(index);
+            }
+        },
+    },
+    components: { NavigationBar }
+};
   </script>
   
   <style lang="scss" scoped>
   @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&display=swap");
   
-
-* {
-  font-family: "Poppins", sans-serif;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html,
-body,
-#app {
-  height: 100%;
-  height: 100vh;
-  overflow: hidden;
-  background-color: #fea162;
-}
-
-div {
-  box-sizing: border-box;
-}
-
-.container {
-  padding: 20px;
-  width: 100%;
-  margin: 0 auto;
-  text-align: center;
-}
-
-.utilities-container {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  background-color: #63f6ff;
-  border-radius: 10px;
-  margin-bottom: 20px;
-  border: 3px solid #22abb3;
-}
-
-.utilities-container button {
-  margin-left: 10px;
-  padding: 10px;
-  border-radius: 5px;
-  background-color: #b36634;
-  color: #fff;
-  font-weight: bold;
-  cursor: pointer;
-  border: none;
-}
-
-.utilities-container button:hover {
-  transform: scale(1.1);
-}
-
-.utilities-container select {
-  padding: 10px;
-  border-radius: 5px;
-  background-color: #b36634;
-  color: #fff;
-  font-weight: bold;
-  cursor: pointer;
-  border: none;
-}
-
-#propertiesTable {
-  width: 100%;
-  border-collapse: collapse;
-  border: 3px solid #22abb3;
-  border-radius: 10px;
-  overflow: hidden;
-  background-color: #63f6ff;
-}
-
-#propertiesTable thead {
-  background-color: #22abb3;
-  color: #fff;
-}
-
-#propertyForm .form-buttons {
-  display: flex;
-  justify-content: space-between;
-}
-
-#propertyForm .form-buttons input {
-  padding: 10px;
-  border-radius: 5px;
-  background-color: #b36634;
-  color: #fff;
-  font-weight: bold;
-  cursor: pointer;
-  border: none;
-}
-
-#propertyForm .form-buttons input:hover {
-  transform: scale(1.1);
-}
-
-#propertyForm .form-buttons .cancelBtn {
-  background-color: #fea162;
-}
-
-#propertyForm .form-buttons .cancelBtn:hover {
-  background-color: #b36634;
-}
-
-#editProperty .form-buttons {
-  display: flex;
-  justify-content: space-between;
-}
-
-#editProperty .form-buttons input {
-  padding: 10px;
-  border-radius: 5px;
-  background-color: #b36634;
-  color: #fff;
-  font-weight: bold;
-  cursor: pointer;
-  border: none;
-}
-
-#editProperty .form-buttons input:hover {
-  transform: scale(1.1);
-}
-
-#editProperty .form-buttons .cancelBtn {
-  background-color: #fea162;
-}
-
-#editProperty .form-buttons .cancelBtn:hover {
-  background-color: #b36634;
-}
-
-.search-container {
-  width: 100%;
-  text-align: center;
-}
-
-.search-container input {
-  padding: 10px;
-  border-radius: 5px;
-  background-color: #fff;
-  color: #000;
-  font-weight: bold;
-  cursor: pointer;
-  border: none;
-}
-
-.search-container input:hover {
-  transform: scale(1.1);
-}
-
-.add-btn {
-  border-radius: 50px;
-  background-color: #fea162;
-  border: none;
-  color: #fff;
-  text-align: center;
-  font-size: 20px;
-  padding: 10px;
-  width: fit-content;
-  transition: all 0.5s;
-  cursor: pointer;
-  margin: 5px;
-}
-
-.add-btn span {
-  cursor: pointer;
-  display: inline-block;
-  position: relative;
-  transition: 0.5s;
-}
-
-.add-btn span:after {
-  position: absolute;
-  opacity: 0;
-  top: 0;
-  right: -20px;
-  transition: 0.5s;
-}
-
-.add-btn:hover {
-  background-color: #b36634;
-}
-
-.add-btn:hover span:after {
-  opacity: 1;
-  right: 0;
-}
-
-#propertyForm,
-#editProperty {
-  display: none;
-  border: 3px solid #22abb3;
-  border-radius: 10px;
-  padding: 2em;
-  width: 400px;
-  text-align: center;
-  position: fixed;
-  background: #63f6ff;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  -webkit-transform: translate(-50%, -50%);
-  animation: slide-in 0.5s forwards;
-}
-
-@keyframes slide-in {
-  from {
-    transform: translateY(-100%);
-    left: 40%;
-    opacity: 0;
-  }
-
-  to {
-    left: 40%;
-    transform: translateY(-50%);
-    opacity: 1;
-  }
-}
-
-#propertyForm h1,
-#editProperty h1 {
-  margin-bottom: 1em;
-  color: #fff;
-}
-
-#propertyForm input,
-#propertyForm select,
-#editProperty input,
-#editProperty select {
-  margin: 0.8em auto;
-  font-family: inherit;
-  text-transform: inherit;
-  font-size: inherit;
-
-  display: block;
-  width: 280px;
-  padding: 0.4em;
-  border-radius: 5px;
-  border: none;
-  background-color: #fff;
-  color: #000;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-#propertyForm input:hover,
-#propertyForm select:hover,
-#editProperty input:hover,
-#editProperty select:hover {
-  transform: scale(1.1);
-}
-
-#propertyForm input:focus,
-#propertyForm select:focus,
-#editProperty input:focus,
-#editProperty select:focus {
-  outline: none;
-  box-shadow: 0 0 5px #22abb3;
-}
-
-#propertyForm .form-buttons input:focus,
-#editProperty .form-buttons input:focus {
-  outline: none;
-  box-shadow: 0 0 5px #22abb3;
-}
-
-img {
-  max-width: 100%;
-  height: auto;
-}
-
-* {
-    font-family: "Poppins", sans-serif;
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  * {
+      font-family: "Poppins", sans-serif;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
   }
   
-  html, body, #app {
-    height: 100%;
+  html,
+  body,
+  #app {
+      height: 100%;
   }
   
   .container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100%;
-    padding: 20px;
-    background-color: #fea162;
-    width: 100%;
-    justify-content: center;
-    text-align: center;
+    margin-top: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100%;
+      min-width: 100%;
+      padding: 20px;
+      background-color: #F2F1E4;
+      width: 100%;
+      justify-content: center;
+      text-align: center;
+      height: 100%;
   }
   
-.announcement-board {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    width: 100%;
-    flex-direction: column;
-}
+  .popup {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+  }
   
-  .announcement-post {
-    width: 95%;
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #fff;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease-in-out;
-    margin: 10px;
+  .popup-content {
+      background: #fffaf1;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      border: 5px solid #A69B8D ;
+  }
   
-    .post-title {
-        text-align: start;
-      font-size: 18px;
-      font-weight: bold;
-    }
+  form {
+      max-width: 400px;
+      margin: 0 auto;
   
-    .post-content {
-        margin-top: 10px;
+  }
+  
+  input,
+  textarea,
+  select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 2px solid #A69B8D;
+      border-radius: 10px;
+  }
+  
+  select {
+      height: 50px;
+  }
+  
+  .form-buttons {
+      display: flex;
+      justify-content: space-between;
+  }
+  
+  button {
+      padding: 10px 20px;
+      background-color: #498c79;
+      color: #101e26;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+  }
+  
+  button:hover {
+      color: #f2d1b3;
+      transition: all 0.5s ease-in-out;
+      transform: scale(1.05);
+  }
+  
+  .announcement-board {
       display: flex;
       flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
       gap: 20px;
-    }
+      width: 100%;
+      flex-direction: column;
+  }
   
-    .post-image {
-      flex: 1;
-      max-width: 10%;
-      margin-right: 20px;
+  .announcement-post {
+      width: 95%;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      border: 3px solid #A69B8D;
+      border-radius: 10px;
+      background-color: #fffaf1;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.5s ease-in-out;
+      margin: 10px;
   
-      img {
-        width: 100%;
-        border-radius: 5px;
+      .header-date {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 10px;
+          width: 100%;
+          color: #101e26;
+  
+          .header {
+              font-weight: bold;
+              display: flex;
+              flex-direction: row;
+              align-items: flex-start;
+  
+              .post-title {
+                  margin-right: 10px;
+                  font-size: 25px;
+                  padding: 5px;
+              }
+  
+              .post-type {
+                  font-size: 20px;
+                  color: #101e26;
+                  background-color: #498c79;
+                  padding: 10px;
+                  border-radius: 10px;
+              }
+          }
+  
+          .date-time {
+              font-weight: 600;
+              display: flex;
+              flex-direction: row;
+              justify-content: space-between;
+              align-items: center;
+              font-size: 14px;
+  
+              .post-date {
+                  margin-right: 10px;
+              }
+          }
       }
-    }
   
-    .post-description {
-        flex: 1;
-      font-size: 14px;
-      text-align: start;
-    }
+      .post-content {
+          margin-top: 10px;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 20px;
+          color: #101e26;
+          flex-direction: column;
+      }
   
-    &:hover {
-      transform: scale(1.05);
-    }
+      .post-description {
+          flex: 1;
+          font-size: 20px;
+          text-align: start;
+      }
+
+        .post-state {
+            flex: 1;
+            font-size: 20px;
+            text-align: center;
+            background-color: #101e26;
+            color: #fffaf1;
+            border-radius: 20px;
+        }
+  
+      .actions {
+          flex: 1;
+          display: flex;
+          flex-direction: row;
+          justify-content: flex-end;
+          align-items: flex-end;
+          margin-top: 10px;
+  
+          button {
+              margin-right: 10px;
+          }
+      }
+  
+      &:hover {
+          transform: scale(1.05);
+      }
+  }
+  
+  .form-buttons button {
+      margin-right: 10px;
   }
   
   @media screen and (max-width: 768px) {
-    .announcement-post {
-      .post-content {
-        flex-direction: column;
+      .announcement-post {
+            .header-date {
+                flex-direction: column;
+                
+                .header {
+                    flex-direction: column;
+                    align-items: center;
+                }
+
+                .date-time {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    margin-top: 10px;
+                }
+            }
+          .post-content {
+              flex-direction: column;
+                width: 100%;
+                flex-wrap: wrap;
+          }
+
+          .actions {
+              flex-direction: column;
+              align-items: center;
+              width: 100%;
+              gap: 5px;
+          }
+
+
       }
-  
-      .post-image {
-        max-width: 100%;
-        margin-right: 0;
-        margin-bottom: 20px;
-  
-        img {
-          height: 100%;
-        }
-      }
-    }
   }
   </style>
-  

@@ -9,33 +9,69 @@
               <img src="@/assets/logos/bcareNegro.png" />
               <h2>Registrarse</h2>
             </div>
-            <div class="input-group">
-              <i class="bx bxs-user"></i>
-              <input
-                type="text"
-                v-model="newUsername"
-                placeholder="Nombre de Usuario"
-                required
-              />
+            <div class="sign-up-inputs">
+              <div class="personal-info">
+                <div class="input-group">
+                  <input
+                    type="text"
+                    v-model="newName"
+                    placeholder="Nombre Completo"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="input-group">
+                <input
+                  type="text"
+                  v-model="newCI"
+                  placeholder="Cédula de Identidad"
+                  required
+                />
+              </div>
+              <div class="input-group">
+                <input
+                  type="text"
+                  v-model="newPhone"
+                  placeholder="Teléfono"
+                  required
+                />
+              </div>
             </div>
-            <div class="input-group">
-              <i class="bx bxs-lock-alt"></i>
-              <input
-                type="password"
-                v-model="newPassword"
-                placeholder="Contraseña"
-                required
-              />
+            <div class="site-info">
+              <div class="input-group">
+                <input
+                  type="text"
+                  v-model="newEmail"
+                  placeholder="email"
+                  required
+                />
+              </div>
+              <div class="input-group">
+                <input
+                  type="text"
+                  v-model="newUsername"
+                  placeholder="Nombre de Usuario"
+                  required
+                />
+              </div>
+              <div class="input-group">
+                <input
+                  type="password"
+                  v-model="newPassword"
+                  placeholder="Contraseña"
+                  required
+                />
+              </div>
+              <div class="input-group">
+                <input
+                  type="password"
+                  v-model="confirmPassword"
+                  placeholder="Confirmar Contraseña"
+                  required
+                />
+              </div>
             </div>
-            <div class="input-group">
-              <i class="bx bxs-lock-alt"></i>
-              <input
-                type="password"
-                v-model="confirmPassword"
-                placeholder="Confirmar Contraseña"
-                required
-              />
-            </div>
+            
             <button @click="signUp">Registrarse</button>
             <div class="footer-sign-up">
               <p>
@@ -56,7 +92,6 @@
               <h2>Iniciar Sesión</h2>
             </div>
             <div class="input-group">
-              <i class="bx bxs-user"></i>
               <input
                 type="text"
                 v-model="username"
@@ -65,7 +100,6 @@
               />
             </div>
             <div class="input-group">
-              <i class="bx bxs-lock-alt"></i>
               <input
                 type="password"
                 v-model="password"
@@ -102,16 +136,25 @@
 
 <script>
 import axios from "axios";
-
+import UserService from '../service/UserService';
+import Swal from 'sweetalert2';
 export default {
+  
   data() {
     return {
       newUsername: "",
       newPassword: "",
       confirmPassword: "",
+      newName: "",
+      newCI: "",
+      newPhone: "",
+      newEmail: "",
       username: "",
       password: "",
     };
+  },
+  created() {
+    this.userService= new UserService();
   },
   methods: {
     toggle() {
@@ -120,11 +163,15 @@ export default {
     },
     loginUser() {
       if (this.username === "" || this.password === "") {
-        alert("Uno o más campos están vacíos");
+        //alert("Uno o más campos están vacíos");
+        Swal.fire({
+          icon: 'error',
+          title: 'Uno o más campos están vacíos'
+        })
         return;
       }
-      axios
-        .post("http://localhost:8080/api/v1/login", {
+      axios //TODO consumir service de login -> UserServie
+        .post("http://localhost:8080/api/v1/user/login", {
           username: this.username,
           password: this.password,
         })
@@ -134,12 +181,29 @@ export default {
             data.data === null &&
             data.errorMessage === null
           ) {
-            alert(
+            /* alert(
               "Los datos ingresados son incorrectos. Por favor, intente nuevamente."
-            );
+            ); */
+            Swal.fire({
+              icon: 'error',
+              title: 'Los datos ingresados son incorrectos.',
+              text: 'Por favor, intente nuevamente.'
+            })
           } else if (data.data) {
             localStorage.setItem("userID", JSON.stringify(data.data));
-            alert("Ingreso exitoso");
+            /* alert("Ingreso exitoso"); */
+            Swal.fire({
+              icon: 'success',
+              title: 'Ingreso exitoso'
+            })
+            //guardamos los datos de data.data en el local storage
+            const typeUser = data.data.typeUser;
+            localStorage.setItem('typeUser', typeUser);
+            //guardando los datos del usuario por si fueran de utilidad 
+            localStorage.setItem("userID", JSON.stringify(data.data));
+            //redireccionamos a la vista de payments
+            const storedTypeUser = localStorage.getItem('typeUser');
+            console.log("el tipo de usuario es "+storedTypeUser);
             this.$router.push("/propertyView");
           } else if (data.errorMessage) {
             alert(data.errorMessage);
@@ -155,14 +219,31 @@ export default {
         this.newPassword === "" ||
         this.confirmPassword === ""
       ) {
-        alert("Uno o más campos están vacíos");
+        /* alert("Uno o más campos están vacíos"); */
+        Swal.fire({
+          icon: 'error',
+          title: 'Uno o más campos están vacíos'
+        })
         return;
       } else if (this.newPassword !== this.confirmPassword) {
-        alert("Las contraseñas no coinciden");
+        /* alert("Las contraseñas no coinciden"); */
+        Swal.fire({
+          icon: 'error',
+          title: 'Las contraseñas no coinciden'
+        })
         return;
       } else {
         // Aquí puedes agregar la llamada API para registrar al usuario si lo necesitas.
-        alert("Registro exitoso");
+        this.userService.signUpUser(this.newName, this.newUsername, this.newPassword, this.newEmail, this.newCI, this.newPhone, 3).then((response) => {//se manda el tipo de user como inquilino
+          //verificar el codigo de envio
+          if(response.responseCode =="USER-0002" ){
+            alert("Registro exitoso")
+            this.$router.push("/login");
+          }else{
+            alert("Error en el registro")
+          }
+        });
+        
       }
     },
     signIn() {
@@ -189,36 +270,35 @@ export default {
 
 .head-signUp,
 .head-signUp {
-  color: black;
+  color: #101e26;
 }
 
-.head-signIn img,
 .head-signUp img {
   width: 100%;
   max-width: 10rem;
 }
-.head-signIn h2,
+
 .head-signUp h2 {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 600;
   margin: 1rem 0;
 }
 .container {
   position: relative;
-  min-height: 100vh;
+  min-height: 100%;
+  min-width: 100%;
   overflow: hidden;
-  background: linear-gradient(
-    90deg,
-    rgba(179, 102, 52, 1) 0%,
-    rgba(255, 177, 125, 1) 50%,
-    rgba(254, 161, 98, 1) 100%
+  background: radial-gradient(
+    circle,
+    rgba(73, 140, 121, 1) 0%,
+    rgba(16, 30, 38, 1) 70%
   );
 }
 
 .row {
   display: flex;
   flex-wrap: wrap;
-  height: 100vh;
+  height: 100%;
 }
 
 .col {
@@ -239,8 +319,9 @@ export default {
 
 .form {
   padding: 1rem;
-  background-color: #ffff;
+  background-color: #F2F1E4;
   border-radius: 1.5rem;
+  border: 5px solid #A69B8D;
   width: 100%;
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
   transform: scale(0);
@@ -251,31 +332,21 @@ export default {
 .input-group {
   position: relative;
   width: 100%;
-  margin: 1rem 0;
+  margin: 10px 0;
 }
-
-.input-group i {
-  position: absolute;
-  top: 50%;
-  left: 1rem;
-  transform: translateY(-50%);
-  font-size: 1.4rem;
-  color: #757575;
-}
-
 .input-group input {
   width: 100%;
   padding: 1rem 3rem;
   font-size: 1rem;
-  background-color: #efefef;
-  border-radius: 0.5rem;
-  border: 0.125rem solid #ffff;
+  background-color: #fffaf1;
+  border-radius: 10px;
+  border: 3px solid #A69B8D;
   outline: none;
   text-align: center;
 }
 
 .input-group input:focus {
-  border: 0.125rem solid #1d6ba0;
+  border: 4px solid #F2D1B3;
 }
 
 .form button {
@@ -284,10 +355,17 @@ export default {
   padding: 0.6rem 0;
   border-radius: 0.5rem;
   border: none;
-  background-color: #22abb3;
-  color: #ffff;
+  background-color: #498C79;
+  color: #101E26;
   font-size: 1.2rem;
   outline: none;
+
+  &:hover {
+    background-color: #498C79;
+    color: #F2D1B3;
+    transition: all 0.5s ease-in-out;
+    transform: scale(1.05);
+  }
 }
 
 .footer-sign-in p,
@@ -318,42 +396,25 @@ export default {
   top: 0;
   left: 0;
   pointer-events: none;
-  z-index: 6;
+  z-index: 0;
   width: 100%;
 }
 
-.text {
-  margin: 4rem;
-  color: #ffff;
-}
-
-.text h2 {
-  font-size: 3.5rem;
-  font-weight: 800;
-  margin: 2rem 0;
-  transition: 1s ease-in-out;
-}
-.text p {
-  font-weight: 600;
-  transition: 1s ease-in-out;
-  transition-delay: 0.2s;
-}
-
 .img img {
-  width: 30vh;
+  width: 100%;
   transition: 1s ease-in-out;
   transition-delay: 0.4s;
 }
 
-.text.sign-in h2,
-.text.sign-in p,
-.img.sign-in img {
+.text .sign-in h2,
+.text .sign-in p,
+.img .sign-in img {
   transform: translateX(-250%);
 }
 
-.text.sign-up h2,
-.text.sign-up p,
-.img.sign-up img {
+.text .sign-up h2,
+.text .sign-up p,
+.img .sign-up img {
   transform: translateX(250%);
 }
 
@@ -405,11 +466,11 @@ export default {
 
 /* RESPONSIVE */
 
-@media only screen and (max-width: 425px) {
+@media only screen and (max-width: 768px) {
   .container::before,
   .container.sign-in::before,
   .container.sign-up::before {
-    height: 100vh;
+    height: 100%;
     border-bottom-right-radius: 0;
     border-top-left-radius: 0;
     z-index: 0;
@@ -428,14 +489,12 @@ export default {
 
   .content-row .col {
     transform: translateY(0);
-    background-color: unset;
   }
 
   .col {
     width: 100%;
     position: absolute;
-    padding: 2rem;
-    background-color: #ffff;
+    padding: 1rem;
     border-top-left-radius: 2rem;
     border-top-right-radius: 2rem;
     transform: translateY(100%);
@@ -445,26 +504,6 @@ export default {
   .row {
     align-items: flex-end;
     justify-content: flex-end;
-  }
-
-  .form,
-  .social-list {
-    box-shadow: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  .text {
-    margin: 0;
-  }
-
-  .text p {
-    display: none;
-  }
-
-  .text h2 {
-    margin: 0.5rem;
-    font-size: 2rem;
   }
 }
 </style>
