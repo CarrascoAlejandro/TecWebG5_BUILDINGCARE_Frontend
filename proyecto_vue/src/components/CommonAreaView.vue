@@ -4,16 +4,23 @@
     <div class="utilities">
       <div class="add-area">
         <div class="add-btn">
-          <!-- <button class="add-button" @click="openForm">
+          <button class="add-button" @click="openForm">
             Añadir Area Común
-          </button> -->
+          </button>
         </div>
+      </div>
+      <div class="search-container">
+        <input v-model="searchText" type="text" placeholder="Buscar Área..." />
       </div>
     </div>
 
     <!-- Lista de Propiedades -->
     <div class="area-list">
-      <div v-for="(area, index) in commonAreas" :key="index" class="area-item">
+      <div
+        v-for="(area, index) in filteredAreas"
+        :key="index"
+        class="area-item"
+      >
         <!-- Contenido de Propiedad -->
         <div class="area-details">
           <div class="specs">
@@ -25,8 +32,15 @@
             {{ area.description }}
           </div>
           <div class="actions">
-            <button v-if="typeUser == 'Administrador'" @click="editArea(index)">Editar</button>
-            <button v-if="typeUser == 'Administrador'" @click="deleteArea(index)">Borrar</button>
+            <button v-if="typeUser == 'Administrador'" @click="editArea(index)">
+              Editar
+            </button>
+            <button
+              v-if="typeUser == 'Administrador'"
+              @click="deleteArea(index)"
+            >
+              Borrar
+            </button>
           </div>
         </div>
       </div>
@@ -38,12 +52,16 @@
         <form>
           <select v-model="selectedType" required>
             <option value="">Selecciona un tipo de área común</option>
-            <option v-for="(type) in types" :key="type.id" :value="type" required>
-              {{ type }}
+            <option v-for="type in types" :key="type.id" :value="type.id">
+              {{ type.type }}
             </option>
           </select>
 
-          <textarea v-model="description" placeholder="Descripción" required></textarea>
+          <textarea
+            v-model="description"
+            placeholder="Descripción"
+            required
+          ></textarea>
           <!-- Botones de acción -->
           <div class="form-buttons">
             <button @click="createArea" v-if="!editing">Crear</button>
@@ -79,9 +97,10 @@ export default {
       index: null,
       image: null,
       selectedType: null,
-      typeUser: '',
-      userName: '',
-      idUserHeader: '',
+      typeUser: "",
+      userName: "",
+      idUserHeader: "",
+      searchText: "",
     };
   },
   created() {
@@ -97,8 +116,26 @@ export default {
     console.log("userName", this.userName);
     console.log("isUserHeader", this.idUserHeader);
     if (this.typeUser == null) {
-      this.$router.push('/');
+      this.$router.push("/");
     }
+  },
+  computed: {
+    filteredAreas() {
+      if (!this.searchText) {
+        return this.commonAreas;
+      }
+
+      const lowercasedSearch = this.searchText.toLowerCase();
+
+      return this.commonAreas.filter((area) => {
+        const matchesType = area.type.toLowerCase().includes(lowercasedSearch);
+        const matchesDescription = area.description
+          .toLowerCase()
+          .includes(lowercasedSearch);
+
+        return matchesType || matchesDescription;
+      });
+    },
   },
   methods: {
     async fetchCommonAreas() {
@@ -126,7 +163,7 @@ export default {
         if (data.responseCode === "CARE-0004" && data.data) {
           // Mapear los datos recibidos a la estructura esperada por el componente
           console.log(data.data);
-          this.types = data.data
+          this.types = data.data;
         } else {
           console.error("Error fetching types:", data.errorMessage);
         }
@@ -155,11 +192,14 @@ export default {
       const newArea = {
         description: this.description,
         idSection: 1,
-        idTypeArea: this.selectedType ? this.selectedType.id : null,
+        idTypeArea: this.selectedType,
       };
 
       try {
-        const response = await CommonAreaService.addCommonArea(newArea, this.idUserHeader);
+        const response = await CommonAreaService.addCommonArea(
+          newArea,
+          this.idUserHeader
+        );
         if (response.responseCode === "CARE-0001" && response.data) {
           // Agrega la nueva área a tu lista local
           this.commonAreas.push({
@@ -187,7 +227,7 @@ export default {
       const updatedArea = {
         description: this.description,
         idSection: 1,
-        idTypeArea: this.selectedType ? this.selectedType.id : null,
+        idTypeArea: this.selectedType,
       };
 
       try {
@@ -231,7 +271,7 @@ export default {
   mounted() {
     this.fetchTypes();
     this.fetchCommonAreas();
-  }
+  },
 };
 </script>
 
@@ -270,20 +310,24 @@ body,
 .add-area {
   display: flex;
   justify-content: center;
-  width: 100%;
+  align-items: center;
+  width: 20%;
 }
 
 .add-btn {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
+  align-items: center;
   width: 100%;
+  margin-right: 1rem;
 }
 
 .add-button {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0.5rem 1rem;
+  width: auto;
+  padding: 12px;
   border: none;
   border-radius: 10px;
   background-color: #498c79;
@@ -395,7 +439,6 @@ body,
   justify-content: center;
   align-items: center;
   gap: 1rem;
-
 }
 
 .actions button {
@@ -436,7 +479,7 @@ body,
   width: 400px;
   padding: 1rem;
   border-radius: 10px;
-  background-color: #F2f1e4;
+  background-color: #f2f1e4;
   border: #a69b8d 5px solid;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
@@ -520,5 +563,71 @@ body,
   color: #f2d1b3;
   transition: all 0.5s ease-in-out;
   transform: scale(1.1);
+}
+
+.search-container {
+  width: 80%;
+  position: relative;
+
+  input {
+    width: 95%;
+    padding: 10px;
+    border: 3px solid #a69b8d;
+    border-radius: 10px;
+    background-color: #fffaf1;
+  }
+
+  input:focus {
+    outline: #a69b8d solid 1px;
+  }
+}
+
+.utilities {
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 20px;
+
+  .add-button {
+    margin-bottom: 10px;
+  }
+
+  .search-container {
+    width: 100%;
+  }
+}
+.search-container {
+  margin-bottom: 10px;
+}
+
+@media screen and (max-width: 830px) {
+  .utilities {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  .add-btn {
+    margin-right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .add-area {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .add-button {
+    margin-bottom: 10px;
+    width: 95%;
+  }
+  .search-container {
+    width: 95%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 }
 </style>

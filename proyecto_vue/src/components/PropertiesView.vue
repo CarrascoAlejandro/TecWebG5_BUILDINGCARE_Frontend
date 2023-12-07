@@ -11,15 +11,19 @@
           Añadir Propiedad
         </button>
       </div>
-      <!-- <div class="search-container">
-        <input v-model="searchText" type="text" placeholder="Buscar Propiedad..." @input="fetchProperties" />
-      </div> -->
+      <div class="search-container">
+        <input
+          v-model="searchText"
+          type="text"
+          placeholder="Buscar Propiedad..."
+        />
+      </div>
     </div>
 
     <!-- Lista de Propiedades -->
     <div class="property-list">
       <div
-        v-for="(property, index) in properties"
+        v-for="(property, index) in filteredProperties"
         :key="index"
         class="property-post"
       >
@@ -115,7 +119,7 @@
           />
           <!-- Botones de acción -->
           <div class="form-buttons">
-            <button @click="createPost" v-if="!editing">Crear</button>
+            <button @click.prevent="createPost" v-if="!editing">Crear</button>
             <button @click="updatePost" v-if="editing">Actualizar</button>
             <button @click="deletePost(index)">Eliminar</button>
             <button @click="closeForm">Cerrar</button>
@@ -278,14 +282,23 @@ export default {
         return;
       }
 
+      console.log("Value:", this.value);
+      console.log("Environments:", this.environments);
+      console.log("Dimensions:", this.dimensions);
+      console.log("Description:", this.description);
+      console.log("Image:", imageUrl);
+      console.log("Selected Type ID:", this.selectedType.id);
+
+      // Detiene la ejecución aquí si las herramientas de desarrollador están abiertas
+
       const newProperty = {
-        propertyEnvironments: parseInt(this.environments),
-        propertyDimensions: parseFloat(this.dimensions),
-        propertyValue: parseFloat(this.value),
+        propertyEnvironments: this.environments,
+        propertyDimensions: this.dimensions,
+        propertyValue: this.value,
         propertyDescription: this.description,
         propertyImage: imageUrl,
         propertyIdSection: 1,
-        propertyIdType: this.selectedType ? this.selectedType.id : null,
+        propertyIdType: this.selectedType ? this.selectedType.id : 2,
       };
 
       try {
