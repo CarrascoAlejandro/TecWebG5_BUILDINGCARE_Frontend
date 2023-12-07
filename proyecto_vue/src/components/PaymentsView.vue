@@ -80,11 +80,13 @@ export default {
     created() {
         this.paymentService = new PaymentService();
         this.userService = new UserService();
+    },
+    mounted() {
+        try{
+            
         const storedData = localStorage.getItem("userID");
         const parsedData = JSON.parse(storedData);
         this.idUserHeader = parsedData.idUser;
-    },
-    mounted() {
         this.typeUser = localStorage.getItem('typeUser');
         //si el typeUser es null, redirige a la vista raiz
         if (this.typeUser == null) {
@@ -92,6 +94,10 @@ export default {
         }
         this.getReceipts();
         this.listAllUsers();
+    }catch(error){
+        console.log(error);
+        this.$router.push('/');
+    }
 
     },
     methods: {

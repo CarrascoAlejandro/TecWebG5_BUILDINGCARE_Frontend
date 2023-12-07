@@ -8,7 +8,7 @@
       </div>
       <nav class="nav-links" :class="{ 'nav-open': isMenuOpen }">
         <div class="logo">
-          <img src="@/assets/logos/bcareHorizontalNegro.png" alt="logo" />
+          <img src="@/assets/logos/bcareHorizontalNegro.png" alt="logo" @click="showabout"/>
         </div>
         <li
           v-for="item in navItems"
@@ -23,6 +23,8 @@
 </template>
 
 <script>
+import Swal from 'sweetalert2';
+
 export default {
   data() {
     return {
@@ -40,7 +42,11 @@ export default {
     };
   },
   created() {
-        this.typeUser = localStorage.getItem("typeUser");
+        try{
+          this.typeUser = localStorage.getItem("typeUser");
+        if (this.typeUser == null) {
+            this.$router.push('/');
+        }
         const storedData = localStorage.getItem("userID");
         // Parsear el JSON almacenado
         const parsedData = JSON.parse(storedData);
@@ -49,9 +55,11 @@ export default {
         this.userName = parsedData.usename;
         console.log("typeUser", this.typeUser);
         console.log("userName", this.userName);
-        // if (this.typeUser == null) {
-        //     this.$router.push('/');
-        // }
+        }catch(error){
+          console.log(error);
+          this.$router.push('/');
+        }
+        
     },
   methods: {
     setActiveNavItem(item) {
@@ -79,6 +87,15 @@ export default {
     closeMenu() {
       this.isMenuOpen = false;
     },
+    showabout() {
+      Swal.fire({
+        title: "BCare",
+        text: "BCare es una aplicación que permite a los usuarios de un condominio interactuar con los administradores del mismo, para poder realizar pagos, reportar problemas, ver noticias y más.\n Saludos de parte de Ale, Gabi, Di, Fabi e Igna",
+        imageWidth: 400,
+        imageHeight: 200,
+        imageAlt: "Custom image",
+      });
+    }
   },
 };
 </script>
