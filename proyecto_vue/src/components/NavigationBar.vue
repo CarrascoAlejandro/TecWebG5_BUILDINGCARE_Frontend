@@ -33,10 +33,10 @@ export default {
       navItems: [
         { name: "users", label: "Usuarios" },
         { name: "blog", label: "Anuncios" },
-        { name: "payments", label: "Pagos" },
+        // { name: "payments", label: "Pagos" },
         { name: "houses", label: "Propiedades" },
         { name: "commonAreas", label: "Áreas Comunes" },
-        { name: "contracts", label: "Contratos" },
+        // { name: "contracts", label: "Contratos" },
         { name: "logOut", label: "Cerrar Sesión" },
       ],
     };
@@ -55,6 +55,17 @@ export default {
         this.userName = parsedData.usename;
         console.log("typeUser", this.typeUser);
         console.log("userName", this.userName);
+        if(this.typeUser==='Administrador'){
+          this.navItems= [
+        { name: "users", label: "Usuarios" },
+        { name: "blog", label: "Anuncios" },
+        { name: "payments", label: "Pagos" },
+        { name: "houses", label: "Propiedades" },
+        { name: "commonAreas", label: "Áreas Comunes" },
+        { name: "contracts", label: "Contratos" },
+        { name: "logOut", label: "Cerrar Sesión" },
+      ]
+        }
         }catch(error){
           console.log(error);
           this.$router.push('/');

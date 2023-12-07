@@ -4,7 +4,7 @@
     <div class="utilities">
       <div class="add-area">
         <div class="add-btn">
-          <button class="add-button" @click="openForm">
+          <button v-if="typeUser=== 'Administrador'"  class="add-button" @click="openForm">
             Añadir Area Común
           </button>
         </div>

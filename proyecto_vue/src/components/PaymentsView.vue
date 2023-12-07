@@ -1,6 +1,6 @@
 <template>
     <NavigationBar />
-    <div class="payment-app">
+    <div  v-if="typeUser === 'Administrador'"  class="payment-app">
         <div class="search-container">
             <input type="text" v-model="searchQuery" @input="filterContracts" placeholder="Buscar usuario...">
         </div>
