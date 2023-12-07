@@ -38,9 +38,7 @@
             <div class="property-environments">
               Ambientes: {{ property.environments }}
             </div>
-            <div class="property-dimensions">
-              Dimensiones: {{ property.dimensions }} m<sup>2</sup>
-            </div>
+            <div class="property-dimensions">Dimensiones: {{ property.dimensions }} m<sup>2</sup></div>
           </div>
         </div>
         <div class="property-content">
