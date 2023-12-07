@@ -1,10 +1,16 @@
 <template>
-  <NavigationBar/>
+  <NavigationBar />
   <div class="property-app">
     <div class="utilities">
-        <div class="add-btn">
-          <button class="add-button" @click="openForm" v-if="typeUser !== 'Inquilino'">Añadir Propiedad</button>
-        </div>
+      <div class="add-btn">
+        <button
+          class="add-button"
+          @click="openForm"
+          v-if="typeUser !== 'Inquilino'"
+        >
+          Añadir Propiedad
+        </button>
+      </div>
       <!-- <div class="search-container">
         <input v-model="searchText" type="text" placeholder="Buscar Propiedad..." @input="fetchProperties" />
       </div> -->
@@ -12,30 +18,53 @@
 
     <!-- Lista de Propiedades -->
     <div class="property-list">
-      <div v-for="(property, index) in properties" :key="index" class="property-post">
+      <div
+        v-for="(property, index) in properties"
+        :key="index"
+        class="property-post"
+      >
         <!-- Contenido de Propiedad -->
 
         <div class="property-details">
           <div class="header">
             <div class="property-type">{{ property.type }}</div>
-            <div class="property-value">$ {{ property.value }}</div>
+            <div class="property-value">{{ property.value }} Bs.</div>
           </div>
           <div class="specs">
             <div class="property-environments">
               Ambientes: {{ property.environments }}
             </div>
-            <div class="property-dimensions">Dimensiones: {{ property.dimensions }}</div>
+            <div class="property-dimensions">
+              Dimensiones: {{ property.dimensions }} m<sup>2</sup>
+            </div>
           </div>
         </div>
         <div class="property-content">
           <div class="property-image">
-            <img v-if="property.image" :src="require(`../../../image_server/img/${property.image}`)"
-              alt="Imagen de la propiedad" />
+            <img
+              v-if="property.image"
+              :src="require(`../../../image_server/img/${property.image}`)"
+              alt="Imagen de la propiedad"
+            />
           </div>
           <div class="property-description">{{ property.description }}</div>
           <div class="actions">
-            <button @click="editProperty(index)" v-if="typeUser != 'Inquilino' && ((typeUser == 'Socio' && nameUser === property.propertyOwner) || typeUser == 'Administrador')">Editar</button>
-            <button @click="deleteProperty(index)" v-if="typeUser === 'Administrador'">Borrar</button>
+            <button
+              @click="editProperty(index)"
+              v-if="
+                typeUser != 'Inquilino' &&
+                ((typeUser == 'Socio' && nameUser === property.propertyOwner) ||
+                  typeUser == 'Administrador')
+              "
+            >
+              Editar
+            </button>
+            <button
+              @click="deleteProperty(index)"
+              v-if="typeUser === 'Administrador'"
+            >
+              Borrar
+            </button>
           </div>
         </div>
       </div>
@@ -47,17 +76,43 @@
         <form>
           <select v-model="selectedType" required>
             <option value="">Selecciona un tipo de propiedad</option>
-            <option v-for="(type) in types" :key="type.id" :value="type">
+            <option v-for="type in types" :key="type.id" :value="type">
               {{ type.type }}
             </option>
           </select>
 
           <input type="hidden" id="PropertyId" />
-          <input v-model="value" placeholder="Valor de la Propiedad" type="number" step="0.01" required />
-          <input v-model="environments" placeholder="Ambientes de la Propiedad" type="number" required />
-          <input v-model="dimensions" placeholder="Dimensiones de la Propiedad" type="number" step="0.01" required />
-          <textarea v-model="description" placeholder="Descripción" required></textarea>
-          <input type="file" @change="handleImageUpload" accept="image/*" required/>
+          <input
+            v-model="value"
+            placeholder="Valor de la Propiedad"
+            type="number"
+            step="0.01"
+            required
+          />
+          <input
+            v-model="environments"
+            placeholder="Ambientes de la Propiedad"
+            type="number"
+            required
+          />
+          <input
+            v-model="dimensions"
+            placeholder="Dimensiones de la Propiedad"
+            type="number"
+            step="0.01"
+            required
+          />
+          <textarea
+            v-model="description"
+            placeholder="Descripción"
+            required
+          ></textarea>
+          <input
+            type="file"
+            @change="handleImageUpload"
+            accept="image/*"
+            required
+          />
           <!-- Botones de acción -->
           <div class="form-buttons">
             <button @click="createPost" v-if="!editing">Crear</button>
@@ -99,7 +154,7 @@ export default {
       index: null,
       image: null,
       selectedType: null,
-      idUserHeader: '',
+      idUserHeader: "",
     };
   },
   computed: {
@@ -121,26 +176,26 @@ export default {
     },
   },
   created() {
-        this.typeUser = localStorage.getItem("typeUser");
-        const storedData = localStorage.getItem("userID");
-        // Parsear el JSON almacenado
-        const parsedData = JSON.parse(storedData);
-        // Acceder al campo "name" dentro del objeto parsedData
-        this.nameUser = parsedData.name;
-        this.idUserHeader = parsedData.idUser;
-        this.propertiesService = new PropertiesService(this.idUserHeader);
-        console.log("typeUser", this.typeUser);
-        console.log("nameUser", this.nameUser);
-        if (this.typeUser == null) {
-            this.$router.push('/');
-        }
-    },
+    this.typeUser = localStorage.getItem("typeUser");
+    const storedData = localStorage.getItem("userID");
+    // Parsear el JSON almacenado
+    const parsedData = JSON.parse(storedData);
+    // Acceder al campo "name" dentro del objeto parsedData
+    this.nameUser = parsedData.name;
+    this.idUserHeader = parsedData.idUser;
+    this.propertiesService = new PropertiesService(this.idUserHeader);
+    console.log("typeUser", this.typeUser);
+    console.log("nameUser", this.nameUser);
+    if (this.typeUser == null) {
+      this.$router.push("/");
+    }
+  },
   methods: {
     //temp
-      logAndReturnImage(image) {
-        console.log(image);
-        return require(`../../../image_server/img/${image}`);
-      },
+    logAndReturnImage(image) {
+      console.log(image);
+      return require(`../../../image_server/img/${image}`);
+    },
     async fetchProperties() {
       try {
         const data = await this.propertiesService.fetchProperties();
@@ -234,7 +289,9 @@ export default {
       };
 
       try {
-        const responseData = await this.propertiesService.addProperty(newProperty);
+        const responseData = await this.propertiesService.addProperty(
+          newProperty
+        );
         if (responseData && responseData.responseCode === "PROP-0001") {
           this.properties.push(responseData.data);
         } else {
@@ -242,8 +299,7 @@ export default {
         }
       } catch (error) {
         console.error("Failed to add property:", error);
-      } 
-      finally {
+      } finally {
         this.closeForm();
       }
     },
@@ -316,7 +372,9 @@ export default {
       const property = this.properties[index];
       if (confirm("¿Seguro que desea eliminar esta propiedad?")) {
         try {
-          const success = await this.propertiesService.deleteProperty(property.id);
+          const success = await this.propertiesService.deleteProperty(
+            property.id
+          );
           if (success) {
             this.properties.splice(index, 1);
           } else {
@@ -639,10 +697,9 @@ button:hover {
     align-items: center;
     width: 100%;
     margin-bottom: 20px;
-    
+
     .add-button {
       margin-bottom: 10px;
-
     }
 
     .search-container {
