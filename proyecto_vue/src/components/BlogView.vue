@@ -1,10 +1,14 @@
 <template>
   <NavigationBar></NavigationBar>
+  
   <div class="container">
+    <div class="search-container">
+      <input type="text" v-model="searchQuery" @input="filterPosts" placeholder="Buscar por título...">
+    </div>
     <button @click="openForm"> Nuevo Post </button>
       <div class="announcement-board">
           
-          <div v-for="(post, index) in posts" :key="index" class="announcement-post">
+          <div v-for="(post, index) in filteredReceipts" :key="index" class="announcement-post">
               <div class="header-date">
                   <div class="header">
                       <div class="post-title">{{ post.postTitle }}</div>
@@ -100,6 +104,8 @@
             typeUser: '',
             userName: '',
             idUserHeader: '',
+            searchQuery: '',
+            filteredReceipts: [],
         };
     },
     created() {
@@ -128,6 +134,7 @@
             try {
                 this.postService.getPosts().then((data) => {
                     this.posts = data.data;
+                    this.filteredReceipts = data.data;
                     console.log(this.posts);
                 });
             }
@@ -139,6 +146,7 @@
             try {
                 this.postService.getPosts().then((data) => {
                     this.posts = data.data;
+                    this.filteredReceipts = data.data;
                     console.log(this.posts);
                 });
             }
@@ -300,6 +308,16 @@
             if (confirmDelete) {
                 // Elimina el post de la lista
                 this.deletePostDB(index);
+            }
+        },
+        filterPosts() {
+            if (this.searchQuery === '') {
+                this.filteredReceipts = this.posts;
+            } else {
+                this.filteredReceipts = this.posts.filter(post =>
+                post.postTitle.toLowerCase().includes(this.searchQuery.toLowerCase()) //||
+                // Puedes añadir más condiciones aquí para filtrar por otras propiedades
+                );
             }
         },
     },
