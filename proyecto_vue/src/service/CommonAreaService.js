@@ -67,6 +67,24 @@ class CommonAreaService {
       throw error;
     }
   }
+  async fetchTypes() {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/v1/commonarea/type`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+          }
+        }
+      );
+      console.log(response);
+      return await response.json();
+    } catch (error) {
+      console.error("Failed to update common area:", error);
+      throw error;
+    }
+  }
 }
 
 export default new CommonAreaService();
