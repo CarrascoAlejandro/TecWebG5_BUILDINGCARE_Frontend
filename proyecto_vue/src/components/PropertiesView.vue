@@ -18,13 +18,13 @@
         <div class="property-details">
           <div class="header">
             <div class="property-type">{{ property.type }}</div>
-            <div class="property-value">$ {{ property.value }}</div>
+            <div class="property-value">{{ property.value }} Bs.</div>
           </div>
           <div class="specs">
             <div class="property-environments">
               Ambientes: {{ property.environments }}
             </div>
-            <div class="property-dimensions">Dimensiones: {{ property.dimensions }}</div>
+            <div class="property-dimensions">Dimensiones: {{ property.dimensions }} m<sup>2</sup></div>
           </div>
         </div>
         <div class="property-content">

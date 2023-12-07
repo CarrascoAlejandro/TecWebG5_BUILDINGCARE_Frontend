@@ -28,7 +28,7 @@
             Tipo: {{ typeContractNames[contract.contractType] }}
           </div>
           <div class="payed-ammount">
-            Monto pagado: {{ contract.contractAmount }}
+            Monto pagado: {{ contract.contractAmount }} Bs.
           </div>
           <div class="date start-date">
             Fecha de inicio: {{ contract.contractSignatureDate }}

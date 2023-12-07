@@ -109,12 +109,12 @@
             </div>
             <button @click="signIn">Iniciar Sesión</button>
 
-            <div class="footer-sign-in">
+            <!-- <div class="footer-sign-in">
               <p>
                 <span> No está registrado? </span>
                 <b @click="toggle" class="pointer"> Crear una cuenta </b>
               </p>
-            </div>
+            </div> -->
           </div>
         </div>
         <div class="form-wrapper"></div>
