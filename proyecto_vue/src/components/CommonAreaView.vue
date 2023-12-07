@@ -4,9 +4,9 @@
     <div class="utilities">
       <div class="add-area">
         <div class="add-btn">
-          <button class="add-button" @click="openForm">
+          <!-- <button class="add-button" @click="openForm">
             Añadir Area Común
-          </button>
+          </button> -->
         </div>
       </div>
     </div>
