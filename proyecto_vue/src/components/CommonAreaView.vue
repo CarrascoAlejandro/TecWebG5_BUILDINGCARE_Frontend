@@ -104,6 +104,7 @@ export default {
     };
   },
   created() {
+    try{
     this.typeUser = localStorage.getItem("typeUser");
     const storedData = localStorage.getItem("userID");
     // Parsear el JSON almacenado
@@ -118,6 +119,11 @@ export default {
     if (this.typeUser == null) {
       this.$router.push("/");
     }
+  }catch(error){
+    console.log(error);
+    this.$router.push('/');
+  }
+
   },
   computed: {
     filteredAreas() {

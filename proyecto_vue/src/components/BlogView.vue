@@ -155,7 +155,11 @@ export default {
     };
   },
   created() {
+    try{
     this.typeUser = localStorage.getItem("typeUser");
+    if (this.typeUser == null) {
+      this.$router.push("/");
+    }
     const storedData = localStorage.getItem("userID");
     // Parsear el JSON almacenado
     const parsedData = JSON.parse(storedData);
@@ -170,6 +174,10 @@ export default {
     if (this.typeUser == null) {
       this.$router.push("/");
     }
+  }catch(error){
+    console.log(error);
+    this.$router.push('/');
+  }
   },
   mounted() {
     this.getPosts();

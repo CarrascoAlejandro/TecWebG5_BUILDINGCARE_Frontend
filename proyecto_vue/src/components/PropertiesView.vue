@@ -117,7 +117,7 @@
           />
           <!-- Botones de acción -->
           <div class="form-buttons">
-            <button @click.prevent="createPost" v-if="!editing">Crear</button>
+            <button @click="createPost" v-if="!editing">Crear</button>
             <button @click="updatePost" v-if="editing">Actualizar</button>
             <button @click="deletePost(index)">Eliminar</button>
             <button @click="closeForm">Cerrar</button>
@@ -178,7 +178,8 @@ export default {
     },
   },
   created() {
-    this.typeUser = localStorage.getItem("typeUser");
+    try{
+      this.typeUser = localStorage.getItem("typeUser");
     const storedData = localStorage.getItem("userID");
     // Parsear el JSON almacenado
     const parsedData = JSON.parse(storedData);
@@ -191,6 +192,11 @@ export default {
     if (this.typeUser == null) {
       this.$router.push("/");
     }
+    }catch(error){
+      console.log(error);
+      this.$router.push("/");
+    }
+    
   },
   methods: {
     //temp
@@ -629,7 +635,7 @@ button:hover {
 
   .property-description {
     flex: 3;
-    font-size: 14px;
+    font-size: 20px;
     text-align: start;
   }
 

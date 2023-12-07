@@ -137,6 +137,7 @@ export default {
     };
   },
   created() {
+    try{
     // await this.loadContracts();
     this.contractService = new ContractService();
     this.propertiesService = new PropertiesService();
@@ -156,6 +157,10 @@ export default {
     if (this.typeUser == null) {
         this.$router.push('/');
     }
+  }catch(error){
+    console.log(error);
+    this.$router.push('/');
+  }
   },
   async mounted() {
     await this.loadContracts();

@@ -128,6 +128,7 @@ export default {
     };
   },
   created() {
+    try{
     this.typeUser = localStorage.getItem("typeUser");
     const storedData = localStorage.getItem("userID");
     // Parsear el JSON almacenado
@@ -137,13 +138,18 @@ export default {
     this.userService = new UserService(this.idUserStore);
     console.log("typeUser", this.typeUser);
     console.log("idUser", this.idUserStore);
+    this.loadUsers();
+    this.loadRoles();
     if (this.typeUser == null) {
       this.$router.push("/");
     }
+  }catch(error){
+    console.log(error);
+    this.$router.push('/');
+  }
   },
   mounted() {
-    this.loadUsers();
-    this.loadRoles();
+    
   },
   methods: {
     /* getProfilePic() {
