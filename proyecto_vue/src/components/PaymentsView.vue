@@ -1,11 +1,14 @@
 <template>
     <NavigationBar />
     <div class="payment-app">
+        <div class="search-container">
+            <input type="text" v-model="searchQuery" @input="filterContracts" placeholder="Buscar usuario...">
+        </div>
         <button @click="openForm" id="newPaymentbtn">Nuevo Pago</button>
 
         <div class="payment-list">
-            <div v-for="(receipt, index) in paymentReceipts" :key="index" class="payment-card">
-                <div class="payment-content"> 
+            <div v-for="(receipt, index) in filteredReceipts " :key="index" class="payment-card">
+                <div class="payment-content">
                     <div class="payment-header">
                         <div class="payment-concept">Concepto: {{ receipt.concept }}</div>
                         <div class="payment-date">Fecha del Pago: {{ receipt.date }}</div>
@@ -37,7 +40,7 @@
                         <option value="" disabled selected>Recibe</option>
                         <option v-for="user in users" :key="user.idUser" :value="user.idUser">{{ user.name }}</option>
                     </select>
-                    
+
                     <!-- Action buttons -->
                     <div class="form-buttons">
                         <button type="submit">Añadir</button>
@@ -70,6 +73,8 @@ export default {
             users: [],
             typeUser: '',
             idUserHeader: '',
+            searchQuery: '',
+            filteredReceipts: [],
         };
     },
     created() {
@@ -84,10 +89,10 @@ export default {
         //si el typeUser es null, redirige a la vista raiz
         if (this.typeUser == null) {
             this.$router.push('/');
-        }   
+        }
         this.getReceipts();
         this.listAllUsers();
-        
+
     },
     methods: {
         listAllUsers() {
@@ -105,6 +110,7 @@ export default {
                 .then((response) => {
                     console.log(response.data);
                     this.paymentReceipts = response.data;
+                    this.filteredReceipts = response.data;
                 })
                 .catch((error) => {
                     console.log(error);
@@ -117,7 +123,7 @@ export default {
             const detail = this.detail;
             const buyer = this.buyer;
             const seller = this.seller;
-            this.paymentService.newPayment(amount, date, concept, detail, buyer, seller,this.idUserHeader)
+            this.paymentService.newPayment(amount, date, concept, detail, buyer, seller, this.idUserHeader)
                 .then((response) => {
                     console.log(response.data);
                     this.paymentReceipts = response.data;
@@ -161,6 +167,22 @@ export default {
             this.closeForm();
             //Reload the page
             location.reload();
+        },
+        filterContracts() {
+            if (this.searchQuery === '') {
+                this.filteredReceipts = this.paymentReceipts;
+            } else {
+                //console.log(this.filteredReceipts.length);
+                // filtrar pagos según cualquier nombre de usuario
+                this.filteredReceipts = this.paymentReceipts.filter((receipt) => {
+                    const paysMatch = receipt.nameUserPays.toLowerCase().includes(this.searchQuery.toLowerCase());
+                    const receivesMatch = receipt.nameUserReceives.toLowerCase().includes(this.searchQuery.toLowerCase());
+
+                    return paysMatch || receivesMatch;
+                });
+
+
+            }
         },
     },
     components: { NavigationBar }
@@ -236,6 +258,7 @@ export default {
     font-weight: 450;
     padding: 10px;
 }
+
 /* Style the actions section (buttons) on the payment card */
 
 
@@ -329,6 +352,31 @@ button {
         transition: all 0.5s ease-in-out;
         transform: scale(1.05);
     }
+}
+
+.search-container {
+    width: 80%;
+    position: relative;
+
+    input {
+        width: 100%;
+        padding: 10px;
+        border: 3px solid #a69b8d;
+        border-radius: 10px;
+        background-color: #fffaf1;
+    }
+
+    input:focus {
+        outline: #a69b8d solid 1px;
+    }
+}
+
+.search-container {
+    width: 93%;
+}
+
+.search-container {
+    margin-bottom: 10px;
 }
 
 /* Media query for responsiveness */

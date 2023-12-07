@@ -25,8 +25,8 @@
             {{ area.description }}
           </div>
           <div class="actions">
-            <button v-if="typeUser== 'Administrador'" @click="editArea(index)">Editar</button>
-            <button v-if="typeUser== 'Administrador'" @click="deleteArea(index)">Borrar</button>
+            <button v-if="typeUser == 'Administrador'" @click="editArea(index)">Editar</button>
+            <button v-if="typeUser == 'Administrador'" @click="deleteArea(index)">Borrar</button>
           </div>
         </div>
       </div>
@@ -36,21 +36,14 @@
     <div class="popup" v-if="showPopup">
       <div class="popup-content">
         <form>
-          <select v-model="type" required>
-            <option value="">Selecciona un tipo de area</option>
-            <option
-              v-for="option in options"
-              :key="option.value"
-              :value="option.value"
-            >
-              {{ option.text }}
+          <select v-model="selectedType" required>
+            <option value="">Selecciona un tipo de área común</option>
+            <option v-for="(type) in types" :key="type.id" :value="type" required>
+              {{ type }}
             </option>
           </select>
-          <textarea
-            v-model="description"
-            placeholder="Descripción"
-            required
-          ></textarea>
+
+          <textarea v-model="description" placeholder="Descripción" required></textarea>
           <!-- Botones de acción -->
           <div class="form-buttons">
             <button @click="createArea" v-if="!editing">Crear</button>
@@ -86,32 +79,27 @@ export default {
       index: null,
       image: null,
       selectedType: null,
-      options: [
-        { text: "Piscina", value: "Piscina" },
-        { text: "Gimnasio", value: "Gimnasio" },
-        { text: "Salón de Eventos", value: "Salón de Eventos" },
-      ],
       typeUser: '',
       userName: '',
       idUserHeader: '',
     };
   },
   created() {
-        this.typeUser = localStorage.getItem("typeUser");
-        const storedData = localStorage.getItem("userID");
-        // Parsear el JSON almacenado
-        const parsedData = JSON.parse(storedData);
-        console.log("parsedData", parsedData);
-        // Acceder al campo "name" dentro del objeto parsedData
-        this.userName = parsedData.usename;
-        this.idUserHeader = parsedData.idUser;
-        console.log("typeUser", this.typeUser);
-        console.log("userName", this.userName);
-        console.log("isUserHeader", this.idUserHeader);
-        if (this.typeUser == null) {
-            this.$router.push('/');
-        }
-    },
+    this.typeUser = localStorage.getItem("typeUser");
+    const storedData = localStorage.getItem("userID");
+    // Parsear el JSON almacenado
+    const parsedData = JSON.parse(storedData);
+    console.log("parsedData", parsedData);
+    // Acceder al campo "name" dentro del objeto parsedData
+    this.userName = parsedData.usename;
+    this.idUserHeader = parsedData.idUser;
+    console.log("typeUser", this.typeUser);
+    console.log("userName", this.userName);
+    console.log("isUserHeader", this.idUserHeader);
+    if (this.typeUser == null) {
+      this.$router.push('/');
+    }
+  },
   methods: {
     async fetchCommonAreas() {
       try {
@@ -130,6 +118,22 @@ export default {
         console.log("Failed fetching common areas:", error);
       }
       console.log(this.commonAreas);
+    },
+    async fetchTypes() {
+      try {
+        const data = await CommonAreaService.fetchTypes();
+        console.log(data);
+        if (data.responseCode === "CARE-0004" && data.data) {
+          // Mapear los datos recibidos a la estructura esperada por el componente
+          console.log(data.data);
+          this.types = data.data
+        } else {
+          console.error("Error fetching types:", data.errorMessage);
+        }
+      } catch (error) {
+        console.error("Failed to fetch types:", error);
+      }
+      console.log("types", this.types);
     },
 
     openForm() {
@@ -151,7 +155,7 @@ export default {
       const newArea = {
         description: this.description,
         idSection: 1,
-        idTypeArea: 1,
+        idTypeArea: this.selectedType ? this.selectedType.id : null,
       };
 
       try {
@@ -183,7 +187,7 @@ export default {
       const updatedArea = {
         description: this.description,
         idSection: 1,
-        idTypeArea: 2,
+        idTypeArea: this.selectedType ? this.selectedType.id : null,
       };
 
       try {
@@ -225,8 +229,9 @@ export default {
     },
   },
   mounted() {
+    this.fetchTypes();
     this.fetchCommonAreas();
-  },
+  }
 };
 </script>
 
@@ -246,6 +251,7 @@ body,
   height: 100%;
   overflow-y: auto;
 }
+
 .property-app {
   display: flex;
   flex-direction: column;
@@ -389,7 +395,7 @@ body,
   justify-content: center;
   align-items: center;
   gap: 1rem;
-  
+
 }
 
 .actions button {

@@ -16,6 +16,7 @@
                   </div>
               </div>
               <div class="post-content">
+
                   <div class="post-description">{{ post.postContent }}</div>
                   <div class="post-state">{{ post.postState }}</div>
 
