@@ -12,7 +12,7 @@
                     <div class="payment-header">
                         <div class="payment-concept">Concepto: {{ receipt.concept }}</div>
                         <div class="payment-date">Fecha del Pago: {{ receipt.date }}</div>
-                        <div class="payment-amount">Monto: {{ receipt.amount }}</div>
+                        <div class="payment-amount">Monto: {{ receipt.amount }} Bs.</div>
                     </div>
                     <div class="payment-info">
                         <div class="payment-detail">Detalle: {{ receipt.detail }}</div>
