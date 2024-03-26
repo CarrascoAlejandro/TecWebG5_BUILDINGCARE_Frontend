@@ -62,6 +62,9 @@
                   required
                 />
               </div>
+              <div v-if="passwordwarning">
+                <p>{{ passwordwarning }}</p>
+              </div>
               <div class="input-group">
                 <input
                   type="password"
@@ -109,12 +112,22 @@
             </div>
             <button @click="signIn">Iniciar Sesión</button>
 
-            <!-- <div class="footer-sign-in">
+            <div class="footer-sign-in">
               <p>
                 <span> No está registrado? </span>
                 <b @click="toggle" class="pointer"> Crear una cuenta </b>
               </p>
-            </div> -->
+              <p>
+                <span> Olvidó su contraseña? </span>
+                <!-- Redirect to RestorePasswordView -->
+                <b 
+                  @click="this.$router.push({
+                    name: 'resetPassword',
+                    params: { toggle: 'request', username: 'None' }
+                  })"
+                > Restablecer Contraseña </b>
+              </p>
+            </div>
           </div>
         </div>
         <div class="form-wrapper"></div>
@@ -151,7 +164,13 @@ export default {
       newEmail: "",
       username: "",
       password: "",
+      passwordwarning: "",
     };
+  },
+  watch: {
+    newPassword() {
+      this.checkPasswordComplexity();
+    }
   },
   created() {
     this.userService= new UserService();
@@ -160,6 +179,26 @@ export default {
     toggle() {
       this.$el.classList.toggle("sign-in");
       this.$el.classList.toggle("sign-up");
+    },
+    checkPasswordComplexity() {
+      const hasNumber = /\d/.test(this.newPassword);
+      const hasUpper = /[A-Z]/.test(this.newPassword);
+      const hasLower = /[a-z]/.test(this.newPassword);
+      const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(this.newPassword);
+
+      if (this.newPassword.length < 8){
+        this.passwordwarning = "La contraseña debe tener al menos 8 caracteres";
+      } else if (!hasNumber){
+        this.passwordwarning = "La contraseña debe tener al menos un número";
+      } else if (!hasUpper){
+        this.passwordwarning = "La contraseña debe tener al menos una letra mayúscula";
+      } else if (!hasLower){
+        this.passwordwarning = "La contraseña debe tener al menos una letra minúscula";
+      } else if (!hasSpecial){
+        this.passwordwarning = "La contraseña debe tener al menos un caracter especial";
+      } else {
+        this.passwordwarning = "";
+      }
     },
     loginUser() {
       if (this.username === "" || this.password === "") {
@@ -230,6 +269,13 @@ export default {
         Swal.fire({
           icon: 'error',
           title: 'Las contraseñas no coinciden'
+        })
+        return;
+      } else if (this.passwordwarning){
+        /* alert(this.passwordwarning); */
+        Swal.fire({
+          icon: 'error',
+          title: this.passwordwarning
         })
         return;
       } else {
