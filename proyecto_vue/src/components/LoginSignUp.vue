@@ -165,6 +165,7 @@ export default {
       username: "",
       password: "",
       passwordwarning: "",
+      attempts: 0,
     };
   },
   watch: {
@@ -209,7 +210,7 @@ export default {
         })
         return;
       }
-      axios //TODO consumir service de login -> UserServie
+      axios
         .post("http://localhost:8080/api/v1/user/login", {
           username: this.username,
           password: this.password,
@@ -223,18 +224,34 @@ export default {
             /* alert(
               "Los datos ingresados son incorrectos. Por favor, intente nuevamente."
             ); */
-            Swal.fire({
-              icon: 'error',
-              title: 'Los datos ingresados son incorrectos.',
-              text: 'Por favor, intente nuevamente.'
-            })
+            
+            
           } else if (data.data) {
             localStorage.setItem("userID", JSON.stringify(data.data));
             /* alert("Ingreso exitoso"); */
-            Swal.fire({
-              icon: 'success',
-              title: 'Ingreso exitoso'
-            })
+            console.log(data.data);
+            if (data.data.warnings.length > 0) {
+              data.data.warnings.forEach((warning) => {
+                /* alert(warning); */
+                Swal.fire({
+                  icon: 'warning',
+                  title: warning,
+                  showCancelButton: true,
+                  confirmButtonText: 'Reset Password',
+                  cancelButtonText: 'Más tarde',
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    this.$router.push("/resetPassword/reset/"+this.username);
+                  }
+                });
+              });
+            } else {
+              /* alert("Ingreso exitoso"); */
+              Swal.fire({
+                icon: 'success',
+                title: 'Ingreso exitoso'
+              })
+            }
             //guardamos los datos de data.data en el local storage
             const typeUser = data.data.typeUser;
             localStorage.setItem('typeUser', typeUser);
@@ -245,7 +262,29 @@ export default {
             console.log("el tipo de usuario es "+storedTypeUser);
             this.$router.push("/propertyView");
           } else if (data.errorMessage) {
-            alert(data.errorMessage);
+            this.attempts++;
+            console.log(this.attempts);
+            if(this.attempts >= 3){
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Ha excedido el número de intentos permitidos. Ha olvidado su contraseña?',
+                showCancelButton: true,
+                confirmButtonText: 'Restaurar contraseña',
+                cancelButtonText: 'Más tarde',
+              })
+              .then((result) => {
+                if (result.isConfirmed) {
+                  this.$router.push("/resetPassword/request/None");
+                }
+              });
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Los datos ingresados son incorrectos.',
+                text: 'Por favor, intente nuevamente.'
+              })
+            }
           }
         })
         .catch((err) => {
