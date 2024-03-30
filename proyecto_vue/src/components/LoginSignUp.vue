@@ -125,6 +125,7 @@
                     name: 'resetPassword',
                     params: { toggle: 'request', username: 'None' }
                   })"
+                  class="pointer"
                 > Restablecer Contraseña </b>
               </p>
             </div>
@@ -322,10 +323,18 @@ export default {
         this.userService.signUpUser(this.newName, this.newUsername, this.newPassword, this.newEmail, this.newCI, this.newPhone, 3).then((response) => {//se manda el tipo de user como inquilino
           //verificar el codigo de envio
           if(response.responseCode =="USER-0002" ){
-            alert("Registro exitoso")
-            this.$router.push("/login");
+            Swal.fire({
+              icon: 'success',
+              title: 'Registro exitoso'
+            }).then(() => {
+              this.toggle();
+            });
           }else{
-            alert("Error en el registro")
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: response.errorMessage
+            });
           }
         });
         

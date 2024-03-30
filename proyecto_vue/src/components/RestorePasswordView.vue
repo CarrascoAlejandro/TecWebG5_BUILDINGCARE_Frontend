@@ -261,6 +261,7 @@ export default {
 
 .head-signUp,
 .head-signUp {
+  padding-top: 15vh;
   color: #101e26;
 }
 
@@ -318,6 +319,10 @@ export default {
   transform: scale(0);
   transition: 0.5s ease-in-out;
   transition-delay: 1s;
+}
+
+.form.sign-up {
+  min-height: 100vh;
 }
 
 .input-group {
@@ -440,7 +445,7 @@ export default {
   right: 50%;
   border-top-left-radius: max(0vh, 0vh);
   border-bottom-right-radius: max(30vh, 30vh);
-  background-image: url("@/assets/images/living1.jpg");
+  background-image: url("@/assets/images/seguridad2.jpg");
   background-size: contain;
   background-repeat: no-repeat;
 }
@@ -450,7 +455,7 @@ export default {
   right: 50%;
   border-top-left-radius: max(30vh, 30vh);
   border-bottom-right-radius: max(0vh, 0vh);
-  background-image: url("@/assets/images/living2.jpg");
+  background-image: url("@/assets/images/seguridad1.jpg");
   background-size: contain;
   background-repeat: no-repeat;
 }

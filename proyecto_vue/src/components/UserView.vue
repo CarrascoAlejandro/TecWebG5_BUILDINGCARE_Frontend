@@ -42,6 +42,7 @@
     <div class="userForm" v-if="showpopup">
       <div class="popup-content">
         <form @submit.prevent="updateUser">
+          <input v-model="nickname" placeholder="Alias" type="text" required disabled style="background-color: #f4f3e6;"/>
           <input
             v-model="name"
             placeholder="Nombre de Usuario"
@@ -54,16 +55,9 @@
             type="email"
             required
           />
-          <input v-model="nickname" placeholder="Alias" type="text" required />
           <input
             v-model="carnet"
             placeholder="Carnet de Identidad"
-            type="text"
-            required
-          />
-          <input
-            v-model="password"
-            placeholder="Contraseña de la Cuenta"
             type="text"
             required
           />
@@ -82,6 +76,7 @@
               {{ role }}
             </option>
           </select>
+          <button @click="openResetInNewTab">Cambiar Contraseña</button>
           <!-- Botones de acción -->
           <div class="form-buttons">
             <button @click="signUp" type="submit" v-if="!userEditing">
@@ -305,6 +300,12 @@ export default {
     changeRole() {
       // Change the role of a user
       this.adminCredential = true;
+    },
+    openResetInNewTab() {
+      let routeUrl = this.$router.resolve({
+        path: "/resetPassword/reset/" + this.nickname
+      });
+      window.open(routeUrl.href, "_blank");
     },
   },
   components: {

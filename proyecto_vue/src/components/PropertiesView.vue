@@ -134,6 +134,7 @@ import PropertiesService from "../service/PropertiesService.js";
 import { uploadImage } from "../service/ImageService.js";
 
 import NavigationBar from "./NavigationBar.vue";
+import Swal from "sweetalert2";
 export default {
   name: "PropertiesView",
   components: {
@@ -387,20 +388,30 @@ export default {
     },
     async deleteProperty(index) {
       const property = this.properties[index];
-      if (confirm("¿Seguro que desea eliminar esta propiedad?")) {
-        try {
-          const success = await this.propertiesService.deleteProperty(
-            property.id
-          );
-          if (success) {
-            this.properties.splice(index, 1);
-          } else {
-            console.error("Error deleting property");
-          }
-        } catch (error) {
-          console.error("Failed to delete property:", error);
+      Swal.fire({
+        title: "¿Estás seguro?",
+        text: "¡No podrás revertir esto!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sí, bórralo",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+            try {
+              const success = await this.propertiesService.deleteProperty(
+                property.id
+              );
+              if (success) {
+                this.properties.splice(index, 1);
+              } else {
+                console.error("Error deleting property");
+              }
+            } catch (error) {
+              console.error("Failed to delete property:", error);
+            }
         }
-      }
+      });
     },
     closeForm() {
       this.showPopup = false;
