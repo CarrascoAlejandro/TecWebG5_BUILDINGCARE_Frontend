@@ -99,4 +99,38 @@ export default class UserService{
             throw err;
         }
     }
+
+    async requestResetPassword(username, email){
+        try{
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            const data = {
+                username: username,
+                email: email,
+            }
+            const response = await axios.post(this.url+'/request_reset_password', null, { headers, params: data });
+            return response.data;
+        }catch(err){
+            console.error('Error al solicitar cambio de contraseña:', err);
+            throw err;
+        }
+    }
+
+    async doResetPassword(username, password){
+        try{
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            const data = {
+                username: username,
+                newPassword: password,
+            }
+            const response = await axios.patch(this.url+'/reset_password', data, { headers });
+            return response.data;
+        }catch(err){
+            console.error('Error al cambiar contraseña:', err);
+            throw err;
+        }
+    }
 }

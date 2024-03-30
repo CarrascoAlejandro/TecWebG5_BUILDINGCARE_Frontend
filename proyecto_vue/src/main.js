@@ -10,6 +10,7 @@ import PropertiesView from "./components/PropertiesView.vue";
 import PaymentsView from "./components/PaymentsView.vue";
 import ContractsView from "./components/ContractsView2.vue";
 import CommonAreaView from "./components/CommonAreaView.vue";
+import RestorePasswordView from "./components/RestorePasswordView.vue";
 
 /**end pages **/
 
@@ -53,6 +54,12 @@ const routes = [
     path: "/commonAreaView",
     component: CommonAreaView,
   },
+  {
+    name: "resetPassword",
+    path: "/resetPassword/:toggle/:username",
+    component: RestorePasswordView,
+
+  }
 ];
 
 const router = createRouter({

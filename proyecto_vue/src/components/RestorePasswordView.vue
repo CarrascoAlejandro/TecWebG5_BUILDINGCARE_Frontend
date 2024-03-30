@@ -1,57 +1,22 @@
 <template>
   <div id="container" class="container">
     <div class="row">
-      <!-- REGISTRARSE -->
+      <!-- CAMBIAR CONTRASENNA -->
       <div class="col align-items-center flex-col sign-up">
         <div class="form-wrapper align-items-center">
           <div class="form sign-up">
             <div class="head-signUp">
               <img src="@/assets/logos/bcareNegro.png" />
-              <h2>Registrarse</h2>
-            </div>
-            <div class="sign-up-inputs">
-              <div class="personal-info">
-                <div class="input-group">
-                  <input
-                    type="text"
-                    v-model="newName"
-                    placeholder="Nombre Completo"
-                    required
-                  />
-                </div>
-              </div>
-              <div class="input-group">
-                <input
-                  type="text"
-                  v-model="newCI"
-                  placeholder="Cédula de Identidad"
-                  required
-                />
-              </div>
-              <div class="input-group">
-                <input
-                  type="text"
-                  v-model="newPhone"
-                  placeholder="Teléfono"
-                  required
-                />
-              </div>
+              <h2>Cambiar contraseña</h2>
             </div>
             <div class="site-info">
               <div class="input-group">
                 <input
                   type="text"
-                  v-model="newEmail"
-                  placeholder="email"
-                  required
-                />
-              </div>
-              <div class="input-group">
-                <input
-                  type="text"
-                  v-model="newUsername"
+                  v-model="username"
                   placeholder="Nombre de Usuario"
-                  required
+                  disabled
+                  style="background-color: #f4f3e6"
                 />
               </div>
               <div class="input-group">
@@ -75,24 +40,23 @@
               </div>
             </div>
             
-            <button @click="signUp">Registrarse</button>
+            <button @click="doResetPassword">Cambiar contraseña</button>
             <div class="footer-sign-up">
               <p>
-                <span> Ya está registrado? </span>
-                <b @click="toggle" class="pointer"> Iniciar Sesión </b>
+                <span> Después de cambiar la contraseña será redirigido a login. </span>
               </p>
             </div>
           </div>
         </div>
       </div>
-      <!-- FIN REGISTRO -->
-      <!-- LOGIN -->
+      <!-- FIN CAMBIAR CONTRASENNA -->
+      <!-- SOLICITAR CAMBIO DE CONTRASENNA -->
       <div class="col align-items-center flex-col sign-in">
         <div class="form-wrapper align-items-center">
           <div class="form sign-in">
             <div class="head-signUp">
               <img src="@/assets/logos/bcareNegro.png" alt="logo" />
-              <h2>Iniciar Sesión</h2>
+              <h2>Recupera tu contraseña</h2>
             </div>
             <div class="input-group">
               <input
@@ -104,35 +68,25 @@
             </div>
             <div class="input-group">
               <input
-                type="password"
-                v-model="password"
-                placeholder="Contraseña"
+                type="text"
+                v-model="email"
+                placeholder="Correo electrónico"
                 required
               />
             </div>
-            <button @click="signIn">Iniciar Sesión</button>
-
+              <button @click="requestResetPassword" :disabled="isRequesting">
+                {{ isRequesting ? 'Espera un momento' : 'Solicitar Correo' }}
+              </button>
             <div class="footer-sign-in">
               <p>
-                <span> No está registrado? </span>
-                <b @click="toggle" class="pointer"> Crear una cuenta </b>
-              </p>
-              <p>
-                <span> Olvidó su contraseña? </span>
-                <!-- Redirect to RestorePasswordView -->
-                <b 
-                  @click="this.$router.push({
-                    name: 'resetPassword',
-                    params: { toggle: 'request', username: 'None' }
-                  })"
-                > Restablecer Contraseña </b>
+                <span> Sigue los pasos en el correo para cambiar tu contraseña </span>
               </p>
             </div>
           </div>
         </div>
         <div class="form-wrapper"></div>
       </div>
-      <!-- END LOGIN -->
+      <!-- FIN SOLICITAR CAMBIO -->
     </div>
 
     <div class="row content-row">
@@ -148,24 +102,18 @@
 </template>
 
 <script>
-import axios from "axios";
 import UserService from '../service/UserService';
 import Swal from 'sweetalert2';
 export default {
   
   data() {
     return {
-      newUsername: "",
       newPassword: "",
       confirmPassword: "",
-      newName: "",
-      newCI: "",
-      newPhone: "",
-      newEmail: "",
       username: "",
-      password: "",
+      email: "",
       passwordwarning: "",
-      attempts: 0,
+      isRequesting: false,
     };
   },
   watch: {
@@ -201,99 +149,40 @@ export default {
         this.passwordwarning = "";
       }
     },
-    loginUser() {
-      if (this.username === "" || this.password === "") {
-        //alert("Uno o más campos están vacíos");
+    requestResetPassword() {
+      if (this.username === "" || this.email === "") {
+        /* alert("Uno o más campos están vacíos"); */
         Swal.fire({
           icon: 'error',
           title: 'Uno o más campos están vacíos'
         })
         return;
       }
-      axios
-        .post("http://localhost:8080/api/v1/user/login", {
-          username: this.username,
-          password: this.password,
-        })
-        .then(({ data }) => {
-          if (
-            data.responseCode === null &&
-            data.data === null &&
-            data.errorMessage === null
-          ) {
-            /* alert(
-              "Los datos ingresados son incorrectos. Por favor, intente nuevamente."
-            ); */
-            
-            
-          } else if (data.data) {
-            localStorage.setItem("userID", JSON.stringify(data.data));
-            /* alert("Ingreso exitoso"); */
-            console.log(data.data);
-            if (data.data.warnings.length > 0) {
-              data.data.warnings.forEach((warning) => {
-                /* alert(warning); */
-                Swal.fire({
-                  icon: 'warning',
-                  title: warning,
-                  showCancelButton: true,
-                  confirmButtonText: 'Reset Password',
-                  cancelButtonText: 'Más tarde',
-                }).then((result) => {
-                  if (result.isConfirmed) {
-                    this.$router.push("/resetPassword/reset/"+this.username);
-                  }
-                });
-              });
-            } else {
-              /* alert("Ingreso exitoso"); */
-              Swal.fire({
-                icon: 'success',
-                title: 'Ingreso exitoso'
-              })
+      this.isRequesting = true;
+      this.userService.requestResetPassword(this.username, this.email).then((response) => {
+        if(response.responseCode =="USER-0006" ){
+          Swal.fire({
+            icon: 'success',
+            title: 'Correo enviado',
+            text: 'Revisa tu correo para cambiar tu contraseña'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              this.$router.push("/login");
             }
-            //guardamos los datos de data.data en el local storage
-            const typeUser = data.data.typeUser;
-            localStorage.setItem('typeUser', typeUser);
-            //guardando los datos del usuario por si fueran de utilidad 
-            localStorage.setItem("userID", JSON.stringify(data.data));
-            //redireccionamos a la vista de payments
-            const storedTypeUser = localStorage.getItem('typeUser');
-            console.log("el tipo de usuario es "+storedTypeUser);
-            this.$router.push("/propertyView");
-          } else if (data.errorMessage) {
-            this.attempts++;
-            console.log(this.attempts);
-            if(this.attempts >= 3){
-              Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Ha excedido el número de intentos permitidos. Ha olvidado su contraseña?',
-                showCancelButton: true,
-                confirmButtonText: 'Restaurar contraseña',
-                cancelButtonText: 'Más tarde',
-              })
-              .then((result) => {
-                if (result.isConfirmed) {
-                  this.$router.push("/resetPassword/request/None");
-                }
-              });
-            } else {
-              Swal.fire({
-                icon: 'error',
-                title: 'Los datos ingresados son incorrectos.',
-                text: 'Por favor, intente nuevamente.'
-              })
-            }
-          }
-        })
-        .catch((err) => {
-          alert("Error en la conexión con el servidor: ", err);
-        });
+          })
+        }else{
+          Swal.fire({
+            icon: 'error',
+            title: 'Error al enviar el correo',
+            text: 'Verifica que los datos sean correctos'
+          })
+        }
+        this.isRequesting = false;
+      });
     },
-    signUp() {
+    doResetPassword() {
       if (
-        this.newUsername === "" ||
+        this.username === "" ||
         this.newPassword === "" ||
         this.confirmPassword === ""
       ) {
@@ -319,26 +208,43 @@ export default {
         return;
       } else {
         // Aquí puedes agregar la llamada API para registrar al usuario si lo necesitas.
-        this.userService.signUpUser(this.newName, this.newUsername, this.newPassword, this.newEmail, this.newCI, this.newPhone, 3).then((response) => {//se manda el tipo de user como inquilino
-          //verificar el codigo de envio
-          if(response.responseCode =="USER-0002" ){
-            alert("Registro exitoso")
-            this.$router.push("/login");
+        this.userService.doResetPassword(this.username, this.newPassword).then((response) => {
+          if(response.responseCode =="USER-0005" ){
+            Swal.fire({
+              icon: 'success',
+              title: 'Contraseña cambiada',
+              text: 'Inicia sesión con tu nueva contraseña'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                this.$router.push("/login");
+              }
+            })
           }else{
-            alert("Error en el registro")
+            Swal.fire({
+              icon: 'error',
+              title: 'Error al cambiar la contraseña',
+              text: 'Verifica que los datos sean correctos'
+            })
           }
         });
         
       }
-    },
-    signIn() {
-      this.loginUser();
-    },
+    }
   },
   mounted() {
-    setTimeout(() => {
-      this.$el.classList.add("sign-in");
-    }, 200);
+    // resetPassword/request/None
+    if (this.$route.params.username === "None") {
+      setTimeout(() => {
+        this.$el.classList.add("sign-in");
+      }, 200);
+
+    // resetPassword/reset/{username}
+    } else {
+      this.username = this.$route.params.username;
+      setTimeout(() => {
+        this.$el.classList.add("sign-up");
+      }, 200);
+    }
   },
 };
 </script>
