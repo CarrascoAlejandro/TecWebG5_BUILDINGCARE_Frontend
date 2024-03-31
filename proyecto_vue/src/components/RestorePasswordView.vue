@@ -223,7 +223,7 @@ export default {
             Swal.fire({
               icon: 'error',
               title: 'Error al cambiar la contraseña',
-              text: 'Verifica que los datos sean correctos'
+              text: response.errorMessage
             })
           }
         });
