@@ -8,9 +8,23 @@
             <div class="head-signUp">
               <img src="@/assets/logos/bcareNegro.png" />
               <h2>Registrarse</h2>
+              <div>
+                  <b>Bienvenido! Ingresa tu información para completar tu registro.</b>
+              </div>
             </div>
             <div class="sign-up-inputs">
               <div class="personal-info">
+                <div class="input-group">
+                <input
+                  type="text"
+                  v-model="newUsername"
+                  placeholder="Nombre de Usuario"
+                  required
+                />
+                <div>
+                  <p>Tu nombre de usuario es un identificador único, no puedes cambiarlo después</p>
+                </div>
+                </div>
                 <div class="input-group">
                   <input
                     type="text"
@@ -20,7 +34,7 @@
                   />
                 </div>
               </div>
-              <div class="input-group">
+              <!-- <div class="input-group">
                 <input
                   type="text"
                   v-model="newCI"
@@ -35,7 +49,7 @@
                   placeholder="Teléfono"
                   required
                 />
-              </div>
+              </div>-->
             </div>
             <div class="site-info">
               <div class="input-group">
@@ -43,14 +57,6 @@
                   type="text"
                   v-model="newEmail"
                   placeholder="email"
-                  required
-                />
-              </div>
-              <div class="input-group">
-                <input
-                  type="text"
-                  v-model="newUsername"
-                  placeholder="Nombre de Usuario"
                   required
                 />
               </div>
@@ -160,8 +166,8 @@ export default {
       newPassword: "",
       confirmPassword: "",
       newName: "",
-      newCI: "",
-      newPhone: "",
+      newCI: "Sin asignar",
+      newPhone: "Sin asignar",
       newEmail: "",
       username: "",
       password: "",
@@ -370,6 +376,7 @@ export default {
 .head-signUp img {
   width: 100%;
   max-width: 10rem;
+  padding-top: 3vh;
 }
 
 .head-signUp h2 {
@@ -556,6 +563,10 @@ export default {
   background-image: url("@/assets/images/living2.jpg");
   background-size: contain;
   background-repeat: no-repeat;
+}
+
+.form.sign-up {
+  min-height: 100vh;
 }
 
 /* RESPONSIVE */
