@@ -31,14 +31,15 @@ export default {
       activeNavItem: "about",
       isMenuOpen: false,
       navItems: [
-        { name: "users", label: "Usuarios" },
-        { name: "blog", label: "Anuncios" },
-        // { name: "payments", label: "Pagos" },
-        { name: "houses", label: "Propiedades" },
-        { name: "commonAreas", label: "Áreas Comunes" },
-        // { name: "contracts", label: "Contratos" },
-        { name: "logOut", label: "Cerrar Sesión" },
+          { name: "users", label: "Usuarios", p_name: "Users" },
+          { name: "blog", label: "Anuncios", p_name: "Posts" },
+          { name: "payments", label: "Pagos", p_name: "Payments" },
+          { name: "houses", label: "Propiedades", p_name: "Properties" },
+          { name: "commonAreas", label: "Áreas Comunes", p_name: "CommonAreas" },
+          { name: "contracts", label: "Contratos", p_name: "Contracts" },
+          { name: "logOut", label: "Cerrar Sesión", p_name: "LogOut"},
       ],
+      privileges: {}
     };
   },
   created() {
@@ -53,19 +54,28 @@ export default {
         console.log("parsedData", parsedData);
         // Acceder al campo "name" dentro del objeto parsedData
         this.userName = parsedData.usename;
+        // Copiar privilegios de acceso
+        this.privileges = parsedData.roleAssignation.privileges;
+        console.log("privileges en navbar", this.privileges);
         console.log("typeUser", this.typeUser);
         console.log("userName", this.userName);
-        if(this.typeUser==='Administrador'){
-          this.navItems= [
-        { name: "users", label: "Usuarios" },
-        { name: "blog", label: "Anuncios" },
-        { name: "payments", label: "Pagos" },
-        { name: "houses", label: "Propiedades" },
-        { name: "commonAreas", label: "Áreas Comunes" },
-        { name: "contracts", label: "Contratos" },
-        { name: "logOut", label: "Cerrar Sesión" },
-      ]
+        
+        this.navItems= [
+          { name: "users", label: "Usuarios", p_name: "Users" },
+          { name: "blog", label: "Anuncios", p_name: "Posts" },
+          { name: "payments", label: "Pagos", p_name: "Payments" },
+          { name: "houses", label: "Propiedades", p_name: "Properties" },
+          { name: "commonAreas", label: "Áreas Comunes", p_name: "CommonAreas" },
+          { name: "contracts", label: "Contratos", p_name: "Contracts" },
+          { name: "logOut", label: "Cerrar Sesión", p_name: "LogOut"},
+        ];
+        for(let i = 0; i < this.navItems.length; i++){
+          if(this.privileges[this.navItems[i].p_name] === "Ninguno" && this.navItems[i].p_name !== "LogOut"){
+            this.navItems.splice(i, 1);
+            i--;
+          }
         }
+        
         }catch(error){
           console.log(error);
           this.$router.push('/');

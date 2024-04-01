@@ -69,7 +69,7 @@ export default class UserService{
                 'Content-Type': 'application/json',
                 'Authorization': this.tokenValue,
             };
-            const response = await axios.get(this.url+'/type/all', { headers });
+            const response = await axios.get('http://localhost:8080/api/v1/roles/list', { headers });
             return response;
         }catch(err){
             console.error('Error al listar tipos de usuarios:', err);

@@ -1,10 +1,10 @@
 <template>
   <NavigationBar></NavigationBar>
-  <div v-if="typeUser === 'Administrador'" class="contract-app">
+  <div v-if="privileges.Contracts === 'Modificacion'" class="contract-app">
     <div class="search-container">
       <input type="text" v-model="searchQuery" @input="filterContracts" placeholder="Buscar propietario...">
     </div>
-    <button v-if="typeUser === 'Administrador'" @click="openForm" id="newPaymentbtn">
+    <button v-if="privileges.Contracts === 'Modificacion'" @click="openForm" id="newPaymentbtn">
       Registrar Nuevo Contrato
     </button>
 
@@ -134,6 +134,8 @@ export default {
 
       searchQuery: '',
       filteredReceipts: [],
+
+      privileges: {},
     };
   },
   created() {
@@ -153,6 +155,8 @@ export default {
     //
     console.log("typeUser", this.typeUser);
     console.log("userName", this.userName);
+    // Copiar los privilegios del usuario
+    this.privileges = parsedData.roleAssignation.privileges;
     console.log("token", this.token);
     if (this.typeUser == null) {
         this.$router.push('/');

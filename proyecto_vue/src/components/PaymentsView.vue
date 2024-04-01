@@ -1,6 +1,6 @@
 <template>
     <NavigationBar />
-    <div  v-if="typeUser === 'Administrador'"  class="payment-app">
+    <div  v-if="privileges.Payments === 'Modificacion'"  class="payment-app">
         <div class="search-container">
             <input type="text" v-model="searchQuery" @input="filterContracts" placeholder="Buscar usuario...">
         </div>
@@ -75,6 +75,7 @@ export default {
             idUserHeader: '',
             searchQuery: '',
             filteredReceipts: [],
+            privileges: '',
         };
     },
     created() {
@@ -88,6 +89,9 @@ export default {
         const parsedData = JSON.parse(storedData);
         this.idUserHeader = parsedData.idUser;
         this.typeUser = localStorage.getItem('typeUser');
+        //Copiar privilegios de acceso
+        this.privileges = parsedData.roleAssignation.privileges;
+        console.log("Payments privileges", this.privileges);
         //si el typeUser es null, redirige a la vista raiz
         if (this.typeUser == null) {
             this.$router.push('/');

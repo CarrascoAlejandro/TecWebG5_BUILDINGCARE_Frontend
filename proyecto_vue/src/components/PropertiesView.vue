@@ -6,7 +6,7 @@
         <button
           class="add-button"
           @click="openForm"
-          v-if="typeUser !== 'Inquilino'"
+          v-if="privileges.Properties === 'Modificacion'"
         >
           Añadir Propiedad
         </button>
@@ -54,16 +54,15 @@
             <button
               @click="editProperty(index)"
               v-if="
-                typeUser != 'Inquilino' &&
-                ((typeUser == 'Socio' && nameUser === property.propertyOwner) ||
-                  typeUser == 'Administrador')
+                ((typeUser == 'Editor' && nameUser === property.propertyOwner) ||
+                  privileges.Properties === 'Modificacion')
               "
             >
               Editar
             </button>
             <button
               @click="deleteProperty(index)"
-              v-if="typeUser === 'Administrador'"
+              v-if="privileges.Properties === 'Modificacion'"
             >
               Borrar
             </button>
@@ -158,6 +157,7 @@ export default {
       image: null,
       selectedType: null,
       idUserHeader: "",
+      privileges: {},
     };
   },
   computed: {
@@ -181,18 +181,20 @@ export default {
   created() {
     try{
       this.typeUser = localStorage.getItem("typeUser");
-    const storedData = localStorage.getItem("userID");
-    // Parsear el JSON almacenado
-    const parsedData = JSON.parse(storedData);
-    // Acceder al campo "name" dentro del objeto parsedData
-    this.nameUser = parsedData.name;
-    this.idUserHeader = parsedData.idUser;
-    this.propertiesService = new PropertiesService(this.idUserHeader);
-    console.log("typeUser", this.typeUser);
-    console.log("nameUser", this.nameUser);
-    if (this.typeUser == null) {
-      this.$router.push("/");
-    }
+      const storedData = localStorage.getItem("userID");
+      // Parsear el JSON almacenado
+      const parsedData = JSON.parse(storedData);
+      // Acceder al campo "name" dentro del objeto parsedData
+      this.nameUser = parsedData.name;
+      this.idUserHeader = parsedData.idUser;
+      this.propertiesService = new PropertiesService(this.idUserHeader);
+      console.log("typeUser", this.typeUser);
+      console.log("privileges", parsedData.roleAssignation);
+      this.privileges = parsedData.roleAssignation.privileges;
+      console.log("nameUser", this.nameUser);
+      if (this.typeUser == null) {
+        this.$router.push("/");
+      }
     }catch(error){
       console.log(error);
       this.$router.push("/");

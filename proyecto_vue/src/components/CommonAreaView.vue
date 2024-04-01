@@ -4,7 +4,7 @@
     <div class="utilities">
       <div class="add-area">
         <div class="add-btn">
-          <button v-if="typeUser=== 'Administrador'"  class="add-button" @click="openForm">
+          <button v-if="privileges.CommonAreas === 'Modificacion'"  class="add-button" @click="openForm">
             Añadir Area Común
           </button>
         </div>
@@ -32,11 +32,11 @@
             {{ area.description }}
           </div>
           <div class="actions">
-            <button v-if="typeUser == 'Administrador'" @click="editArea(index)">
+            <button v-if="privileges.CommonAreas === 'Modificacion'" @click="editArea(index)">
               Editar
             </button>
             <button
-              v-if="typeUser == 'Administrador'"
+              v-if="privileges.CommonAreas === 'Modificacion'"
               @click="deleteArea(index)"
             >
               Borrar
@@ -101,6 +101,7 @@ export default {
       userName: "",
       idUserHeader: "",
       searchText: "",
+      privileges: {},
     };
   },
   created() {
@@ -113,6 +114,8 @@ export default {
     // Acceder al campo "name" dentro del objeto parsedData
     this.userName = parsedData.usename;
     this.idUserHeader = parsedData.idUser;
+    // Copiar privilegios de acceso
+    this.privileges = parsedData.roleAssignation.privileges;
     console.log("typeUser", this.typeUser);
     console.log("userName", this.userName);
     console.log("isUserHeader", this.idUserHeader);

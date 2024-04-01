@@ -3,7 +3,7 @@
   <div class="container">
     <div class="utilities">
       <button
-        v-if="typeUser === 'Administrador'"
+        v-if="privileges.Users === 'Modificacion'"
         class="btn btn-primary"
         @click="addRole"
       >
@@ -17,7 +17,7 @@
           <!-- Imagina que tienes una imagen predeterminada para cada tipo de rol o puedes añadir una propiedad de imagen a cada rol si es necesario -->
           <img
             class="profile-picture"
-            src="ruta_a_la_imagen_correspondiente"
+            :src="role.name === 'Admin' ? admin_pic : role.name === 'Editor' ? propietario_pic : inquilino_pic"
             alt="profile-pic"
           />
           <!-- Muestra el nombre del rol -->
@@ -38,12 +38,20 @@
             class="btn btn-primary"
             style="margin-right: 10px"
             @click="editRole(role)"
+            v-if="role.name !== 'Admin' && role.name !== 'Usuario Base'"
           >
             Editar
           </button>
-          <button class="btn btn-primary" @click="deleteRole(role)">
+          <button 
+            class="btn btn-primary" 
+            @click="deleteRole(role)" 
+            v-if="role.name !== 'Admin' && role.name !== 'Usuario Base'"
+          >
             Eliminar
           </button>
+          <div v-else>
+            <p>Este rol no puede ser modificado ni eliminado</p>
+          </div>
         </div>
       </div>
     </div>
@@ -55,11 +63,12 @@
             placeholder="Nombre del Rol"
             type="text"
             required
+            :disabled="roleEditing"
           />
           <p>Área Común</p>
           <select
             v-model="commonAreas"
-            :disabled="typeUser !== 'Administrador'"
+            :disabled="privileges.Users !== 'Modificacion'"
             required
           >
             <option value="Lectura">Lectura</option>
@@ -69,7 +78,7 @@
           <p>Anuncios</p>
           <select
             v-model="posts"
-            :disabled="typeUser !== 'Administrador'"
+            :disabled="privileges.Users !== 'Modificacion'"
             required
           >
             <option value="Lectura">Lectura</option>
@@ -79,7 +88,7 @@
           <p>Pagos</p>
           <select
             v-model="payments"
-            :disabled="typeUser !== 'Administrador'"
+            :disabled="privileges.Users !== 'Modificacion'"
             required
           >
             <option value="Lectura">Lectura</option>
@@ -89,27 +98,27 @@
           <p>Usuarios</p>
           <select
             v-model="users"
-            :disabled="typeUser !== 'Administrador'"
+            :disabled="privileges.Users !== 'Modificacion'"
             required
           >
             <option value="Lectura">Lectura</option>
             <option value="Modificacion">Modificación</option>
-            <option value="Ninguno">Ninguno</option>
+            <option value="Ninguno" disabled>Ninguno</option>
           </select>
           <p>Propiedades</p>
           <select
             v-model="properties"
-            :disabled="typeUser !== 'Administrador'"
+            :disabled="privileges.Users !== 'Modificacion'"
             required
           >
             <option value="Lectura">Lectura</option>
             <option value="Modificacion">Modificación</option>
-            <option value="Ninguno">Ninguno</option>
+            <option value="Ninguno" disabled>Ninguno</option>
           </select>
           <p>Contratos</p>
           <select
             v-model="contracts"
-            :disabled="typeUser !== 'Administrador'"
+            :disabled="privileges.Users !== 'Modificacion'"
             required
           >
             <option value="Lectura">Lectura</option>
@@ -133,6 +142,7 @@ import RoleService from "@/service/RoleService";
 import Administrador from "@/assets/images/admin.png";
 import Inquilino from "@/assets/images/user.png";
 import Propietario from "@/assets/images/property.png";
+import Swal from "sweetalert2";
 
 export default {
   data() {
@@ -160,6 +170,7 @@ export default {
       admin_pic: Administrador,
       inquilino_pic: Inquilino,
       propietario_pic: Propietario,
+      privileges: {},
     };
   },
   created() {
@@ -170,12 +181,15 @@ export default {
       const parsedData = JSON.parse(storedData);
       // Acceder al campo "name" dentro del objeto parsedData
       this.idUserStore = parsedData.idUser;
+      // Copiar privilegios de acceso
+      this.privileges = parsedData.roleAssignation.privileges;
       this.userService = new UserService(this.idUserStore);
       this.roleService = new RoleService();
       console.log("typeUser", this.typeUser);
       console.log("idUser", this.idUserStore);
       this.loadRoles();
       this.fetchRoles();
+      console.log("whyyy")
       if (this.typeUser == null) {
         this.$router.push("/");
       }
@@ -193,9 +207,16 @@ export default {
       this.userService
         .listAllUserTypes()
         .then((response) => {
-          console.log(response.data.data);
+          let temp = [];
+          console.log("loaded roles", response.data.data);
           for (let i = 0; i < response.data.data.length; i++) {
-            this.roles.push(response.data.data[i].permission);
+            if(response.data.data[i].name !== 'Admin' && response.data.data[i].name !== 'Usuario Base'){
+              //Append at the end of the array
+              this.roles.push(response.data.data[i].name);
+            } else {
+              //temp.push(response.data.data[i].name);
+            } 
+            this.roles = this.roles.concat(temp);
           }
         })
         .catch((error) => {
@@ -203,7 +224,7 @@ export default {
         });
     },
     verifyPermission() {
-      if (this.typeUser != "Administrador") {
+      if (this.privileges.Users !== 'Modificacion') {
         // Buscar el registro en this.users con idUser igual a this.idUserStore
         this.users = this.users.filter(
           (user) => user.idUser === this.idUserStore
@@ -228,7 +249,7 @@ export default {
       try {
         const data = await this.roleService.fetchRoles();
         if (data.responseCode === "ROLE-0000" && data.data) {
-          console.log("data", data);
+          console.log("data", data.data);
           // Mapeamos los datos para asignar cada privilegio a su variable correspondiente
           this.roles = data.data.map((role) => ({
             name: role.name,
@@ -239,9 +260,16 @@ export default {
             properties: role.privileges.Properties,
             contracts: role.privileges.Contracts,
           }));
+          // Reassign roles "Admin" and "Usuario Base" to the last two positions
+          this.roles = this.roles.sort((a) => {
+            if (a.name === "Admin") return 1;
+            if (a.name === "Usuario Base") return 1;
+            return -1;
+          });
         } else {
           console.error("Error fetching roles: ", data.errorMessage);
         }
+        console.log("roles", this.roles);
       } catch (error) {
         console.error(
           "Failed to fetch roles:",
@@ -263,7 +291,23 @@ export default {
         },
       };
       console.log(role);
-
+      //Verificar que se hayan asignado todos los permisos
+      if (
+        !role.name ||
+        !role.privileges.CommonAreas ||
+        !role.privileges.Posts ||
+        !role.privileges.Payments ||
+        !role.privileges.Users ||
+        !role.privileges.Properties ||
+        !role.privileges.Contracts
+      ) {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Por favor, completa todos los campos.",
+        });
+        return;
+      }
       try {
         // Llama a la función addRole de RoleService y pasa el objeto role.
         const response = await this.roleService.addRole(role);

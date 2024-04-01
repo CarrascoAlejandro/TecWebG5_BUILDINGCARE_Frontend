@@ -3,7 +3,7 @@
   <div class="container">
     <div class="utilities">
       <button
-        v-if="typeUser === 'Administrador'"
+        v-if="privileges.Users === 'Modificacion'"
         class="btn btn-primary"
         @click="addUser"
         style="margin-right: 10px"
@@ -11,7 +11,7 @@
         Añadir Usuarios
       </button>
       <button
-        v-if="typeUser === 'Administrador'"
+        v-if="privileges.Users === 'Modificacion'"
         class="btn btn-primary"
         @click="navigateToRoles"
       >
@@ -27,20 +27,20 @@
         <div class="profile-header">
           <img
             class="profile-picture"
-            v-if="user.typeUser === 'Administrador'"
+            v-if="user.typeUser === 'Admin'"
             :src="admin_pic"
             alt="profile-pic"
           />
           <img
             class="profile-picture"
-            v-else-if="user.typeUser === 'Inquilino'"
+            v-else-if="user.typeUser === 'Editor'"
             :src="inquilino_pic"
             alt="profile-pic"
           />
           <img
             class="profile-picture"
             v-else
-            :src="propietario_pic"
+            :src="inquilino_pic"
             alt="profile-pic"
           />
           <h2 class="profile-name">{{ user?.name }}</h2>
@@ -89,7 +89,7 @@
           />
           <select
             v-model="role"
-            :disabled="typeUser !== 'Administrador'"
+            :disabled="privileges.Users !== 'Modificacion'"
             required
           >
             <option v-for="role in roles" :key="role" :value="role">
@@ -140,6 +140,7 @@ export default {
       admin_pic: Administrador,
       inquilino_pic: Inquilino,
       propietario_pic: Propietario,
+      privileges: {},
     };
   },
   created() {
@@ -151,6 +152,8 @@ export default {
       // Acceder al campo "name" dentro del objeto parsedData
       this.idUserStore = parsedData.idUser;
       this.userService = new UserService(this.idUserStore);
+      // Copiar privilegios de acceso
+      this.privileges = parsedData.roleAssignation.privileges;
       console.log("typeUser", this.typeUser);
       console.log("idUser", this.idUserStore);
       this.loadUsers();
@@ -196,9 +199,9 @@ export default {
       this.userService
         .listAllUserTypes()
         .then((response) => {
-          console.log(response.data.data);
+          console.log("role types", response.data.data);
           for (let i = 0; i < response.data.data.length; i++) {
-            this.roles.push(response.data.data[i].permission);
+            this.roles.push(response.data.data[i].name);
           }
         })
         .catch((error) => {
@@ -206,7 +209,7 @@ export default {
         });
     },
     verifyPermission() {
-      if (this.typeUser != "Administrador") {
+      if (this.privileges.Users !== "Modificacion") {
         // Buscar el registro en this.users con idUser igual a this.idUserStore
         this.users = this.users.filter(
           (user) => user.idUser === this.idUserStore

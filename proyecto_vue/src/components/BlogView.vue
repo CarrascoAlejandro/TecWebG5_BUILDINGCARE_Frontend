@@ -33,7 +33,7 @@
 
           <div class="actions">
             <button
-              v-if="typeUser == 'Administrador'"
+              v-if="privileges.Posts === 'Modificacion'"
               @click="postStatus(post.id, post.postState)"
             >
               {{ post.postState !== "Done" ? "Completar" : "Completado" }}
@@ -48,13 +48,13 @@
                   post.postState
                 )
               "
-              v-if="typeUser == 'Administrador' || post.postUser == userName"
+              v-if="privileges.Posts === 'Modificacion' || post.postUser == userName"
             >
               Editar
             </button>
             <button
               @click="deletePost(post.id)"
-              v-if="typeUser == 'Administrador' || post.postUser == userName"
+              v-if="privileges.Posts === 'Modificacion' || post.postUser == userName"
             >
               Eliminar
             </button>
@@ -152,6 +152,7 @@ export default {
       idUserHeader: "",
       searchQuery: "",
       filteredReceipts: [],
+      privileges: {},
     };
   },
   created() {
@@ -167,6 +168,8 @@ export default {
     // Acceder al campo "name" dentro del objeto parsedData
     this.userName = parsedData.usename;
     this.isUserHeader = parsedData.idUser;
+    // Copiar privilegios de acceso
+    this.privileges = parsedData.roleAssignation.privileges;
     this.postService = new PostService(this.isUserHeader);
     console.log("typeUser", this.typeUser);
     console.log("userName", this.userName);
