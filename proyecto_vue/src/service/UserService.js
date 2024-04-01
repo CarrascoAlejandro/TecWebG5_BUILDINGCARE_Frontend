@@ -4,7 +4,7 @@ export default class UserService{
     constructor(token='1') {
         this.tokenValue = token;
     }
-    url = "http://localhost:8080/api/v1/user";
+    url = "http://143.198.78.35:8080/api/v1/user";
     token = '1';
     async listAllUsers(){
         try{
@@ -38,7 +38,7 @@ export default class UserService{
         
     }
     async signUpUser(name, usename, password, email, CI, phone, itTypeUser){
-        const url = "http://localhost:8080/api/v1/user/signup";
+        const url = "http://143.198.78.35:8080/api/v1/user/signup";
         try{
             const headers = {
                 'Content-Type': 'application/json',
@@ -69,7 +69,7 @@ export default class UserService{
                 'Content-Type': 'application/json',
                 'Authorization': this.tokenValue,
             };
-            const response = await axios.get('http://localhost:8080/api/v1/roles/list', { headers });
+            const response = await axios.get('http://143.198.78.35:8080/api/v1/roles/list', { headers });
             return response;
         }catch(err){
             console.error('Error al listar tipos de usuarios:', err);
