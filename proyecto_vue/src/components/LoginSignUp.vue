@@ -218,7 +218,7 @@ export default {
         return;
       }
       axios
-        .post("http://localhost:8080/api/v1/user/login", {
+        .post("http://143.198.78.35:8080/api/v1/user/login", {
           username: this.username,
           password: this.password,
         })

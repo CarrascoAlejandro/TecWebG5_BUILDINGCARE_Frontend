@@ -6,6 +6,6 @@ COPY ./dist ./
 
 RUN npm install -g serve
 
-EXPOSE 8080
+EXPOSE 8081
 
-CMD [ "serve", "-s", "." , "-l", "8080" ]
+CMD [ "serve", "-s", "." , "-l", "8081" ]

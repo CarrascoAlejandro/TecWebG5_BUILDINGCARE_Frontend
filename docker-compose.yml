@@ -21,3 +21,21 @@ services:
       - "8080:8080"
     depends_on:
       - condominiodb
+
+  image_server:
+    build: 
+      context: ./image_server
+      dockerfile: Dockerfile
+    container_name: image_server
+    restart: unless-stopped
+    ports:
+      - "3003:3003"
+
+  frontend:
+    build:
+      context: ./proyecto_vue
+      dockerfile: Dockerfile
+    container_name: frontend
+    restart: unless-stopped
+    ports:
+      - "8081:8081"

@@ -6,7 +6,7 @@ export default class RoleService {
   }
   async fetchRoles() {
     try {
-      const response = await fetch("http://localhost:8080/api/v1/roles/list");
+      const response = await fetch("http://143.198.78.35:8080/api/v1/roles/list");
       return await response.json();
     } catch (error) {
       console.error("Failed to fetch roles:", error);
@@ -17,7 +17,7 @@ export default class RoleService {
   async addRole(role) {
     try {
       const response = await fetch(
-        "http://localhost:8080/api/v1/roles/create",
+        "http://143.198.78.35:8080/api/v1/roles/create",
         {
           method: "POST",
           headers: {
@@ -36,7 +36,7 @@ export default class RoleService {
   async updateRole(role) {
     try {
       const response = await fetch(
-        "http://localhost:8080/api/v1/roles/assign",
+        "http://143.198.78.35:8080/api/v1/roles/assign",
         {
           method: "PUT",
           headers: {
@@ -62,7 +62,7 @@ export default class RoleService {
   async deleteRole(roleName) {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/v1/roles?roleName=${encodeURIComponent(
+        `http://143.198.78.35:8080/api/v1/roles?roleName=${encodeURIComponent(
           roleName
         )}`,
         {
