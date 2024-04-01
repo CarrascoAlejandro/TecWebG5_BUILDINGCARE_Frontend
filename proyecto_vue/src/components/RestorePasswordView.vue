@@ -8,6 +8,9 @@
             <div class="head-signUp">
               <img src="@/assets/logos/bcareNegro.png" />
               <h2>Cambiar contraseña</h2>
+              <div>
+                  <b>Antes de ingresar tu nueva contraseña, revisa que tu nombre de usuario sea el correcto</b>
+              </div>
             </div>
             <div class="site-info">
               <div class="input-group">
@@ -261,7 +264,7 @@ export default {
 
 .head-signUp,
 .head-signUp {
-  padding-top: 15vh;
+  padding-top: 8vh;
   color: #101e26;
 }
 
