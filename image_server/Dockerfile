@@ -5,13 +5,13 @@ FROM node:18
 WORKDIR /app
 
 # Copy package.json and package-lock.json into the working directory
-COPY image_server/package*.json ./
+COPY ./package*.json ./
 
 # Install the application dependencies
 RUN npm install
 
 # Copy the rest of the application code into the working directory
-COPY image_server/ .
+COPY . .
 
 # Make port 3003 available outside the container
 EXPOSE 3003
