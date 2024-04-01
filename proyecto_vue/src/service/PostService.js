@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export default class PostService{
     constructor(token='1') {
-        this.url = "http://localhost:8080/api/v1/blog";
+        this.url = "http://143.198.78.35:8080/api/v1/blog";
         this.token = token;
     }
     async newPost(title, content, idTypePost) {
@@ -64,7 +64,7 @@ export default class PostService{
     }
 
     async getPosts() {
-        const baseURL = 'http://localhost:8080/api/v1/blog/all';
+        const baseURL = 'http://143.198.78.35:8080/api/v1/blog/all';
         try {
             // Define los encabezados para especificar que se espera una respuesta en formato JSON
             const headers = {
@@ -83,7 +83,7 @@ export default class PostService{
         }
     }
     async getPostById (postId){
-        const baseURL = 'http://localhost:8080/api/v1/blog/';
+        const baseURL = 'http://143.198.78.35:8080/api/v1/blog/';
         try {
             // Define los encabezados para especificar que se espera una respuesta en formato JSON
             const headers = {
@@ -102,7 +102,7 @@ export default class PostService{
         }
     }
     async deletePostById (postIdToDelete){
-        const baseURL = 'http://localhost:8080/api/v1/blog/';
+        const baseURL = 'http://143.198.78.35:8080/api/v1/blog/';
         try {
             // Define los encabezados para especificar que se espera una respuesta en formato JSON
             const headers = {
@@ -121,7 +121,7 @@ export default class PostService{
         }
     }
     async updatePostById  ( title, content, state, idTypePost, idPostRequest, postIdToUpdate, tokenUser){
-        const baseURL = 'http://localhost:8080/api/v1/blog/';
+        const baseURL = 'http://143.198.78.35:8080/api/v1/blog/';
         
         try {
             const updateData = {
@@ -250,7 +250,7 @@ export default class PostService{
 
     async markPostAsDone(postId) {
         console.log('entro al updateTask()\n'+' ID'+postId);
-        const url = `http://localhost:8080/api/v1/blog/${postId}/done`;
+        const url = `http://143.198.78.35:8080/api/v1/blog/${postId}/done`;
         console.log('url', url);
         const options = {
             method: "PUT",

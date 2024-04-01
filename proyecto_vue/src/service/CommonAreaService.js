@@ -2,7 +2,7 @@ class CommonAreaService {
   async getCommonAreas() {
     try {
       const response = await fetch(
-        "http://localhost:8080/api/v1/commonarea/all"
+        "http://143.198.78.35:8080/api/v1/commonarea/all"
       );
       return await response.json();
     } catch (error) {
@@ -12,7 +12,7 @@ class CommonAreaService {
   }
   async addCommonArea(commonArea, token) {
     try {
-      const response = await fetch("http://localhost:8080/api/v1/commonarea", {
+      const response = await fetch("http://143.198.78.35:8080/api/v1/commonarea", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -34,7 +34,7 @@ class CommonAreaService {
   async deleteCommonArea(commonAreaId) {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/v1/commonarea/${commonAreaId}`,
+        `http://143.198.78.35:8080/api/v1/commonarea/${commonAreaId}`,
         { method: "DELETE" }
       );
       return await response.json();
@@ -46,7 +46,7 @@ class CommonAreaService {
   async updateCommonArea(commonAreaId, updatedCommonArea, token) {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/v1/commonarea/${commonAreaId}`,
+        `http://143.198.78.35:8080/api/v1/commonarea/${commonAreaId}`,
         {
           method: "PUT",
           headers: {
@@ -70,7 +70,7 @@ class CommonAreaService {
   async fetchTypes() {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/v1/commonarea/type`,
+        `http://143.198.78.35:8080/api/v1/commonarea/type`,
         {
           method: "GET",
           headers: {

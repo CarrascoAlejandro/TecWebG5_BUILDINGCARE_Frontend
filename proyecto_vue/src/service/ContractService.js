@@ -3,7 +3,7 @@
 export default class ContractService {
 
     async getAllContracts(token) {
-        const url = 'http://localhost:8080/api/v1/contract';
+        const url = 'http://143.198.78.35:8080/api/v1/contract';
         const options = {
             method: 'GET',
             headers: {
@@ -27,7 +27,7 @@ export default class ContractService {
     }
 
     async getTypeContract(token) {
-        const url = 'http://localhost:8080/api/v1/contract/type';
+        const url = 'http://143.198.78.35:8080/api/v1/contract/type';
         const options = {
             method: 'GET',
             headers: {
@@ -51,7 +51,7 @@ export default class ContractService {
     }
 
     async getProperties(token) {
-        const url = 'http://localhost:8080/api/v1/property/all';
+        const url = 'http://143.198.78.35:8080/api/v1/property/all';
         const options = {
             method: 'GET',
             headers: {
@@ -74,7 +74,7 @@ export default class ContractService {
     }
 
     async getPropertyById(id, token) {
-        const url = `http://localhost:8080/api/v1/property/${id}`;
+        const url = `http://143.198.78.35:8080/api/v1/property/${id}`;
         const options = {
             method: 'GET',
             headers: {
@@ -95,7 +95,7 @@ export default class ContractService {
     }
 
     async getContractById(id, token) {
-        const url = `http://localhost:8080/api/v1/contract/${id}`;
+        const url = `http://143.198.78.35:8080/api/v1/contract/${id}`;
         const options = {
             method: 'GET',
             headers: {
@@ -116,7 +116,7 @@ export default class ContractService {
     }
 
     async getTypeContractById(id, token) {
-        const url = `http://localhost:8080/api/v1/contract/type/${id}`;
+        const url = `http://143.198.78.35:8080/api/v1/contract/type/${id}`;
         const options = {
             method: 'GET',
             headers: {
@@ -138,7 +138,7 @@ export default class ContractService {
 
     async createContract(contract,token) {//signatureDate,endDate,amount,idProperty,idType,
         console.log("entro a crear contrato");
-        const url = 'http://localhost:8080/api/v1/contract';
+        const url = 'http://143.198.78.35:8080/api/v1/contract';
         console.log("data"+JSON.stringify(contract));
         const options = {
             method: "POST",
@@ -168,7 +168,7 @@ export default class ContractService {
     }
 
     async updateContract(id, contract, token) {
-        const url = `http://localhost:8080/api/v1/contract/${id}`;
+        const url = `http://143.198.78.35:8080/api/v1/contract/${id}`;
         const options = {
             method: "PUT",
             headers: {
@@ -192,7 +192,7 @@ export default class ContractService {
     }
 
     async deleteContract(id, token) {
-        const url = `http://localhost:8080/api/v1/contract/${id}`;
+        const url = `http://143.198.78.35:8080/api/v1/contract/${id}`;
         const options = {
             method: "DELETE",
             headers: {

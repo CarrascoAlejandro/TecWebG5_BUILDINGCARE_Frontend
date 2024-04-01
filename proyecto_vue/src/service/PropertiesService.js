@@ -5,7 +5,7 @@ export default class PropertiesService {
 }
   async fetchProperties() {
     try {
-      const response = await fetch("http://localhost:8080/api/v1/property/all");
+      const response = await fetch("http://143.198.78.35:8080/api/v1/property/all");
       return await response.json();
     } catch (error) {
       console.error("Failed to fetch properties:", error);
@@ -15,7 +15,7 @@ export default class PropertiesService {
 
   async addProperty(property) {
     try {
-      const response = await fetch("http://localhost:8080/api/v1/property", {
+      const response = await fetch("http://143.198.78.35:8080/api/v1/property", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -33,7 +33,7 @@ export default class PropertiesService {
   async deleteProperty(propertyId) {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/v1/property/${propertyId}`,
+        `http://143.198.78.35:8080/api/v1/property/${propertyId}`,
         { method: "DELETE" }
       );
       return response.ok;
@@ -46,7 +46,7 @@ export default class PropertiesService {
   async updateProperty(propertyId, updatedProperty) {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/v1/property/${propertyId}`,
+        `http://143.198.78.35:8080/api/v1/property/${propertyId}`,
         {
           method: "PUT",
           headers: {
@@ -66,7 +66,7 @@ export default class PropertiesService {
   async fetchTypes() {
     try {
       const response = await fetch(
-        "http://localhost:8080/api/v1/property/type"
+        "http://143.198.78.35:8080/api/v1/property/type"
       );
       return await response.json();
     } catch (error) {
