@@ -5,110 +5,120 @@
       <button
         v-if="typeUser === 'Administrador'"
         class="btn btn-primary"
-        @click="addUser"
-        style="margin-right: 10px"
+        @click="addRole"
       >
-        Añadir Usuarios
-      </button>
-      <button
-        v-if="typeUser === 'Administrador'"
-        class="btn btn-primary"
-        @click="navigateToRoles"
-      >
-        Administrar Roles
+        Añadir Roles
       </button>
     </div>
     <div class="user-list">
-      <div
-        class="profile-card"
-        v-for="(user, index) in users"
-        :key="user.userId"
-      >
+      <!-- Itera sobre cada rol usando v-for -->
+      <div class="profile-card" v-for="role in roles" :key="role.name">
         <div class="profile-header">
+          <!-- Imagina que tienes una imagen predeterminada para cada tipo de rol o puedes añadir una propiedad de imagen a cada rol si es necesario -->
           <img
             class="profile-picture"
-            v-if="user.typeUser === 'Administrador'"
-            :src="admin_pic"
+            src="ruta_a_la_imagen_correspondiente"
             alt="profile-pic"
           />
-          <img
-            class="profile-picture"
-            v-else-if="user.typeUser === 'Inquilino'"
-            :src="inquilino_pic"
-            alt="profile-pic"
-          />
-          <img
-            class="profile-picture"
-            v-else
-            :src="propietario_pic"
-            alt="profile-pic"
-          />
-          <h2 class="profile-name">{{ user?.name }}</h2>
+          <!-- Muestra el nombre del rol -->
+          <h2 class="profile-name">{{ role.name }}</h2>
         </div>
         <div class="profile-info">
-          <p>Correo: {{ user?.email }}</p>
-          <p>Usuario: {{ user?.usename }}</p>
-          <p>Rol: {{ user?.typeUser }}</p>
-          <p>CI: {{ user?.ci }}</p>
-          <p>Teléfono: {{ user?.phone }}</p>
+          <!-- Muestra los privilegios; ajusta los textos según necesites -->
+          <p>Área Común: {{ role.commonAreas }}</p>
+          <p>Anuncios: {{ role.posts }}</p>
+          <p>Pagos: {{ role.payments }}</p>
+          <p>Usuarios: {{ role.users }}</p>
+          <p>Propiedades: {{ role.properties }}</p>
+          <p>Contratos: {{ role.contracts }}</p>
         </div>
+        <!-- Botones de acción; asumo que querrás manejar estas acciones por rol -->
         <div class="actionButtons">
-          <button class="btn btn-primary" @click="editUser(index)">
+          <button
+            class="btn btn-primary"
+            style="margin-right: 10px"
+            @click="editRole(role)"
+          >
             Editar
+          </button>
+          <button class="btn btn-primary" @click="deleteRole(role)">
+            Eliminar
           </button>
         </div>
       </div>
     </div>
     <div class="userForm" v-if="showpopup">
       <div class="popup-content">
-        <form @submit.prevent="updateUser">
+        <form @submit.prevent="roleEditing ? updateRole() : createRole()">
           <input
             v-model="name"
-            placeholder="Nombre de Usuario"
+            placeholder="Nombre del Rol"
             type="text"
             required
           />
-          <input
-            v-model="email"
-            placeholder="Correo Electrónico"
-            type="email"
-            required
-          />
-          <input v-model="nickname" placeholder="Alias" type="text" required />
-          <input
-            v-model="carnet"
-            placeholder="Carnet de Identidad"
-            type="text"
-            required
-          />
-          <input
-            v-model="password"
-            placeholder="Contraseña de la Cuenta"
-            type="text"
-            required
-          />
-          <input
-            v-model="phone"
-            placeholder="Número de Teléfono"
-            type="text"
-            required
-          />
+          <p>Área Común</p>
           <select
-            v-model="role"
+            v-model="commonAreas"
             :disabled="typeUser !== 'Administrador'"
             required
           >
-            <option v-for="role in roles" :key="role" :value="role">
-              {{ role }}
-            </option>
+            <option value="Lectura">Lectura</option>
+            <option value="Modificacion">Modificación</option>
+            <option value="Ninguno">Ninguno</option>
           </select>
-          <!-- Botones de acción -->
+          <p>Anuncios</p>
+          <select
+            v-model="posts"
+            :disabled="typeUser !== 'Administrador'"
+            required
+          >
+            <option value="Lectura">Lectura</option>
+            <option value="Modificacion">Modificación</option>
+            <option value="Ninguno">Ninguno</option>
+          </select>
+          <p>Pagos</p>
+          <select
+            v-model="payments"
+            :disabled="typeUser !== 'Administrador'"
+            required
+          >
+            <option value="Lectura">Lectura</option>
+            <option value="Modificacion">Modificación</option>
+            <option value="Ninguno">Ninguno</option>
+          </select>
+          <p>Usuarios</p>
+          <select
+            v-model="users"
+            :disabled="typeUser !== 'Administrador'"
+            required
+          >
+            <option value="Lectura">Lectura</option>
+            <option value="Modificacion">Modificación</option>
+            <option value="Ninguno">Ninguno</option>
+          </select>
+          <p>Propiedades</p>
+          <select
+            v-model="properties"
+            :disabled="typeUser !== 'Administrador'"
+            required
+          >
+            <option value="Lectura">Lectura</option>
+            <option value="Modificacion">Modificación</option>
+            <option value="Ninguno">Ninguno</option>
+          </select>
+          <p>Contratos</p>
+          <select
+            v-model="contracts"
+            :disabled="typeUser !== 'Administrador'"
+            required
+          >
+            <option value="Lectura">Lectura</option>
+            <option value="Modificacion">Modificación</option>
+            <option value="Ninguno">Ninguno</option>
+          </select>
           <div class="form-buttons">
-            <button @click="signUp" type="submit" v-if="!userEditing">
-              Crear
-            </button>
-            <button type="submit" v-if="userEditing">Actualizar</button>
-            <button @click="deleteUser(index)">Eliminar</button>
+            <button type="submit" v-if="!roleEditing">Crear</button>
+            <button type="submit" v-if="roleEditing">Actualizar</button>
             <button @click="closeForm">Cerrar</button>
           </div>
         </form>
@@ -117,8 +127,9 @@
   </div>
 </template>
 <script>
-import UserService from "@/service/UserService";
 import NavigationBar from "./NavigationBar.vue";
+import UserService from "@/service/UserService";
+import RoleService from "@/service/RoleService";
 import Administrador from "@/assets/images/admin.png";
 import Inquilino from "@/assets/images/user.png";
 import Propietario from "@/assets/images/property.png";
@@ -126,20 +137,24 @@ import Propietario from "@/assets/images/property.png";
 export default {
   data() {
     return {
-      users: [],
+      roles: [],
       adminCredential: false,
       name: "",
-      email: "",
-      password: "",
-      nickname: "",
-      carnet: "",
-      phone: "",
-      role: "",
-      picture: "",
+      commonAreas: "",
+      posts: "",
+      payments: "",
+      users: "",
+      properties: "",
+      contracts: "",
       userId: "",
+      commonAreaRole: "",
+      announcementsRole: "",
+      paymentsRole: "",
+      usersRole: "",
+      propertiesRole: "",
+      contractsRole: "",
       showpopup: false,
-      userEditing: false,
-      roles: [],
+      roleEditing: false,
       typeUser: null,
       idUserStore: null,
       admin_pic: Administrador,
@@ -156,10 +171,11 @@ export default {
       // Acceder al campo "name" dentro del objeto parsedData
       this.idUserStore = parsedData.idUser;
       this.userService = new UserService(this.idUserStore);
+      this.roleService = new RoleService();
       console.log("typeUser", this.typeUser);
       console.log("idUser", this.idUserStore);
-      this.loadUsers();
       this.loadRoles();
+      this.fetchRoles();
       if (this.typeUser == null) {
         this.$router.push("/");
       }
@@ -168,34 +184,10 @@ export default {
       this.$router.push("/");
     }
   },
-  mounted() {},
+  mounted() {
+    //this.fetchRoles();
+  },
   methods: {
-    navigateToRoles() {
-      this.$router.push({ name: "role", label: "Roles" });
-    },
-    signUp() {
-      // Aquí puedes agregar la llamada API para registrar al usuario si lo necesitas.
-      this.userService
-        .signUpUser(
-          this.name,
-          this.nickname,
-          this.password,
-          this.email,
-          this.carnet,
-          this.phone,
-          this.role
-        )
-        .then((response) => {
-          //se manda el tipo de user como inquilino
-          //verificar el codigo de envio
-          if (response.responseCode == "USER-0002") {
-            alert("Registro exitoso");
-            this.$router.push("/login");
-          } else {
-            alert("Error en el registro");
-          }
-        });
-    },
     loadRoles() {
       // Logic to load all roles
       this.userService
@@ -232,83 +224,134 @@ export default {
           console.log(error);
         });
     },
-    createUser() {
-      // Logic to create a new user
-      const newUser = {
-        name: this.name,
-        email: this.email,
-        password: this.password,
-        nickname: this.nickname,
-        role: this.role,
-        userId: this.userId,
-      };
-      this.users.push(newUser);
-      this.clearForm();
+    async fetchRoles() {
+      try {
+        const data = await this.roleService.fetchRoles();
+        if (data.responseCode === "ROLE-0000" && data.data) {
+          console.log("data", data);
+          // Mapeamos los datos para asignar cada privilegio a su variable correspondiente
+          this.roles = data.data.map((role) => ({
+            name: role.name,
+            commonAreas: role.privileges.CommonAreas,
+            posts: role.privileges.Posts,
+            payments: role.privileges.Payments,
+            users: role.privileges.Users,
+            properties: role.privileges.Properties,
+            contracts: role.privileges.Contracts,
+          }));
+        } else {
+          console.error("Error fetching roles: ", data.errorMessage);
+        }
+      } catch (error) {
+        console.error(
+          "Failed to fetch roles:",
+          error.message ? error.message : error
+        );
+      }
     },
-    editUser(index) {
-      // Logic to edit a user
-      console.log(this.users[index].idUser);
+    async createRole() {
+      // Construye el objeto role con la información necesaria.
+      const role = {
+        name: this.name, // Asume que this.name contiene el nombre del rol a crear.
+        privileges: {
+          CommonAreas: this.commonAreas, // Asume que this.commonAreas contiene el privilegio para Áreas Comunes.
+          Posts: this.posts, // Asume que this.posts contiene el privilegio para Anuncios.
+          Payments: this.payments, // Asume que this.payments contiene el privilegio para Pagos.
+          Users: this.users, // Asume que this.users contiene el privilegio para Usuarios.
+          Properties: this.properties, // Asume que this.properties contiene el privilegio para Propiedades.
+          Contracts: this.contracts, // Asume que this.contracts contiene el privilegio para Contratos.
+        },
+      };
+      console.log(role);
+
+      try {
+        // Llama a la función addRole de RoleService y pasa el objeto role.
+        const response = await this.roleService.addRole(role);
+
+        // Maneja la respuesta como desees, por ejemplo, mostrando un mensaje de éxito.
+        console.log(response.data); // Muestra el mensaje de éxito en la consola.
+
+        // Aquí puedes incluir cualquier lógica adicional tras crear el rol, como recargar la lista de roles.
+        this.fetchRoles();
+        this.clearForm();
+      } catch (error) {
+        // Maneja los errores aquí, por ejemplo, mostrando un mensaje de error al usuario.
+        console.error("Error creating role:", error.message);
+      }
+    },
+    editRole(role) {
+      console.log("role", role);
+      this.name = role.name;
+      this.commonAreas = role.commonAreas;
+      this.posts = role.posts;
+      this.payments = role.payments;
+      this.users = role.users;
+      this.properties = role.properties;
+      this.contracts = role.contracts;
+
+      // Abre el formulario y establece el estado para editar
       this.showpopup = true;
-      this.userId = this.users[index].idUser;
-      this.name = this.users[index].name;
-      this.email = this.users[index].email;
-      this.password = this.users[index].password;
-      this.nickname = this.users[index].usename;
-      this.carnet = this.users[index].ci;
-      this.phone = this.users[index].phone;
-      this.role = this.users[index].typeUser;
-      this.index = index;
-      this.userEditing = true;
+      this.roleEditing = true;
     },
-    updateUser() {
-      // Logic to update a user
-      const updatedUser = {
-        userId: this.userId,
-        name: this.name,
-        usename: this.nickname,
-        email: this.email,
-        ci: this.carnet,
-        role: this.role,
-        phone: this.phone,
-        password: this.password,
-        picture: this.picture,
+    async updateRole() {
+      // Construye el objeto updatedRole con la información actualizada.
+      const updatedRole = {
+        name: this.name, // Asume que this.name contiene el nombre actualizado del rol.
+        privileges: {
+          CommonAreas: this.commonAreas, // Privilegio actualizado para Áreas Comunes.
+          Posts: this.posts, // Privilegio actualizado para Anuncios.
+          Payments: this.payments, // Privilegio actualizado para Pagos.
+          Users: this.users, // Privilegio actualizado para Usuarios.
+          Properties: this.properties, // Privilegio actualizado para Propiedades.
+          Contracts: this.contracts, // Privilegio actualizado para Contratos.
+        },
       };
-      console.log(updatedUser);
-      this.userService
-        .updateUser(
-          updatedUser.userId,
-          updatedUser.name,
-          updatedUser.usename,
-          updatedUser.email,
-          updatedUser.ci,
-          updatedUser.phone,
-          updatedUser.role
-        )
-        .then((response) => {
-          console.log(response.data);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      this.clearForm();
-      //Reload the page
-      location.reload();
+
+      try {
+        // Llama a la función updateRole de RoleService y pasa el objeto updatedRole.
+        const response = await this.roleService.updateRole(updatedRole);
+
+        // Maneja la respuesta como desees, por ejemplo, mostrando un mensaje de éxito.
+        console.log("Role updated successfully", response);
+
+        // Aquí puedes incluir cualquier lógica adicional tras actualizar el rol, como recargar la lista de roles.
+        this.fetchRoles();
+      } catch (error) {
+        // Maneja los errores aquí, por ejemplo, mostrando un mensaje de error al usuario.
+        console.error("Error updating role:", error);
+      }
     },
-    deleteUser(index) {
-      // Logic to delete a user
-      this.users.splice(index, 1);
+    async deleteRole(role) {
+      if (
+        !confirm(`Estás seguro de que quieres eliminar el rol ${role.name}?`)
+      ) {
+        return;
+      }
+
+      try {
+        const response = await this.roleService.deleteRole(role.name);
+        console.log(response); // Aquí podrías verificar la respuesta del servidor
+
+        // Si todo sale bien, podrías querer actualizar la lista de roles
+        this.fetchRoles();
+      } catch (error) {
+        alert("No se pudo eliminar el rol. Por favor, inténtalo de nuevo.");
+        console.error("Error deleting role:", error);
+      }
     },
     clearForm() {
       // Clear the form fields
       this.name = "";
-      this.email = "";
-      this.password = "";
-      this.nickname = "";
-      this.role = "";
-      this.userEditing = false;
+      this.commonAreas = "";
+      this.posts = "";
+      this.payments = "";
+      this.users = "";
+      this.properties = "";
+      this.contracts = "";
+      this.roleEditing = false;
       this.showpopup = false;
     },
-    addUser() {
+    addRole() {
       // Show the form to add a new user
       this.showpopup = true;
     },
