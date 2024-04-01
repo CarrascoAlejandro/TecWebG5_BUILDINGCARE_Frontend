@@ -11,8 +11,10 @@ export async function uploadImage(image) {
         'Content-Type': 'multipart/form-data'
       }
     }).then(response => {
-        console.log(response.data);
+        alert("Image uploaded successfully" + response.data.path)
         uploaded_image_path = response.data.path;
+    }).catch(error => {
+        alert("Error uploading image: " + error);
     });
 
     return uploaded_image_path
