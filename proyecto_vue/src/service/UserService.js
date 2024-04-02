@@ -1,5 +1,4 @@
 import axios from 'axios';
-import nodemailer from 'nodemailer';
 
 export default class UserService{
     constructor(token='1') {
@@ -102,7 +101,10 @@ export default class UserService{
     }
 
     async requestResetPassword(username, email){
-        const referralUrl = 'http://143.198.78.35:80';
+        return {
+            responseCode: "USER-0006s"
+        }
+        /* const referralUrl = 'http://143.198.78.35:80';
         const subject = "Recuperar contraseña";
         const text = "<link href='https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap' rel='stylesheet'>"
         + "<body style='margin: 0; padding: 0; font-family: 'Poppins', sans-serif;'>"
@@ -147,7 +149,7 @@ export default class UserService{
             console.log('Message sent: %s', info.messageId);
         } catch (error) {
             console.error('Error occurred while sending email:', error);
-        }
+        } */
     }
 
     async doResetPassword(username, password){
