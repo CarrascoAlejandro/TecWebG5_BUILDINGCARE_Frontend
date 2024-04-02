@@ -3,10 +3,10 @@
 export async function uploadImage(image) {
     //const url = "http://localhost:3003/upload";
     let temp_solution_fix_later = [
-        "casacarton.jpg",
-        "casapinna.jpg",
-        "casapython.jpg",
-        "casaqueso.jpg",
+        "depto1.jpg",
+        "depto2.jpg",
+        "depto3.jpg",
+        "depto4.jpg",
     ]
     let next_pic_to_upload = localStorage.getItem("next_pic_to_upload");
     let uploaded_image_path = temp_solution_fix_later[parseInt(next_pic_to_upload)];
