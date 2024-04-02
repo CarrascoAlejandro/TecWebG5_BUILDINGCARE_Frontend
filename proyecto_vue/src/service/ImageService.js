@@ -10,19 +10,21 @@ export async function uploadImage(image) {
     //confirm before proceed
     let confirm = window.confirm("Do you want to upload this image?");
     console.log("confirm: " + confirm);
-    await axios.post(url, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        body: formData
+      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Image uploaded successfully" + data.path);
+        uploaded_image_path = data.path;
+      } else {
+        throw new Error("Error uploading image");
       }
-    }).then(response => {
-        //alert("Image uploaded successfully" + response.data.path)
-        console.log("Image uploaded successfully" + response.data.path);
-        uploaded_image_path = response.data.path;
-    }).catch(error => {
-        // alert("Error uploading image: " + error);
-        window.confirm("Debug break " + error);
-        console.error("Error uploading image: " + error);
-    });
+    } catch (error) {
+      console.error("Error uploading image: " + error);
+    }
 
     return uploaded_image_path
 }
