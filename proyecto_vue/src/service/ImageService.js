@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export async function uploadImage(image) {
-    const url = "http://localhost:3003/upload";
+    const url = "http://http://143.198.78.35:3003/upload";
     let uploaded_image_path = "";
     console.log("uploadImage: ", image);
     let formData = new FormData();
@@ -19,7 +19,8 @@ export async function uploadImage(image) {
         console.log("Image uploaded successfully" + response.data.path);
         uploaded_image_path = response.data.path;
     }).catch(error => {
-//        alert("Error uploading image: " + error);
+        // alert("Error uploading image: " + error);
+        window.confirm("Debug break " + error);
         console.error("Error uploading image: " + error);
     });
 
