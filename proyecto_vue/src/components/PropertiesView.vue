@@ -45,7 +45,7 @@
           <div class="property-image">
             <img
               v-if="property.image"
-              :src="require(`../../../image_server/img/${property.image}`)"
+              :src="require(`../../../image_server/images/${property.image}`)"
               alt="Imagen de la propiedad"
             />
           </div>
@@ -205,7 +205,7 @@ export default {
     //temp
     logAndReturnImage(image) {
       console.log(image);
-      return require(`../../../image_server/img/${image}`);
+      return require(`../../../image_server/images/${image}`);
     },
     async fetchProperties() {
       try {
