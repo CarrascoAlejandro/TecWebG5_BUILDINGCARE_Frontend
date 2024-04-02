@@ -7,8 +7,9 @@ export async function uploadImage(image) {
     let formData = new FormData();
     formData.append('image', image);
     console.log("formDataImage: " + formData.get('image'));
-
-    try {
+    console.log("uploaded_image_path: " + uploaded_image_path);
+    return uploaded_image_path
+    /* try {
         const response = await fetch(url, {
             method: 'POST',
             headers: {
@@ -32,5 +33,5 @@ export async function uploadImage(image) {
     //let confirm = window.confirm("Do you want to upload this image?");
     //console.log("confirm: " + confirm);
     console.log("uploaded_image_path: " + uploaded_image_path);
-    return uploaded_image_path
+    return uploaded_image_path */
 }
