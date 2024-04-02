@@ -1,13 +1,21 @@
 //import axios from 'axios';
 
 export async function uploadImage(image) {
-    const url = "http://localhost:3003/upload";
-    let uploaded_image_path = "casaqueso.jpg";
+    //const url = "http://localhost:3003/upload";
+    let temp_solution_fix_later = [
+        "casacarton.jpg",
+        "casapinna.jpg",
+        "casapython.jpg",
+        "casaqueso.jpg",
+    ]
+    let next_pic_to_upload = localStorage.getItem("next_pic_to_upload");
+    let uploaded_image_path = temp_solution_fix_later[parseInt(next_pic_to_upload)];
     console.log("uploadImage: ", image);
     let formData = new FormData();
     formData.append('image', image);
     console.log("formDataImage: " + formData.get('image'));
     console.log("uploaded_image_path: " + uploaded_image_path);
+    localStorage.setItem("next_pic_to_upload", parseInt(next_pic_to_upload) + 1);
     return uploaded_image_path
     /* try {
         const response = await fetch(url, {
