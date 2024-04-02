@@ -286,6 +286,11 @@ export default {
       let imageUrl = await uploadImage(this.image);
       if (!imageUrl) {
         console.error("Failed to upload image");
+        Swal.fire({
+          icon: "error",
+          title: "Error al subir la imagen",
+          text: "Por favor, intenta de nuevo",
+        });
         return;
       }
 

@@ -39,3 +39,6 @@ services:
     restart: unless-stopped
     ports:
       - "8081:8081"
+    depends_on:
+      - backend
+      - image_server
