@@ -30,7 +30,7 @@ const upload = multer({ storage: storage });
 
 app.post("/upload", upload.single("image"), (req, res) => {
   console.log(req.file.filename);
-  res.json({ path: `${req.file.filename}` });
+  res.json({ path: req.file.filename });
 });
 
 app.listen(3003, () => console.log("Image server listening on port 3003!"));
