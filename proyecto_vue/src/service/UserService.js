@@ -102,7 +102,11 @@ export default class UserService{
 
     async requestResetPassword(username, email){
         return {
-            responseCode: "USER-0006s"
+            responseCode: "USER-0006",
+            data: {
+                username: username,
+                email: email
+            }
         }
         /* const referralUrl = 'http://143.198.78.35:80';
         const subject = "Recuperar contraseña";
