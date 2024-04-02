@@ -1,7 +1,7 @@
 //import axios from 'axios';
 
 export async function uploadImage(image) {
-    const url = "http://http://143.198.78.35:3003/upload";
+    const url = "http://143.198.78.35:3003/upload";
     let uploaded_image_path = "";
     console.log("uploadImage: ", image);
     let formData = new FormData();
