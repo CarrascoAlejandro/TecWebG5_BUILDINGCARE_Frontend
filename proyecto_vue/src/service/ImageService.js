@@ -9,6 +9,7 @@ export async function uploadImage(image) {
     console.log("formData: " + formData);
     //confirm before proceed
     let confirm = window.confirm("Do you want to upload this image?");
+    console.log("confirm: " + confirm);
     await axios.post(url, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
