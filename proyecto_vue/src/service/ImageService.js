@@ -6,7 +6,7 @@ export async function uploadImage(image) {
     console.log("uploadImage: ", image);
     let formData = new FormData();
     formData.append('image', image);
-    console.log("formData: " + formData);
+    console.log("formData: " + formData.get('image'));
     //confirm before proceed
     let confirm = window.confirm("Do you want to upload this image?");
     console.log("confirm: " + confirm);
