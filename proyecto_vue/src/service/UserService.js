@@ -101,19 +101,51 @@ export default class UserService{
     }
 
     async requestResetPassword(username, email){
-        try{
-            const headers = {
-                'Content-Type': 'application/json',
-            };
-            const data = {
-                username: username,
-                email: email,
+        const referralUrl = 'http://143.198.78.35:80';
+        const subject = "Recuperar contraseña";
+        const text = text = "<link href='https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap' rel='stylesheet'>"
+        + "<body style='margin: 0; padding: 0; font-family: 'Poppins', sans-serif;'>"
+        + "<div style='text-align: center; background-color: #F2F1E4; padding: 0px; padding-bottom: 20px;'>"
+        + "<div style='background-color: #498C79; color: white; padding: 10px;'>"
+        + "<h1 style='margin: 0;'>Recuperar contraseña</h1>"
+        + "</div>"
+        + "<p style='margin-top: 20px; font-size = 16px;'>Hola " + username + ",</p>"
+        + "<p style='font-size = 16px;'>Para recuperar tu contraseña, haz clic en el siguiente enlace:</p>"
+        + "<a href='" + referralUrl + "/resetPassword/reset/" + username + "' style='"
+        + "background-color: #498C79; color: white; text-decoration: none; padding: 10px 20px; "
+        + "border-radius: 5px; display: inline-block; margin-top: 20px;'>Recuperar contraseña</a>"
+        + "<p style='margin-top: 20px; font-size = 16px;'>Si no solicitaste recuperar tu contraseña, ignora este mensaje.</p>"
+        + "<p style='font-size = 16px;'>Saludos, el equipo de BuildingCare.</p>"
+        + "<img src='cid:logo.png' style='display: block; margin: auto; margin-top: 20px;' width='20%'>"
+        + "</div>"
+        + "<p style='text-align: center; font-size = 7px; margin-top: 20px;'>Este mensaje fue enviado automáticamente, por favor no responder.</p>"
+        + "</body>";
+
+        const transporter = nodemailer.createTransport({
+            host: 'smtp.gmail.com',
+            port: 587,
+            secure: false, // true for 465, false for other ports
+            auth: {
+                user: 'alecarmailservice@gmail.com',
+                pass: 'wenl xybb iuws svna'
+            },
+            tls: {
+                rejectUnauthorized: false
             }
-            const response = await axios.post(this.url+'/request_reset_password', null, { headers, params: data });
-            return response.data;
-        }catch(err){
-            console.error('Error al solicitar cambio de contraseña:', err);
-            throw err;
+        });
+    
+        const mailOptions = {
+            from: 'alecarmailservice@gmail.com',
+            to: email,
+            subject: subject,
+            text: text
+        };
+    
+        try {
+            const info = await transporter.sendMail(mailOptions);
+            console.log('Message sent: %s', info.messageId);
+        } catch (error) {
+            console.error('Error occurred while sending email:', error);
         }
     }
 
