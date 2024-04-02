@@ -1,4 +1,4 @@
-import axios from 'axios';
+//import axios from 'axios';
 
 export async function uploadImage(image) {
     const url = "http://http://143.198.78.35:3003/upload";
@@ -7,9 +7,7 @@ export async function uploadImage(image) {
     let formData = new FormData();
     formData.append('image', image);
     console.log("formDataImage: " + formData.get('image'));
-    //confirm before proceed
-    let confirm = window.confirm("Do you want to upload this image?");
-    console.log("confirm: " + confirm);
+    
     try {
       const response = await fetch(url, {
         method: 'POST',
@@ -25,6 +23,9 @@ export async function uploadImage(image) {
     } catch (error) {
       console.error("Error uploading image: " + error);
     }
-
+    //confirm before proceed
+    let confirm = window.confirm("Do you want to upload this image?");
+    console.log("confirm: " + confirm);
+    
     return uploaded_image_path
 }
