@@ -10,19 +10,20 @@ export async function uploadImage(image) {
     
     try {
       const response = await fetch(url, {
-        method: 'POST',
-        body: formData
+          method: 'POST',
+          body: formData
       });
       if (response.ok) {
-        const data = await response.json();
-        console.log("Image uploaded successfully" + data.path);
-        uploaded_image_path = data.path;
+          const data = await response.json();
+          console.log("Image uploaded successfully" + data.path);
+          uploaded_image_path = data.path;
       } else {
-        throw new Error("Error uploading image");
+          throw new Error("Error uploading image: " + response.statusText);
       }
-    } catch (error) {
+  } catch (error) {
       console.error("Error uploading image: " + error);
-    }
+  }
+  
     //confirm before proceed
     let confirm = window.confirm("Do you want to upload this image?");
     console.log("confirm: " + confirm);
