@@ -8,8 +8,6 @@ const app = express();
 
 app.use(cors());
 
-const multer = require('multer');
-
 const upload = multer({ dest: 'img/' });
 
 app.post('/upload', upload.single('image'), (req, res) => {
