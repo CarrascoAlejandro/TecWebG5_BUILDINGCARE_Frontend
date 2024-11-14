@@ -74,7 +74,7 @@
                 />
               </div>
             </div>
-            
+
             <button @click="signUp">Registrarse</button>
             <div class="footer-sign-up">
               <p>
@@ -120,12 +120,16 @@
               <p>
                 <span> Olvidó su contraseña? </span>
                 <!-- Redirect to RestorePasswordView -->
-                <b 
-                  @click="this.$router.push({
-                    name: 'resetPassword',
-                    params: { toggle: 'request', username: 'None' }
-                  })"
-                > Restablecer Contraseña </b>
+                <b
+                  @click="
+                    this.$router.push({
+                      name: 'resetPassword',
+                      params: { toggle: 'request', username: 'None' },
+                    })
+                  "
+                >
+                  Restablecer Contraseña
+                </b>
               </p>
             </div>
           </div>
@@ -149,10 +153,9 @@
 
 <script>
 import axios from "axios";
-import UserService from '../service/UserService';
-import Swal from 'sweetalert2';
+import UserService from "../service/UserService";
+import Swal from "sweetalert2";
 export default {
-  
   data() {
     return {
       newUsername: "",
@@ -171,10 +174,10 @@ export default {
   watch: {
     newPassword() {
       this.checkPasswordComplexity();
-    }
+    },
   },
   created() {
-    this.userService= new UserService();
+    this.userService = new UserService();
   },
   methods: {
     toggle() {
@@ -187,16 +190,19 @@ export default {
       const hasLower = /[a-z]/.test(this.newPassword);
       const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(this.newPassword);
 
-      if (this.newPassword.length < 8){
+      if (this.newPassword.length < 8) {
         this.passwordwarning = "La contraseña debe tener al menos 8 caracteres";
-      } else if (!hasNumber){
+      } else if (!hasNumber) {
         this.passwordwarning = "La contraseña debe tener al menos un número";
-      } else if (!hasUpper){
-        this.passwordwarning = "La contraseña debe tener al menos una letra mayúscula";
-      } else if (!hasLower){
-        this.passwordwarning = "La contraseña debe tener al menos una letra minúscula";
-      } else if (!hasSpecial){
-        this.passwordwarning = "La contraseña debe tener al menos un caracter especial";
+      } else if (!hasUpper) {
+        this.passwordwarning =
+          "La contraseña debe tener al menos una letra mayúscula";
+      } else if (!hasLower) {
+        this.passwordwarning =
+          "La contraseña debe tener al menos una letra minúscula";
+      } else if (!hasSpecial) {
+        this.passwordwarning =
+          "La contraseña debe tener al menos un caracter especial";
       } else {
         this.passwordwarning = "";
       }
@@ -205,9 +211,9 @@ export default {
       if (this.username === "" || this.password === "") {
         //alert("Uno o más campos están vacíos");
         Swal.fire({
-          icon: 'error',
-          title: 'Uno o más campos están vacíos'
-        })
+          icon: "error",
+          title: "Uno o más campos están vacíos",
+        });
         return;
       }
       axios
@@ -224,8 +230,6 @@ export default {
             /* alert(
               "Los datos ingresados son incorrectos. Por favor, intente nuevamente."
             ); */
-            
-            
           } else if (data.data) {
             localStorage.setItem("userID", JSON.stringify(data.data));
             /* alert("Ingreso exitoso"); */
@@ -234,56 +238,55 @@ export default {
               data.data.warnings.forEach((warning) => {
                 /* alert(warning); */
                 Swal.fire({
-                  icon: 'warning',
+                  icon: "warning",
                   title: warning,
                   showCancelButton: true,
-                  confirmButtonText: 'Reset Password',
-                  cancelButtonText: 'Más tarde',
+                  confirmButtonText: "Reset Password",
+                  cancelButtonText: "Más tarde",
                 }).then((result) => {
                   if (result.isConfirmed) {
-                    this.$router.push("/resetPassword/reset/"+this.username);
+                    this.$router.push("/resetPassword/reset/" + this.username);
                   }
                 });
               });
             } else {
               /* alert("Ingreso exitoso"); */
               Swal.fire({
-                icon: 'success',
-                title: 'Ingreso exitoso'
-              })
+                icon: "success",
+                title: "Ingreso exitoso",
+              });
             }
             //guardamos los datos de data.data en el local storage
             const typeUser = data.data.typeUser;
-            localStorage.setItem('typeUser', typeUser);
-            //guardando los datos del usuario por si fueran de utilidad 
+            localStorage.setItem("typeUser", typeUser);
+            //guardando los datos del usuario por si fueran de utilidad
             localStorage.setItem("userID", JSON.stringify(data.data));
             //redireccionamos a la vista de payments
-            const storedTypeUser = localStorage.getItem('typeUser');
-            console.log("el tipo de usuario es "+storedTypeUser);
+            const storedTypeUser = localStorage.getItem("typeUser");
+            console.log("el tipo de usuario es " + storedTypeUser);
             this.$router.push("/propertyView");
           } else if (data.errorMessage) {
             this.attempts++;
             console.log(this.attempts);
-            if(this.attempts >= 3){
+            if (this.attempts >= 3) {
               Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Ha excedido el número de intentos permitidos. Ha olvidado su contraseña?',
+                icon: "error",
+                title: "Error",
+                text: "Ha excedido el número de intentos permitidos. Ha olvidado su contraseña?",
                 showCancelButton: true,
-                confirmButtonText: 'Restaurar contraseña',
-                cancelButtonText: 'Más tarde',
-              })
-              .then((result) => {
+                confirmButtonText: "Restaurar contraseña",
+                cancelButtonText: "Más tarde",
+              }).then((result) => {
                 if (result.isConfirmed) {
                   this.$router.push("/resetPassword/request/None");
                 }
               });
             } else {
               Swal.fire({
-                icon: 'error',
-                title: 'Los datos ingresados son incorrectos.',
-                text: 'Por favor, intente nuevamente.'
-              })
+                icon: "error",
+                title: "Los datos ingresados son incorrectos.",
+                text: "Por favor, intente nuevamente.",
+              });
             }
           }
         })
@@ -299,36 +302,46 @@ export default {
       ) {
         /* alert("Uno o más campos están vacíos"); */
         Swal.fire({
-          icon: 'error',
-          title: 'Uno o más campos están vacíos'
-        })
+          icon: "error",
+          title: "Uno o más campos están vacíos",
+        });
         return;
       } else if (this.newPassword !== this.confirmPassword) {
         /* alert("Las contraseñas no coinciden"); */
         Swal.fire({
-          icon: 'error',
-          title: 'Las contraseñas no coinciden'
-        })
+          icon: "error",
+          title: "Las contraseñas no coinciden",
+        });
         return;
-      } else if (this.passwordwarning){
+      } else if (this.passwordwarning) {
         /* alert(this.passwordwarning); */
         Swal.fire({
-          icon: 'error',
-          title: this.passwordwarning
-        })
+          icon: "error",
+          title: this.passwordwarning,
+        });
         return;
       } else {
         // Aquí puedes agregar la llamada API para registrar al usuario si lo necesitas.
-        this.userService.signUpUser(this.newName, this.newUsername, this.newPassword, this.newEmail, this.newCI, this.newPhone, 3).then((response) => {//se manda el tipo de user como inquilino
-          //verificar el codigo de envio
-          if(response.responseCode =="USER-0002" ){
-            alert("Registro exitoso")
-            this.$router.push("/login");
-          }else{
-            alert("Error en el registro")
-          }
-        });
-        
+        this.userService
+          .signUpUser(
+            this.newName,
+            this.newUsername,
+            this.newPassword,
+            this.newEmail,
+            this.newCI,
+            this.newPhone
+          )
+          .then((response) => {
+            //se manda el tipo de user como inquilino
+            //verificar el codigo de envio
+            if (response.responseCode == "USER-0002") {
+              alert("Registro exitoso");
+              this.$router.push("/login");
+            } else {
+              console.log(response.responseCode);
+              alert("Error en el registro");
+            }
+          });
       }
     },
     signIn() {
@@ -404,9 +417,9 @@ export default {
 
 .form {
   padding: 1rem;
-  background-color: #F2F1E4;
+  background-color: #f2f1e4;
   border-radius: 1.5rem;
-  border: 5px solid #A69B8D;
+  border: 5px solid #a69b8d;
   width: 100%;
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
   transform: scale(0);
@@ -425,13 +438,13 @@ export default {
   font-size: 1rem;
   background-color: #fffaf1;
   border-radius: 10px;
-  border: 3px solid #A69B8D;
+  border: 3px solid #a69b8d;
   outline: none;
   text-align: center;
 }
 
 .input-group input:focus {
-  border: 4px solid #F2D1B3;
+  border: 4px solid #f2d1b3;
 }
 
 .form button {
@@ -440,14 +453,14 @@ export default {
   padding: 0.6rem 0;
   border-radius: 0.5rem;
   border: none;
-  background-color: #498C79;
-  color: #101E26;
+  background-color: #498c79;
+  color: #101e26;
   font-size: 1.2rem;
   outline: none;
 
   &:hover {
-    background-color: #498C79;
-    color: #F2D1B3;
+    background-color: #498c79;
+    color: #f2d1b3;
     transition: all 0.5s ease-in-out;
     transform: scale(1.05);
   }
